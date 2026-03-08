@@ -9,18 +9,18 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{overflow:hidden;font-family:'Share Tech Mono','Courier New',monospace;background:#000;transition:background .4s}
 body.light #scanlines{opacity:0.6}
-body.light #vignette{background:radial-gradient(ellipse at center,transparent 30%,rgba(0,0,0,0.45) 100%)}
+body.light #vignette{background:radial-gradient(ellipse at center,transparent 40%,rgba(0,0,0,0.3) 100%)}
 body.light #ui button{background:rgba(0,20,15,0.25);border-color:rgba(0,60,40,0.6);color:rgba(0,50,35,0.95)}
 body.light #ui button:hover{background:rgba(0,50,35,0.35);color:rgba(0,40,25,1)}
 body.light #ui button.on{background:rgba(0,50,35,0.3);color:rgba(0,60,40,1);border-color:rgba(0,60,40,0.8)}
 body.light #hdr h1{color:rgba(0,40,28,0.95);text-shadow:0 0 10px rgba(0,40,30,0.2)}
 body.light #hdr .sub{color:rgba(0,35,25,0.65)}
 body.light .m-mel{color:rgba(160,15,15,1)} body.light .m-bal{color:rgba(150,90,0,1)} body.light .m-cas{color:rgba(0,70,150,1)}
-body.light #tip{background:rgba(20,30,25,0.94);border-color:rgba(0,60,40,0.5);color:rgba(200,220,210,0.95);box-shadow:0 4px 24px rgba(0,0,0,0.35)}
-body.light #tip .tp-group{color:rgba(160,180,170,0.7)}
-body.light #tip .tp-title{color:rgba(220,240,230,1);text-shadow:none}
-body.light #tip .tp-desc{color:rgba(170,190,180,0.8)}
-body.light #tip .tp-usage{border-top-color:rgba(100,120,110,0.3);color:rgba(220,160,30,0.95)}
+body.light #tip{background:rgba(245,248,246,0.98);border-color:rgba(0,80,60,0.4);color:rgba(0,35,25,0.95);box-shadow:0 4px 20px rgba(0,0,0,0.18)}
+body.light #tip .tp-group{color:rgba(0,60,45,0.6)}
+body.light #tip .tp-title{color:rgba(0,45,30,1);text-shadow:none}
+body.light #tip .tp-desc{color:rgba(0,40,30,0.7)}
+body.light #tip .tp-usage{border-top-color:rgba(0,60,45,0.2);color:rgba(180,110,10,0.95)}
 body.light .li{color:rgba(0,40,30,0.7)}
 body.light #foot{color:rgba(0,40,30,0.45)}
 canvas{display:block;width:100vw;height:100vh}
@@ -313,20 +313,20 @@ function draw(){
     G.fillStyle=bg;G.fillRect(0,0,W,H);
   } else {
     var bg=G.createRadialGradient(W/2,H/2,0,W/2,H/2,W*.75);
-    bg.addColorStop(0,'#8a9990');bg.addColorStop(0.4,'#6b7d73');bg.addColorStop(1,'#4a5c52');
+    bg.addColorStop(0,'#d8e0dc');bg.addColorStop(0.4,'#c8d2cc');bg.addColorStop(1,'#b8c4be');
     G.fillStyle=bg;G.fillRect(0,0,W,H);
   }
 
   // Grid overlay (EVA style)
-  G.strokeStyle=isDark?'rgba(0,255,200,0.018)':'rgba(0,50,35,0.1)';G.lineWidth=0.5;
+  G.strokeStyle=isDark?'rgba(0,255,200,0.018)':'rgba(0,80,60,0.06)';G.lineWidth=0.5;
   var gs=40;
   for(var gx=0;gx<W;gx+=gs){G.beginPath();G.moveTo(gx,0);G.lineTo(gx,H);G.stroke();}
   for(var gy=0;gy<H;gy+=gs){G.beginPath();G.moveTo(0,gy);G.lineTo(W,gy);G.stroke();}
 
   // Sphere wireframes — teal glow
   [RADII[1],RADII[2],RADII[3]].forEach(function(R,ri){
-    var op=isDark?[0.06,0.04,0.03][ri]:[0.15,0.1,0.07][ri];
-    G.strokeStyle=isDark?'rgba(0,255,200,'+op+')':'rgba(0,40,30,'+op+')';G.lineWidth=0.5;
+    var op=isDark?[0.06,0.04,0.03][ri]:[0.1,0.07,0.05][ri];
+    G.strokeStyle=isDark?'rgba(0,255,200,'+op+')':'rgba(0,80,60,'+op+')';G.lineWidth=0.5;
     for(var i=0;i<8;i++){
       var a=i*Math.PI/4;G.beginPath();
       for(var j=0;j<=48;j++){var ph=j/48*Math.PI*2;var p=proj(R*Math.cos(ph)*Math.cos(a),R*Math.sin(ph),R*Math.cos(ph)*Math.sin(a));if(j===0)G.moveTo(p.x,p.y);else G.lineTo(p.x,p.y);}
@@ -342,7 +342,7 @@ function draw(){
   // Animated ring pulse
   var pulseR=200+Math.sin(time*0.8)*60;
   var pulseOp=0.03+Math.sin(time*0.8)*0.015;
-  G.strokeStyle=isDark?'rgba(0,255,200,'+pulseOp+')':'rgba(0,40,30,'+(pulseOp*3)+')';G.lineWidth=1;G.beginPath();
+  G.strokeStyle=isDark?'rgba(0,255,200,'+pulseOp+')':'rgba(0,80,60,'+(pulseOp*2)+')';G.lineWidth=1;G.beginPath();
   for(var j=0;j<=48;j++){var a=j/48*Math.PI*2;var p=proj(pulseR*Math.cos(a),0,pulseR*Math.sin(a));if(j===0)G.moveTo(p.x,p.y);else G.lineTo(p.x,p.y);}
   G.stroke();
 
@@ -378,12 +378,12 @@ function draw(){
       if(isH){G.shadowColor='rgba('+c[0]+','+c[1]+','+c[2]+',0.4)';G.shadowBlur=20*sc;}
       G.fillStyle='rgba(2,10,8,'+alpha*.88+')';
     } else {
-      if(isH){G.shadowColor='rgba('+c[0]+','+c[1]+','+c[2]+',0.35)';G.shadowBlur=18*sc;}
-      else{G.shadowColor='rgba(0,0,0,0.2)';G.shadowBlur=8*sc;}
-      G.fillStyle='rgba(15,25,20,'+alpha*.92+')';
+      if(isH){G.shadowColor='rgba('+c[0]+','+c[1]+','+c[2]+',0.3)';G.shadowBlur=16*sc;}
+      else{G.shadowColor='rgba(0,0,0,0.12)';G.shadowBlur=6*sc;}
+      G.fillStyle='rgba(240,245,242,'+alpha*.96+')';
     }
     rr(x,y,cw,ch,2*sc);G.fill();
-    G.strokeStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+(isH?alpha*(isDark?.9:.85):alpha*(isDark?.35:.5))+')';
+    G.strokeStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+(isH?alpha*(isDark?.9:.7):alpha*(isDark?.35:.45))+')';
     G.lineWidth=(isH?1.5:.7)*sc;rr(x,y,cw,ch,2*sc);G.stroke();
     G.shadowColor='transparent';G.shadowBlur=0;
 
@@ -393,7 +393,7 @@ function draw(){
     G.fillRect(x+0.5*sc,y+0.5*sc,cw-1*sc,barH);
     // Count text in bar
     if(sc>0.25&&udata&&udata.count>0){
-      G.fillStyle='rgba(0,0,0,'+alpha*.6+')';
+      G.fillStyle=isDark?'rgba(0,0,0,'+alpha*.6+')':'rgba(255,255,255,'+alpha*.8+')';
       G.font='600 '+Math.max(4,5*sc)+'px "Orbitron","Share Tech Mono",monospace';
       G.textAlign='right';
       G.fillText('x'+udata.count,x+cw-3*sc,y+0.5*sc+barH-1.5*sc);
@@ -414,7 +414,8 @@ function draw(){
 
     // Text — EVA monospace style
     if(sc>0.18){
-      G.fillStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+alpha*.9+')';
+      if(isDark){G.fillStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+alpha*.9+')';}
+      else{G.fillStyle='rgba('+Math.floor(c[0]*.4)+','+Math.floor(c[1]*.4)+','+Math.floor(c[2]*.4)+','+alpha+')';}
       G.font=(isH?'700 ':'600 ')+Math.max(4.5,6.5*sc)+'px "Orbitron","Share Tech Mono",monospace';
       G.textAlign='center';
       var lines=(n.t||'').split('\n');
@@ -428,7 +429,7 @@ function draw(){
 
   // Center crosshair
   var cx=W/2+pX,cy=H/2+pY;
-  G.strokeStyle=isDark?'rgba(0,255,200,0.06)':'rgba(0,40,30,0.15)';G.lineWidth=0.5;
+  G.strokeStyle=isDark?'rgba(0,255,200,0.06)':'rgba(0,80,60,0.1)';G.lineWidth=0.5;
   G.beginPath();G.moveTo(cx-15,cy);G.lineTo(cx+15,cy);G.stroke();
   G.beginPath();G.moveTo(cx,cy-15);G.lineTo(cx,cy+15);G.stroke();
 }
