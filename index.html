@@ -3,254 +3,211 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Claude Code System — 3D Sphere</title>
+<title>MAGI SYSTEM — Claude Code Work System</title>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;600;700&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
-body{overflow:hidden;font-family:'SF Pro Display',-apple-system,'Segoe UI',sans-serif;transition:background .5s}
-body.dark{background:#000}
-body.light{background:#eef1f6}
+body{overflow:hidden;font-family:'Share Tech Mono','Courier New',monospace;background:#000}
 canvas{display:block;width:100vw;height:100vh}
-#ui{position:fixed;top:16px;left:16px;z-index:10;display:flex;gap:6px;align-items:center}
-#ui button{padding:5px 12px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:500;letter-spacing:.3px;transition:all .25s;border:none}
-.dark #ui button{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.6);box-shadow:0 1px 4px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.05)}
-.dark #ui button:hover{background:rgba(255,255,255,0.14);color:#fff}
-.dark #ui button.on{background:rgba(80,130,255,0.2);color:#8ab4ff;box-shadow:0 0 12px rgba(80,130,255,.15),inset 0 1px 0 rgba(255,255,255,.05)}
-.light #ui button{background:rgba(255,255,255,0.8);color:rgba(0,0,0,0.5);box-shadow:0 1px 4px rgba(0,0,0,.08)}
-.light #ui button:hover{background:#fff;color:#222}
-.light #ui button.on{background:rgba(50,100,220,0.1);color:#2255cc;box-shadow:0 1px 6px rgba(50,100,220,.12)}
-#hdr{position:fixed;top:16px;right:20px;z-index:10;text-align:right;transition:color .4s}
-.dark #hdr{color:rgba(255,255,255,0.4)} .dark #hdr h1{font-size:16px;font-weight:600;color:rgba(255,255,255,0.75);letter-spacing:.5px}
-.dark #hdr .sub{font-size:11px;margin-top:2px;opacity:.5}
-.light #hdr{color:rgba(0,0,0,0.35)} .light #hdr h1{font-size:16px;font-weight:600;color:rgba(0,0,0,0.6);letter-spacing:.5px}
-.light #hdr .sub{font-size:11px;margin-top:2px;opacity:.4}
-#tip{position:fixed;padding:10px 14px;border-radius:8px;font-size:11px;max-width:280px;pointer-events:none;display:none;z-index:20;line-height:1.6;transition:opacity .15s}
-.dark #tip{background:rgba(12,12,30,0.94);border:1px solid rgba(255,255,255,0.1);color:#ddd;box-shadow:0 4px 20px rgba(0,0,0,.5)}
-.light #tip{background:rgba(255,255,255,0.97);border:1px solid rgba(0,0,0,0.08);color:#222;box-shadow:0 4px 20px rgba(0,0,0,.1)}
-#tip .tp-group{font-size:9px;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
-.dark #tip .tp-group{color:rgba(255,255,255,.35)} .light #tip .tp-group{color:rgba(0,0,0,.3)}
-#tip .tp-title{font-weight:700;font-size:12px;margin-bottom:2px}
-#tip .tp-desc{font-size:10px;line-height:1.5;margin-top:4px}
-.dark #tip .tp-desc{color:rgba(255,255,255,.55)} .light #tip .tp-desc{color:rgba(0,0,0,.5)}
-#tip .tp-usage{margin-top:6px;padding-top:5px;font-size:9px;display:flex;align-items:center;gap:6px}
-.dark #tip .tp-usage{border-top:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.4)}
-.light #tip .tp-usage{border-top:1px solid rgba(0,0,0,.06);color:rgba(0,0,0,.35)}
-#tip .tp-bar{height:3px;border-radius:2px;flex:1;overflow:hidden}
-.dark #tip .tp-bar{background:rgba(255,255,255,.08)} .light #tip .tp-bar{background:rgba(0,0,0,.06)}
-#tip .tp-fill{height:100%;border-radius:2px;transition:width .3s}
-#leg{position:fixed;bottom:14px;left:16px;z-index:10;display:flex;gap:14px;flex-wrap:wrap}
-.li{display:flex;align-items:center;gap:5px;font-size:9px;letter-spacing:.3px;font-weight:500}
-.dark .li{color:rgba(255,255,255,0.35)} .light .li{color:rgba(0,0,0,0.35)}
-.ld{width:7px;height:7px;border-radius:50%}
-#foot{position:fixed;bottom:14px;right:20px;font-size:9px;z-index:10;letter-spacing:.5px}
-.dark #foot{color:rgba(255,255,255,0.2)} .light #foot{color:rgba(0,0,0,0.2)}
+#ui{position:fixed;top:14px;left:14px;z-index:10;display:flex;gap:5px;align-items:center}
+#ui button{padding:4px 10px;border-radius:2px;cursor:pointer;font-size:10px;font-family:'Share Tech Mono',monospace;text-transform:uppercase;letter-spacing:1.5px;transition:all .2s;border:1px solid rgba(0,255,200,0.2);background:rgba(0,20,15,0.6);color:rgba(0,255,200,0.5)}
+#ui button:hover{background:rgba(0,255,200,0.1);color:rgba(0,255,200,0.9);box-shadow:0 0 8px rgba(0,255,200,0.2)}
+#ui button.on{background:rgba(0,255,200,0.12);color:#0fc;border-color:rgba(0,255,200,0.4);box-shadow:0 0 12px rgba(0,255,200,0.15)}
+#hdr{position:fixed;top:12px;right:16px;z-index:10;text-align:right}
+#hdr h1{font-family:'Orbitron',monospace;font-size:14px;font-weight:600;color:rgba(0,255,200,0.7);letter-spacing:3px;text-transform:uppercase;text-shadow:0 0 20px rgba(0,255,200,0.3)}
+#hdr .sub{font-size:9px;color:rgba(0,255,200,0.3);letter-spacing:2px;margin-top:3px;text-transform:uppercase}
+#magi-status{position:fixed;top:40px;right:16px;z-index:10;display:flex;flex-direction:column;gap:4px;align-items:flex-end}
+.magi-item{display:flex;align-items:center;gap:6px;font-size:9px;letter-spacing:1.5px;text-transform:uppercase}
+.magi-dot{width:6px;height:6px;border-radius:1px;animation:magiPulse 2s infinite}
+.m-mel{color:rgba(255,60,60,0.7)} .m-mel .magi-dot{background:rgba(255,60,60,0.8);box-shadow:0 0 6px rgba(255,60,60,0.4)}
+.m-bal{color:rgba(255,180,40,0.7)} .m-bal .magi-dot{background:rgba(255,180,40,0.8);box-shadow:0 0 6px rgba(255,180,40,0.4)}
+.m-cas{color:rgba(0,200,255,0.7)} .m-cas .magi-dot{background:rgba(0,200,255,0.8);box-shadow:0 0 6px rgba(0,200,255,0.4)}
+@keyframes magiPulse{0%,100%{opacity:1}50%{opacity:0.4}}
+#tip{position:fixed;padding:10px 14px;border-radius:2px;font-size:10px;max-width:300px;pointer-events:none;display:none;z-index:20;line-height:1.7;font-family:'Share Tech Mono',monospace;background:rgba(0,12,10,0.95);border:1px solid rgba(0,255,200,0.2);color:rgba(0,255,200,0.8);box-shadow:0 0 20px rgba(0,255,200,0.08),inset 0 0 30px rgba(0,255,200,0.02)}
+#tip .tp-group{font-size:8px;text-transform:uppercase;letter-spacing:2px;margin-bottom:4px;color:rgba(0,255,200,0.3)}
+#tip .tp-title{font-family:'Orbitron',monospace;font-weight:600;font-size:11px;margin-bottom:2px;color:rgba(0,255,200,0.9);text-shadow:0 0 8px rgba(0,255,200,0.3)}
+#tip .tp-desc{font-size:9px;line-height:1.6;margin-top:5px;color:rgba(0,255,200,0.5)}
+#tip .tp-usage{margin-top:7px;padding-top:6px;font-size:8px;display:flex;align-items:center;gap:8px;border-top:1px solid rgba(0,255,200,0.1);color:rgba(255,180,40,0.6);text-transform:uppercase;letter-spacing:1px}
+#tip .tp-bar{height:2px;border-radius:0;flex:1;overflow:hidden;background:rgba(0,255,200,0.08)}
+#tip .tp-fill{height:100%;background:rgba(255,180,40,0.6)}
+#leg{position:fixed;bottom:12px;left:14px;z-index:10;display:flex;gap:14px;flex-wrap:wrap}
+.li{display:flex;align-items:center;gap:5px;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:rgba(0,255,200,0.3)}
+.ld{width:6px;height:6px;border-radius:1px}
+#foot{position:fixed;bottom:12px;right:16px;font-size:8px;z-index:10;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,255,200,0.15)}
+#scanlines{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:5;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px)}
+#vignette{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:4;background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,0.4) 100%)}
 </style>
 </head>
-<body class="dark">
+<body>
+<div id="scanlines"></div>
+<div id="vignette"></div>
 <div id="ui">
-  <button class="on" id="bRot" onclick="toggleRot()">Auto Rotate</button>
-  <button onclick="resetCam()">Reset</button>
-  <button id="bTheme" onclick="toggleTheme()">&#9788; Day</button>
+  <button class="on" id="bRot" onclick="toggleRot()">AUTO ROT</button>
+  <button onclick="resetCam()">RESET</button>
 </div>
-<div id="hdr"><h1>Claude Code Work System</h1><div class="sub">TP_skills v2.1 &middot; 3D Sphere &middot; MAGI</div></div>
+<div id="hdr">
+  <h1>MAGI SYSTEM</h1>
+  <div class="sub">Claude Code Work System &middot; TP_skills v2.1</div>
+</div>
+<div id="magi-status">
+  <div class="magi-item m-mel"><span>MELCHIOR-1 &middot; TECH</span><div class="magi-dot"></div></div>
+  <div class="magi-item m-bal"><span>BALTHASAR-2 &middot; BIZ</span><div class="magi-dot"></div></div>
+  <div class="magi-item m-cas"><span>CASPER-3 &middot; REAL</span><div class="magi-dot"></div></div>
+</div>
 <div id="tip"></div>
 <div id="leg"></div>
-<div id="foot">Drag: rotate &middot; Scroll: zoom &middot; Right-drag: pan</div>
+<div id="foot">DRAG: ROTATE &middot; SCROLL: ZOOM &middot; R-DRAG: PAN</div>
 
 <script>
 var C=document.createElement('canvas');document.body.appendChild(C);
 var G=C.getContext('2d');var W,H,DPR;
-var isDark=true;
 function resize(){DPR=window.devicePixelRatio||1;W=window.innerWidth;H=window.innerHeight;C.width=W*DPR;C.height=H*DPR;C.style.width=W+'px';C.style.height=H+'px';G.setTransform(DPR,0,0,DPR,0,0);}
 resize();window.addEventListener('resize',resize);
 
-function toggleTheme(){
-  isDark=!isDark;
-  document.body.className=isDark?'dark':'light';
-  document.getElementById('bTheme').innerHTML=isDark?'&#9788; Day':'&#9790; Night';
-}
-
 // === SKILL USAGE DATA ===
-var USAGE={};
-var MAX_USAGE=1;
+var USAGE={};var MAX_USAGE=1;
 (function loadUsage(){
   var x=new XMLHttpRequest();
   x.open('GET','skill_usage.json?t='+Date.now(),true);
   x.onload=function(){
-    if(x.status===200){
-      try{
-        var d=JSON.parse(x.responseText);
-        USAGE=d.skills||{};
-        var mx=1;
-        for(var k in USAGE){if(USAGE[k].count>mx)mx=USAGE[k].count;}
-        MAX_USAGE=mx;
-      }catch(e){}
-    }
-  };
-  x.send();
+    if(x.status===200){try{var d=JSON.parse(x.responseText);USAGE=d.skills||{};var mx=1;for(var k in USAGE){if(USAGE[k].count>mx)mx=USAGE[k].count;}MAX_USAGE=mx;}catch(e){}}
+  };x.send();
 })();
-
 function getUsage(id){
-  var mappings={
-    'pj01':'01_imsms_console','pj02':'02_imsms_backend','pj03':'03_imsms_agent',
-    'pj04':'04_mdm','pj05':'05_imsms_demo','pj06':'06_imsms_website',
-    'pj10':'10_ai_chatbot','pj20':'20_teamplayer_site','pj30':'30_iros_extractor',
-    'pj31':'31_auto_contact','pj36':'36_a_imessage_claude','pj50':'50_session_manager',
-    'system':'index','ceo_rules':'ceo_protocol','charter':'magi_workflow_charter',
-    'qa_system':'qa_process','magi':'magi_analysis','team':'multi_agent_team'
-  };
-  var key=mappings[id]||id;
-  return USAGE[key]||null;
+  var m={'pj01':'01_imsms_console','pj02':'02_imsms_backend','pj03':'03_imsms_agent','pj04':'04_mdm','pj05':'05_imsms_demo','pj06':'06_imsms_website','pj10':'10_ai_chatbot','pj20':'20_teamplayer_site','pj30':'30_iros_extractor','pj31':'31_auto_contact','pj36':'36_a_imessage_claude','pj50':'50_session_manager','system':'index','ceo_rules':'ceo_protocol','charter':'magi_workflow_charter','qa_system':'qa_process','magi':'magi_analysis','team':'multi_agent_team'};
+  return USAGE[m[id]||id]||null;
 }
 
-// === COLORS ===
+// === EVA MAGI COLOR PALETTE ===
 var COL={
-  system:[110,110,220], magi:[150,80,240], team:[70,130,250],
-  dev_team:[50,140,240], qa_team:[240,140,50], pm_team:[40,190,110],
-  deploy_policy:[130,130,210], presets:[190,190,50],
-  process:[220,185,40], ceo_rules:[200,70,200],
-  qa_system:[240,170,40], hooks:[50,190,190],
-  charter:[140,95,210], projects:[220,70,70],
-  imsms_core:[230,60,60], others:[190,80,80],
-  files:[120,120,170]
+  system:[0,255,200],magi:[255,60,60],team:[0,200,255],
+  dev_team:[0,180,255],qa_team:[255,180,40],pm_team:[0,255,160],
+  deploy_policy:[100,200,220],presets:[200,200,80],
+  process:[255,200,50],ceo_rules:[255,80,80],
+  qa_system:[255,180,40],hooks:[0,220,200],
+  charter:[140,180,255],projects:[255,100,80],
+  imsms_core:[255,80,60],others:[220,120,80],
+  files:[120,200,180]
 };
-var COL_LIGHT={
-  system:[80,80,190], magi:[120,50,210], team:[40,100,220],
-  dev_team:[20,110,210], qa_team:[210,110,20], pm_team:[10,160,80],
-  deploy_policy:[100,100,180], presets:[160,160,20],
-  process:[190,155,10], ceo_rules:[170,40,170],
-  qa_system:[210,140,10], hooks:[20,160,160],
-  charter:[110,65,180], projects:[190,40,40],
-  imsms_core:[200,30,30], others:[160,50,50],
-  files:[90,90,140]
-};
-function gc(n){var p=isDark?COL:COL_LIGHT;return p[n.pg]||p[n.gid]||[120,120,170];}
-
-// === STARS (dark mode background) ===
-var STARS=[];
-for(var i=0;i<200;i++){
-  STARS.push({
-    x:Math.random()*2-1,y:Math.random()*2-1,z:Math.random()*2-1,
-    b:Math.random()*0.4+0.1,s:Math.random()*1.2+0.3
-  });
-}
+function gc(n){return COL[n.pg]||COL[n.gid]||[0,255,200];}
 
 // === NODE DATA ===
 var ALL=[];var EDGES=[];
-ALL.push({id:'system',t:'Claude Code\nWork System',d:'TP_skills v2.1 기반 작업 체계',gid:'system',pg:'system',layer:0,sz:2.5});
+ALL.push({id:'system',t:'MAGI SYSTEM\nCLAUDE CODE',d:'TP_skills v2.1 기반 작업 체계',gid:'system',pg:'system',layer:0,sz:2.5});
 
 var L1=[
-  {id:'magi',t:'MAGI 3축 체계',d:'프로젝트 분석/의사결정\n(에이전트가 아닌 프로젝트에 적용)'},
-  {id:'team',t:'멀티에이전트 팀\n(10명)',d:'간단 1줄 수정 외\n모든 작업에 필수 투입'},
-  {id:'process',t:'작업 프로세스',d:'CEO 지시→실행→보고'},
-  {id:'ceo_rules',t:'CEO 대응 원칙\n(9개)',d:'CEO는 바꾸지 않는다\nClaude가 100% 적응'},
-  {id:'qa_system',t:'QA 체계',d:'브라우저 검증 3단계'},
-  {id:'hooks',t:'자동화 Hook',d:'세션 생명주기 자동 관리'},
-  {id:'charter',t:'워크플로우 헌장\n(8조)',d:''},
-  {id:'projects',t:'프로젝트 맵\n(9개)',d:''},
-  {id:'files',t:'파일 구조',d:''},
+  {id:'magi',t:'MAGI 3-AXIS',d:'프로젝트 분석/의사결정\nMELCHIOR · BALTHASAR · CASPER'},
+  {id:'team',t:'AGENT TEAM\n(10 UNITS)',d:'간단 1줄 수정 외\n모든 작업에 필수 투입'},
+  {id:'process',t:'WORK PROCESS',d:'CEO 지시→실행→보고'},
+  {id:'ceo_rules',t:'CEO PROTOCOL\n(9 RULES)',d:'CEO는 바꾸지 않는다\nClaude가 100% 적응'},
+  {id:'qa_system',t:'QA SYSTEM',d:'브라우저 검증 3단계'},
+  {id:'hooks',t:'AUTO HOOKS',d:'세션 생명주기 자동 관리'},
+  {id:'charter',t:'WORKFLOW\nCHARTER (8)',d:''},
+  {id:'projects',t:'PROJECT MAP\n(9 PJ)',d:''},
+  {id:'files',t:'FILE STRUCT',d:''},
 ];
 L1.forEach(function(n){n.layer=1;n.sz=1.4;n.gid=n.id;n.pg=n.id;ALL.push(n);EDGES.push({a:'system',b:n.id});});
 
 var L2=[
-  {id:'melchior',t:'Melchior (기술)',d:'코드 품질, 아키텍처, 기술 부채',pg:'magi'},
-  {id:'balthazar',t:'Balthazar (사업)',d:'ROI, 매출 기여, 비용 효과',pg:'magi'},
-  {id:'casper',t:'Casper (현실)',d:'1인 팀 실행 가능성, 유지보수',pg:'magi'},
-  {id:'dev_team',t:'DEV 팀 (4명)',d:'코드 구현 담당',pg:'team',sz:1.2},
-  {id:'qa_team',t:'QA 팀 (3명)',d:'검증 담당\nDEV에 최소 1명 동반',pg:'team',sz:1.2},
-  {id:'pm_team',t:'PM & 분석 (3명)',d:'조율, 분석, 기록',pg:'team',sz:1.2},
-  {id:'deploy_policy',t:'투입 정책',d:'작업 규모별 에이전트 수',pg:'team',sz:1.1},
-  {id:'presets',t:'조합 프리셋 (7종)',d:'시나리오별 최적 조합',pg:'team',sz:1.1},
-  {id:'step1',t:'1. 지시 접수',d:'ANCHOR가 CEO 의도 해석\n규모 판단 + 배정',pg:'process'},
-  {id:'step2',t:'2. 오지시 방어',d:'세션 맥락과 무관한 지시\n감지 시 확인',pg:'process'},
-  {id:'step3',t:'3. 병렬 실행\n(Split View)',d:'DEV+QA 동시 투입\nCEO에게 가시화',pg:'process'},
-  {id:'step4',t:'4. 검증',d:'QA 에이전트 검증\nPlaywright 스크린샷',pg:'process'},
-  {id:'step5',t:'5. 결과 보고',d:'결론 먼저(된다/안된다)\n→ 요약 → 확인경로',pg:'process'},
-  {id:'step6',t:'6. 기록',d:'SCRIBE가 TP_history\n+ TP_skills 업데이트',pg:'process'},
-  {id:'ceo1',t:"1. '해봐' = 실행+확인+보고",d:"'해봐' = 실행+확인+보고 한 세트",pg:'ceo_rules'},
-  {id:'ceo2',t:"2. '그리고' = 번호매기고 순서대로",d:"'그리고' 연쇄 = 번호 매기고 순서대로",pg:'ceo_rules'},
-  {id:'ceo3',t:'3. 감정 강도 = 버그 심각도',d:'감정 강도 = 버그 심각도',pg:'ceo_rules'},
-  {id:'ceo4',t:"4. '다 해' = 핵심 80% 먼저",d:"'다 해' = 핵심 80% 먼저",pg:'ceo_rules'},
-  {id:'ceo5',t:'5. 회귀 방지 > 신규 기능',d:'회귀 방지 > 신규 기능',pg:'ceo_rules'},
-  {id:'ceo6',t:'6. 보고 = 결론 먼저',d:'보고 = 결론 먼저',pg:'ceo_rules'},
-  {id:'ceo7',t:'7. 초단문=즉시 / 장문=분해',d:'초단문=즉시행동 / 장문=분해후행동',pg:'ceo_rules'},
-  {id:'ceo8',t:'8. 리스크때만 방향 확인',d:'리스크 높을 때만 방향 확인',pg:'ceo_rules'},
-  {id:'ceo9',t:'9. 오지시 방어',d:'맥락 무관 지시 시 확인',pg:'ceo_rules'},
-  {id:'qa1',t:'Quick: curl (10초)',d:'curl 상태 확인 (10초)',pg:'qa_system'},
-  {id:'qa2',t:'Standard: Playwright (30초)',d:'Playwright 스크린샷 (30초)',pg:'qa_system'},
-  {id:'qa3',t:'Full: Lighthouse (2-3분)',d:'전체 라우트 + Lighthouse (2-3분)',pg:'qa_system'},
-  {id:'hook1',t:'SessionStart\nGit + Notion',d:'Git 초기화 + Notion 기록',pg:'hooks'},
-  {id:'hook2',t:'PreCompact\n백업 + Notion',d:'SESSION_STATE.md 백업\nJSONL 백업 + Notion',pg:'hooks'},
-  {id:'hook3',t:'PostToolUse\nchanges.log',d:'Write/Edit 시 changes.log\n자동 추적',pg:'hooks'},
-  {id:'hook4',t:'Stop\nNotion 종료',d:'Notion 세션 종료 기록',pg:'hooks'},
-  {id:'wf1',t:'제1조: 세션 시작 (5분)',d:'세션 시작 프로토콜 (5분 체크)',pg:'charter'},
-  {id:'wf2',t:'제2조: Go/No-Go Gate',d:'IMSMS 매출 기여?\n기성 솔루션? 1일 PoC?',pg:'charter'},
-  {id:'wf3',t:'제3조: 분석 먼저',d:'분석 먼저, 코딩 나중',pg:'charter'},
-  {id:'wf4',t:'제4조: Contract-First',d:'Contract-First API',pg:'charter'},
-  {id:'wf5',t:'제5조: SESSION_HANDOFF',d:'SESSION_HANDOFF.md',pg:'charter'},
-  {id:'wf6',t:'제6조: 보안 근본원인',d:'보안 수정 근본원인 원칙',pg:'charter'},
-  {id:'wf7',t:'제7조: fix 커밋 품질',d:'fix 커밋 품질 관리',pg:'charter'},
-  {id:'wf8',t:'제8조: Critical Path',d:'Critical Path 태깅',pg:'charter'},
-  {id:'imsms_core',t:'IMSMS Core (핵심)',d:'Console, Backend, Agent\nMDM, Demo, Website',pg:'projects',sz:1.1},
-  {id:'others',t:'기타 프로젝트',d:'AI Chatbot, TP Site, IROS\nAutoContact, A.iMessage, Session Mgr',pg:'projects',sz:1.1},
-  {id:'f1',t:'index.md (2.6KB)',d:'자동로드 2.6KB',pg:'files'},
-  {id:'f2',t:'projects/ (9개)',d:'9개 프로젝트 스킬',pg:'files'},
-  {id:'f3',t:'_reference/',d:'헌장, 프로토콜, QA, 분석',pg:'files'},
-  {id:'f4',t:'_templates/',d:'MAGI 토론, 프로젝트 템플릿',pg:'files'},
-  {id:'f5',t:'_archive/',d:'구파일 12개',pg:'files'},
-  {id:'f6',t:'.claude/rules/',d:'자동로드 규칙 4개',pg:'files'},
-  {id:'f7',t:'CHANGELOG.md',d:'PM 이력',pg:'files'},
+  {id:'melchior',t:'MELCHIOR',d:'코드 품질, 아키텍처, 기술 부채',pg:'magi'},
+  {id:'balthazar',t:'BALTHASAR',d:'ROI, 매출 기여, 비용 효과',pg:'magi'},
+  {id:'casper',t:'CASPER',d:'1인 팀 실행 가능성, 유지보수',pg:'magi'},
+  {id:'dev_team',t:'DEV TEAM (4)',d:'코드 구현 담당',pg:'team',sz:1.2},
+  {id:'qa_team',t:'QA TEAM (3)',d:'검증 담당\nDEV에 최소 1명 동반',pg:'team',sz:1.2},
+  {id:'pm_team',t:'PM TEAM (3)',d:'조율, 분석, 기록',pg:'team',sz:1.2},
+  {id:'deploy_policy',t:'DEPLOY POLICY',d:'작업 규모별 에이전트 수',pg:'team',sz:1.1},
+  {id:'presets',t:'PRESETS (7)',d:'시나리오별 최적 조합',pg:'team',sz:1.1},
+  {id:'step1',t:'01 RECEIVE',d:'ANCHOR가 CEO 의도 해석\n규모 판단 + 배정',pg:'process'},
+  {id:'step2',t:'02 MISFIRE\nGUARD',d:'세션 맥락과 무관한 지시\n감지 시 확인',pg:'process'},
+  {id:'step3',t:'03 PARALLEL\nEXEC',d:'DEV+QA 동시 투입\nSplit View',pg:'process'},
+  {id:'step4',t:'04 VERIFY',d:'QA 에이전트 검증\nPlaywright 스크린샷',pg:'process'},
+  {id:'step5',t:'05 REPORT',d:'결론 먼저(된다/안된다)\n→ 요약 → 확인경로',pg:'process'},
+  {id:'step6',t:'06 RECORD',d:'SCRIBE가 TP_history\n+ TP_skills 업데이트',pg:'process'},
+  {id:'ceo1',t:"R1: DO IT",d:"'해봐' = 실행+확인+보고 한 세트",pg:'ceo_rules'},
+  {id:'ceo2',t:'R2: SEQUENCE',d:"'그리고' 연쇄 = 번호 매기고 순서대로",pg:'ceo_rules'},
+  {id:'ceo3',t:'R3: EMOTION=SEV',d:'감정 강도 = 버그 심각도',pg:'ceo_rules'},
+  {id:'ceo4',t:'R4: CORE 80%',d:"'다 해' = 핵심 80% 먼저",pg:'ceo_rules'},
+  {id:'ceo5',t:'R5: NO REGRESS',d:'회귀 방지 > 신규 기능',pg:'ceo_rules'},
+  {id:'ceo6',t:'R6: RESULT FIRST',d:'보고 = 결론 먼저',pg:'ceo_rules'},
+  {id:'ceo7',t:'R7: SHORT=ACT',d:'초단문=즉시행동 / 장문=분해',pg:'ceo_rules'},
+  {id:'ceo8',t:'R8: RISK ONLY',d:'리스크 높을 때만 방향 확인',pg:'ceo_rules'},
+  {id:'ceo9',t:'R9: MISFIRE DEF',d:'맥락 무관 지시 시 확인',pg:'ceo_rules'},
+  {id:'qa1',t:'LV1: QUICK',d:'curl 상태 확인 (10초)',pg:'qa_system'},
+  {id:'qa2',t:'LV2: STANDARD',d:'Playwright 스크린샷 (30초)',pg:'qa_system'},
+  {id:'qa3',t:'LV3: FULL',d:'전체 라우트 + Lighthouse (2-3분)',pg:'qa_system'},
+  {id:'hook1',t:'HOOK:START',d:'Git 초기화 + Notion 기록',pg:'hooks'},
+  {id:'hook2',t:'HOOK:COMPACT',d:'SESSION_STATE.md 백업\nJSONL 백업 + Notion',pg:'hooks'},
+  {id:'hook3',t:'HOOK:WRITE',d:'Write/Edit 시 changes.log\n자동 추적',pg:'hooks'},
+  {id:'hook4',t:'HOOK:STOP',d:'Notion 세션 종료 기록',pg:'hooks'},
+  {id:'wf1',t:'ART.1 SESSION',d:'세션 시작 프로토콜 (5분 체크)',pg:'charter'},
+  {id:'wf2',t:'ART.2 GO/NOGO',d:'IMSMS 매출 기여?\n기성 솔루션? 1일 PoC?',pg:'charter'},
+  {id:'wf3',t:'ART.3 ANALYZE',d:'분석 먼저, 코딩 나중',pg:'charter'},
+  {id:'wf4',t:'ART.4 CONTRACT',d:'Contract-First API',pg:'charter'},
+  {id:'wf5',t:'ART.5 HANDOFF',d:'SESSION_HANDOFF.md',pg:'charter'},
+  {id:'wf6',t:'ART.6 SEC ROOT',d:'보안 수정 근본원인 원칙',pg:'charter'},
+  {id:'wf7',t:'ART.7 FIX QA',d:'fix 커밋 품질 관리',pg:'charter'},
+  {id:'wf8',t:'ART.8 CRITPATH',d:'Critical Path 태깅',pg:'charter'},
+  {id:'imsms_core',t:'IMSMS CORE',d:'Console, Backend, Agent\nMDM, Demo, Website',pg:'projects',sz:1.1},
+  {id:'others',t:'OTHER PJ',d:'AI Chatbot, TP Site, IROS\nAutoContact, A.iMessage, Session',pg:'projects',sz:1.1},
+  {id:'f1',t:'INDEX.MD',d:'자동로드 2.6KB',pg:'files'},
+  {id:'f2',t:'PROJECTS/',d:'9개 프로젝트 스킬',pg:'files'},
+  {id:'f3',t:'_REFERENCE/',d:'헌장, 프로토콜, QA, 분석',pg:'files'},
+  {id:'f4',t:'_TEMPLATES/',d:'MAGI 토론, 프로젝트 템플릿',pg:'files'},
+  {id:'f5',t:'_ARCHIVE/',d:'구파일 12개',pg:'files'},
+  {id:'f6',t:'RULES/',d:'자동로드 규칙 4개',pg:'files'},
+  {id:'f7',t:'CHANGELOG',d:'PM 이력',pg:'files'},
 ];
 L2.forEach(function(n){n.layer=2;n.sz=n.sz||1;n.gid=n.id;ALL.push(n);EDGES.push({a:n.pg,b:n.id});});
 
 var L3=[
-  {id:'ag_jungsuk',t:'정석 — Backend',d:"Spring Boot, Java, API\n원칙주의 · '명세부터 봅시다'",pg:'dev_team'},
-  {id:'ag_haneul',t:'하늘 — Frontend',d:"React, Next.js, UI/UX\n사용자 관점 · '화면 띄워봅시다'",pg:'dev_team'},
-  {id:'ag_chulsoo',t:'철수 — DevOps',d:"AWS, Docker, CI/CD\n안정성 최우선 · '롤백 플랜 먼저'",pg:'dev_team'},
-  {id:'ag_minsoo',t:'민수 — Native',d:"Swift, macOS Agent, iMessage\n실용주의 · '실기기에서 돌려봐야'",pg:'dev_team'},
-  {id:'ag_gate',t:'보안 GATE',d:"OWASP, 인증/인가, 시크릿 노출\n'이 엔드포인트 인증 없이 열려있네요'",pg:'qa_team'},
-  {id:'ag_probe',t:'기능 PROBE',d:"회귀 테스트, 엣지케이스 발굴\n'CEO가 이렇게 쓸 때 터집니다'",pg:'qa_team'},
-  {id:'ag_perf',t:'성능 QA',d:"응답시간, 메모리, Lighthouse\n'응답 200ms 넘으면 안 됩니다'",pg:'qa_team'},
-  {id:'ag_scout',t:'SCOUT 정찰병',d:"코드 분석, 의존성 추적, 영향도\n'이 함수 호출하는 곳이 7군데'",pg:'pm_team'},
-  {id:'ag_anchor',t:'ANCHOR PM',d:"CEO 의도 해석, 작업 분해, 배정\n'3단계로 나눠서 갑시다'",pg:'pm_team'},
-  {id:'ag_scribe',t:'SCRIBE 기록',d:"세션 로그, TP_history, TP_skills\n'기록 안 남기면 다음에 또 삽질'",pg:'pm_team'},
-  {id:'dp1',t:'탐색/조사: 1-2명',d:'탐색/조사 작업',pg:'deploy_policy'},
-  {id:'dp2',t:'일반 개발: 2-3명',d:'일반 개발 (DEV+QA)',pg:'deploy_policy'},
-  {id:'dp3',t:'대규모: 3-5명',d:'대규모 변경',pg:'deploy_policy'},
-  {id:'dp4',t:'긴급: 2명',d:'긴급 대응',pg:'deploy_policy'},
-  {id:'dp5',t:'의사결정: MAGI',d:'MAGI 3축 토론',pg:'deploy_policy'},
-  {id:'ps1',t:'Backend API\n정석+보안+SCOUT',d:'Backend API 개발 프리셋',pg:'presets'},
-  {id:'ps2',t:'Frontend UI\n하늘+기능+성능',d:'Frontend UI 개발 프리셋',pg:'presets'},
-  {id:'ps3',t:'풀스택\n정석+하늘+기능+ANCHOR',d:'풀스택 개발 프리셋',pg:'presets'},
-  {id:'ps4',t:'Agent 수정\n민수+기능+SCRIBE',d:'Agent 수정 프리셋',pg:'presets'},
-  {id:'ps5',t:'배포/인프라\n철수+보안+ANCHOR',d:'배포/인프라 프리셋',pg:'presets'},
-  {id:'ps6',t:'코드 분석\nSCOUT+PROBE',d:'코드 분석 프리셋',pg:'presets'},
-  {id:'ps7',t:'대규모 리팩토링',d:'SCOUT + 정석 + 하늘 + 보안 + ANCHOR',pg:'presets'},
-  {id:'pj01',t:'01 Console',d:'React 18 + Express · Production',pg:'imsms_core'},
-  {id:'pj02',t:'02 Backend',d:'Spring Boot + Java 17 · Production',pg:'imsms_core'},
-  {id:'pj03',t:'03 Agent TP',d:'Swift 메뉴바앱 · Production',pg:'imsms_core'},
-  {id:'pj04',t:'04 MDM',d:'Node.js + React · Development',pg:'imsms_core'},
-  {id:'pj05',t:'05 Demo',d:'Next.js · Active',pg:'imsms_core'},
-  {id:'pj06',t:'06 Website',d:'Next.js + Tailwind · Production',pg:'imsms_core'},
-  {id:'pj10',t:'10 AI Chatbot',d:'React + Ollama · Inactive',pg:'others'},
-  {id:'pj20',t:'20 TP Site',d:'Next.js + Vercel · Stable',pg:'others'},
-  {id:'pj30',t:'30 IROS',d:'Python + Selenium · Utility',pg:'others'},
-  {id:'pj31',t:'31 AutoContact',d:'Python + PyQt · Production',pg:'others'},
-  {id:'pj36',t:'36 A.iMessage',d:'Node.js + TypeScript · Production',pg:'others'},
-  {id:'pj50',t:'50 Session Mgr',d:'Python + Shell · Production',pg:'others'},
+  {id:'ag_jungsuk',t:'JUNGSUK\nBACKEND',d:"Spring Boot, Java, API\n원칙주의 · '명세부터 봅시다'",pg:'dev_team'},
+  {id:'ag_haneul',t:'HANEUL\nFRONTEND',d:"React, Next.js, UI/UX\n사용자 관점 · '화면 띄워봅시다'",pg:'dev_team'},
+  {id:'ag_chulsoo',t:'CHULSOO\nDEVOPS',d:"AWS, Docker, CI/CD\n안정성 · '롤백 플랜 먼저'",pg:'dev_team'},
+  {id:'ag_minsoo',t:'MINSOO\nNATIVE',d:"Swift, macOS, iMessage\n실용주의 · '실기기에서 돌려봐야'",pg:'dev_team'},
+  {id:'ag_gate',t:'GATE\nSECURITY',d:"OWASP, 인증/인가\n'엔드포인트 인증 없이 열려있네요'",pg:'qa_team'},
+  {id:'ag_probe',t:'PROBE\nFUNC QA',d:"회귀, 엣지케이스\n'CEO가 쓸 때 터집니다'",pg:'qa_team'},
+  {id:'ag_perf',t:'PERF\nLOAD QA',d:"응답시간, Lighthouse\n'200ms 넘으면 안 됩니다'",pg:'qa_team'},
+  {id:'ag_scout',t:'SCOUT\nRECON',d:"코드 분석, 의존성 추적\n'호출하는 곳이 7군데'",pg:'pm_team'},
+  {id:'ag_anchor',t:'ANCHOR\nPM LEAD',d:"CEO 의도 해석, 작업 분해\n'3단계로 나눠서 갑시다'",pg:'pm_team'},
+  {id:'ag_scribe',t:'SCRIBE\nRECORDER',d:"세션 로그, TP_history\n'기록 안 남기면 삽질'",pg:'pm_team'},
+  {id:'dp1',t:'RECON: 1-2',d:'탐색/조사 작업',pg:'deploy_policy'},
+  {id:'dp2',t:'DEV: 2-3',d:'일반 개발 (DEV+QA)',pg:'deploy_policy'},
+  {id:'dp3',t:'MAJOR: 3-5',d:'대규모 변경',pg:'deploy_policy'},
+  {id:'dp4',t:'URGENT: 2',d:'긴급 대응',pg:'deploy_policy'},
+  {id:'dp5',t:'DECIDE: MAGI',d:'MAGI 3축 토론',pg:'deploy_policy'},
+  {id:'ps1',t:'PS1: BACKEND\nAPI PRESET',d:'정석 + 보안 + SCOUT',pg:'presets'},
+  {id:'ps2',t:'PS2: FRONT\nUI PRESET',d:'하늘 + 기능 + 성능',pg:'presets'},
+  {id:'ps3',t:'PS3: FULL\nSTACK',d:'정석 + 하늘 + 기능 + ANCHOR',pg:'presets'},
+  {id:'ps4',t:'PS4: AGENT\nMODIFY',d:'민수 + 기능 + SCRIBE',pg:'presets'},
+  {id:'ps5',t:'PS5: DEPLOY\nINFRA',d:'철수 + 보안 + ANCHOR',pg:'presets'},
+  {id:'ps6',t:'PS6: CODE\nANALYSIS',d:'SCOUT + PROBE',pg:'presets'},
+  {id:'ps7',t:'PS7: MAJOR\nREFACTOR',d:'SCOUT+정석+하늘+보안+ANCHOR',pg:'presets'},
+  {id:'pj01',t:'PJ01 CONSOLE',d:'React 18 + Express · PROD',pg:'imsms_core'},
+  {id:'pj02',t:'PJ02 BACKEND',d:'Spring Boot + Java 17 · PROD',pg:'imsms_core'},
+  {id:'pj03',t:'PJ03 AGENT',d:'Swift 메뉴바앱 · PROD',pg:'imsms_core'},
+  {id:'pj04',t:'PJ04 MDM',d:'Node.js + React · DEV',pg:'imsms_core'},
+  {id:'pj05',t:'PJ05 DEMO',d:'Next.js · ACTIVE',pg:'imsms_core'},
+  {id:'pj06',t:'PJ06 WEB',d:'Next.js + Tailwind · PROD',pg:'imsms_core'},
+  {id:'pj10',t:'PJ10 CHATBOT',d:'React + Ollama · INACTIVE',pg:'others'},
+  {id:'pj20',t:'PJ20 TP SITE',d:'Next.js + Vercel · STABLE',pg:'others'},
+  {id:'pj30',t:'PJ30 IROS',d:'Python + Selenium · UTIL',pg:'others'},
+  {id:'pj31',t:'PJ31 AUTOCON',d:'Python + PyQt · PROD',pg:'others'},
+  {id:'pj36',t:'PJ36 A.iMSG',d:'Node.js + TS · PROD',pg:'others'},
+  {id:'pj50',t:'PJ50 SESSION',d:'Python + Shell · PROD',pg:'others'},
 ];
 L3.forEach(function(n){n.layer=3;n.sz=n.sz||0.85;n.gid=n.id;ALL.push(n);EDGES.push({a:n.pg,b:n.id});});
 
 var CROSS=[
-  ['step1','ag_anchor','ANCHOR가 접수'],['step2','ceo9','오지시 방어'],
-  ['step3','dev_team','DEV 투입'],['step3','qa_team','QA 동시 투입'],
-  ['step4','qa_system','QA 체계 적용'],['step5','ceo6','결론 먼저'],
-  ['step6','ag_scribe','SCRIBE 기록'],['dp5','magi','MAGI 토론'],
-  ['ag_anchor','ceo_rules','CEO 원칙'],['ag_scribe','f7','CHANGELOG'],
-  ['ag_gate','wf6','보안 근본원인'],['ag_probe','wf7','회귀 테스트'],
-  ['ag_jungsuk','wf4','Contract-First'],['qa2','ag_haneul','Playwright'],
-  ['hook2','pj50','Session Manager'],['ceo5','wf7','회귀=fix품질'],
-  ['pj01','ag_haneul','Frontend'],['pj02','ag_jungsuk','Backend'],
-  ['pj03','ag_minsoo','Native'],['pj36','ag_minsoo','Native'],
+  ['step1','ag_anchor','ANCHOR'],['step2','ceo9','MISFIRE DEF'],
+  ['step3','dev_team','DEV DEPLOY'],['step3','qa_team','QA SYNC'],
+  ['step4','qa_system','QA APPLY'],['step5','ceo6','RESULT FIRST'],
+  ['step6','ag_scribe','SCRIBE LOG'],['dp5','magi','MAGI DEBATE'],
+  ['ag_anchor','ceo_rules','CEO RULES'],['ag_scribe','f7','CHANGELOG'],
+  ['ag_gate','wf6','SEC ROOT'],['ag_probe','wf7','REGRESS TEST'],
+  ['ag_jungsuk','wf4','CONTRACT'],['qa2','ag_haneul','PLAYWRIGHT'],
+  ['hook2','pj50','SESSION MGR'],['ceo5','wf7','REGRESS=FIX'],
+  ['pj01','ag_haneul','FRONTEND'],['pj02','ag_jungsuk','BACKEND'],
+  ['pj03','ag_minsoo','NATIVE'],['pj36','ag_minsoo','NATIVE'],
   ['ps1','ag_jungsuk'],['ps1','ag_gate'],['ps1','ag_scout'],
   ['ps2','ag_haneul'],['ps2','ag_probe'],['ps2','ag_perf'],
   ['ps3','ag_jungsuk'],['ps3','ag_haneul'],['ps3','ag_probe'],['ps3','ag_anchor'],
@@ -262,24 +219,19 @@ var NM={};ALL.forEach(function(n){NM[n.id]=n;});
 
 // === SPHERE PLACEMENT ===
 var RADII=[0,180,340,500];
-
 function placeSphere(nodes,R){
   var phi=(1+Math.sqrt(5))/2;
   nodes.forEach(function(n,i){
-    var theta=2*Math.PI*i/phi;
-    var cp=1-(2*(i+0.5))/nodes.length;
-    var sp=Math.sqrt(1-cp*cp);
+    var theta=2*Math.PI*i/phi;var cp=1-(2*(i+0.5))/nodes.length;var sp=Math.sqrt(1-cp*cp);
     n.x=R*sp*Math.cos(theta);n.y=R*cp;n.z=R*sp*Math.sin(theta);
   });
 }
 NM['system'].x=0;NM['system'].y=0;NM['system'].z=0;
 placeSphere(ALL.filter(function(n){return n.layer===1;}),RADII[1]);
-
 function placeNearParent(nodes,R){
   var pgIdx={};
   nodes.forEach(function(n){
-    if(!pgIdx[n.pg])pgIdx[n.pg]=0;
-    var idx=pgIdx[n.pg]++;
+    if(!pgIdx[n.pg])pgIdx[n.pg]=0;var idx=pgIdx[n.pg]++;
     var p=NM[n.pg];if(!p){n.x=0;n.y=0;n.z=0;return;}
     var pd=Math.sqrt(p.x*p.x+p.y*p.y+p.z*p.z)||1;
     var bx=p.x/pd,by=p.y/pd,bz=p.z/pd;
@@ -287,8 +239,7 @@ function placeNearParent(nodes,R){
     var ang=(idx/sib)*Math.PI*2;var sp=0.35;
     var ax=0,ay=1,az=0;if(Math.abs(by)>0.9){ax=1;ay=0;az=0;}
     var t1x=by*az-bz*ay,t1y=bz*ax-bx*az,t1z=bx*ay-by*ax;
-    var t1d=Math.sqrt(t1x*t1x+t1y*t1y+t1z*t1z)||1;
-    t1x/=t1d;t1y/=t1d;t1z/=t1d;
+    var t1d=Math.sqrt(t1x*t1x+t1y*t1y+t1z*t1z)||1;t1x/=t1d;t1y/=t1d;t1z/=t1d;
     var t2x=by*t1z-bz*t1y,t2y=bz*t1x-bx*t1z,t2z=bx*t1y-by*t1x;
     var dx=bx+Math.cos(ang)*sp*t1x+Math.sin(ang)*sp*t2x;
     var dy=by+Math.cos(ang)*sp*t1y+Math.sin(ang)*sp*t2y;
@@ -299,73 +250,60 @@ function placeNearParent(nodes,R){
 }
 placeNearParent(ALL.filter(function(n){return n.layer===2;}),RADII[2]);
 placeNearParent(ALL.filter(function(n){return n.layer===3;}),RADII[3]);
-
 var edgesR=EDGES.map(function(e){return{a:NM[e.a],b:NM[e.b],cr:e.cr||0,label:e.label||''};}).filter(function(e){return e.a&&e.b;});
 
 // Camera
-var camD=900,rX=-0.15,rY=0.3,pX=0,pY=0,aRot=true;
-var time=0;
+var camD=900,rX=-0.15,rY=0.3,pX=0,pY=0,aRot=true,time=0;
 
 function proj(x,y,z){
   var cy=Math.cos(rY),sy=Math.sin(rY),cx=Math.cos(rX),sx=Math.sin(rX);
-  var x1=x*cy-z*sy,z1=x*sy+z*cy;
-  var y1=y*cx-z1*sx,z2=y*sx+z1*cx;
-  var f=camD/(camD+z2);
-  return{x:x1*f+W/2+pX,y:y1*f+H/2+pY,s:f,z:z2};
+  var x1=x*cy-z*sy,z1=x*sy+z*cy;var y1=y*cx-z1*sx,z2=y*sx+z1*cx;
+  var f=camD/(camD+z2);return{x:x1*f+W/2+pX,y:y1*f+H/2+pY,s:f,z:z2};
 }
 
 var hov=null,tip=document.getElementById('tip');
-
 function hitTest(mx,my){
   var best=null,bestZ=99999;
-  ALL.forEach(function(n){
-    if(n._bx===undefined)return;
-    if(mx>=n._bx&&mx<=n._bx+n._bw&&my>=n._by&&my<=n._by+n._bh&&n._pz<bestZ){best=n;bestZ=n._pz;}
-  });
+  ALL.forEach(function(n){if(n._bx===undefined)return;if(mx>=n._bx&&mx<=n._bx+n._bw&&my>=n._by&&my<=n._by+n._bh&&n._pz<bestZ){best=n;bestZ=n._pz;}});
   return best;
 }
 
 function draw(){
-  time+=0.016;
-  G.clearRect(0,0,W,H);
+  time+=0.016;G.clearRect(0,0,W,H);
 
-  // Background
-  if(isDark){
-    var bg=G.createRadialGradient(W/2,H/2,0,W/2,H/2,W*.7);
-    bg.addColorStop(0,'#08081a');bg.addColorStop(0.5,'#040410');bg.addColorStop(1,'#010104');
-    G.fillStyle=bg;G.fillRect(0,0,W,H);
-    // Stars
-    STARS.forEach(function(s){
-      var p=proj(s.x*800,s.y*800,s.z*800);
-      if(p.z>-camD){
-        var twinkle=s.b*(0.7+0.3*Math.sin(time*2+s.x*10));
-        G.fillStyle='rgba(180,190,255,'+twinkle+')';
-        G.beginPath();G.arc(p.x,p.y,s.s*p.s,0,Math.PI*2);G.fill();
-      }
-    });
-  } else {
-    var bg=G.createRadialGradient(W/2,H/2,0,W/2,H/2,W*.7);
-    bg.addColorStop(0,'#f4f6fb');bg.addColorStop(0.5,'#eceef5');bg.addColorStop(1,'#e0e3ed');
-    G.fillStyle=bg;G.fillRect(0,0,W,H);
-  }
+  // Background: deep dark teal
+  var bg=G.createRadialGradient(W/2,H/2,0,W/2,H/2,W*.75);
+  bg.addColorStop(0,'#051510');bg.addColorStop(0.4,'#030e0a');bg.addColorStop(1,'#010403');
+  G.fillStyle=bg;G.fillRect(0,0,W,H);
 
-  // Sphere wireframes with glow
+  // Grid overlay (EVA style)
+  G.strokeStyle='rgba(0,255,200,0.018)';G.lineWidth=0.5;
+  var gs=40;
+  for(var gx=0;gx<W;gx+=gs){G.beginPath();G.moveTo(gx,0);G.lineTo(gx,H);G.stroke();}
+  for(var gy=0;gy<H;gy+=gs){G.beginPath();G.moveTo(0,gy);G.lineTo(W,gy);G.stroke();}
+
+  // Sphere wireframes — teal glow
   [RADII[1],RADII[2],RADII[3]].forEach(function(R,ri){
-    var op=isDark?[0.05,0.035,0.025][ri]:[0.06,0.04,0.03][ri];
-    var wc=isDark?'100,100,200':'120,120,180';
-    G.strokeStyle='rgba('+wc+','+op+')';G.lineWidth=0.5;
+    var op=[0.06,0.04,0.03][ri];
+    G.strokeStyle='rgba(0,255,200,'+op+')';G.lineWidth=0.5;
     for(var i=0;i<8;i++){
       var a=i*Math.PI/4;G.beginPath();
       for(var j=0;j<=48;j++){var ph=j/48*Math.PI*2;var p=proj(R*Math.cos(ph)*Math.cos(a),R*Math.sin(ph),R*Math.cos(ph)*Math.sin(a));if(j===0)G.moveTo(p.x,p.y);else G.lineTo(p.x,p.y);}
       G.stroke();
     }
     for(var i=-1;i<=1;i++){
-      var lat=i*Math.PI/4;var r=R*Math.cos(lat);var yy=R*Math.sin(lat);
-      G.beginPath();
+      var lat=i*Math.PI/4;var r=R*Math.cos(lat);var yy=R*Math.sin(lat);G.beginPath();
       for(var j=0;j<=48;j++){var a=j/48*Math.PI*2;var p=proj(r*Math.cos(a),yy,r*Math.sin(a));if(j===0)G.moveTo(p.x,p.y);else G.lineTo(p.x,p.y);}
       G.stroke();
     }
   });
+
+  // Animated ring pulse
+  var pulseR=200+Math.sin(time*0.8)*60;
+  var pulseOp=0.03+Math.sin(time*0.8)*0.015;
+  G.strokeStyle='rgba(0,255,200,'+pulseOp+')';G.lineWidth=1;G.beginPath();
+  for(var j=0;j<=48;j++){var a=j/48*Math.PI*2;var p=proj(pulseR*Math.cos(a),0,pulseR*Math.sin(a));if(j===0)G.moveTo(p.x,p.y);else G.lineTo(p.x,p.y);}
+  G.stroke();
 
   ALL.forEach(function(n){var p=proj(n.x,n.y,n.z);n._px=p.x;n._py=p.y;n._ps=p.s;n._pz=p.z;});
 
@@ -375,97 +313,80 @@ function draw(){
     var c=gc(e.a);var as=(pa.s+pb.s)/2;
     var isH=hov&&(e.a.id===hov.id||e.b.id===hov.id);
     G.beginPath();G.moveTo(pa.x,pa.y);G.lineTo(pb.x,pb.y);
-    if(isDark){
-      if(e.cr){G.setLineDash([2,4]);G.strokeStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+(isH?.65:.2*as)+')';G.lineWidth=(isH?1.5:.5)*as;}
-      else{G.setLineDash([]);G.strokeStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+(isH?.75:.3*as)+')';G.lineWidth=(isH?2:0.8)*as;}
-    } else {
-      if(e.cr){G.setLineDash([2,4]);G.strokeStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+(isH?.5:.15*as)+')';G.lineWidth=(isH?1.5:.6)*as;}
-      else{G.setLineDash([]);G.strokeStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+(isH?.6:.22*as)+')';G.lineWidth=(isH?2:0.9)*as;}
-    }
+    if(e.cr){G.setLineDash([2,4]);G.strokeStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+(isH?.6:.15*as)+')';G.lineWidth=(isH?1.5:.4)*as;}
+    else{G.setLineDash([]);G.strokeStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+(isH?.7:.25*as)+')';G.lineWidth=(isH?2:.7)*as;}
     G.stroke();G.setLineDash([]);
   });
 
   var sorted=ALL.slice().sort(function(a,b){return b._pz-a._pz;});
 
-  // Nodes
+  // Nodes — EVA MAGI style
   sorted.forEach(function(n){
     var c=gc(n);var sc=(n.sz||1)*n._ps;
     if(sc<0.06)return;
-
-    // Usage boost: nodes with higher usage are slightly larger
-    var usageBoost=1;
-    var udata=getUsage(n.id);
-    if(udata&&udata.count>0){usageBoost=1+Math.min(0.3,(udata.count/MAX_USAGE)*0.3);}
-
-    var cw=88*sc*usageBoost,ch=34*sc*usageBoost;
+    var usageBoost=1;var udata=getUsage(n.id);
+    if(udata&&udata.count>0){usageBoost=1+Math.min(0.25,(udata.count/MAX_USAGE)*0.25);}
+    var cw=90*sc*usageBoost,ch=36*sc*usageBoost;
     var x=n._px-cw/2,y=n._py-ch/2;
     var alpha=Math.max(0.06,Math.min(1,n._ps*1.3));
     var isH=hov&&hov.id===n.id;
     n._bx=x;n._by=y;n._bw=cw;n._bh=ch;
 
-    if(isDark){
-      // Dark: glass card
-      if(isH){G.shadowColor='rgba('+c[0]+','+c[1]+','+c[2]+',0.5)';G.shadowBlur=20*sc;}
-      G.fillStyle='rgba('+Math.floor(c[0]*.15)+','+Math.floor(c[1]*.15)+','+Math.floor(c[2]*.15)+','+alpha*.8+')';
-      rr(x,y,cw,ch,4*sc);G.fill();
-      G.strokeStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+(isH?alpha*.8:alpha*.3)+')';
-      G.lineWidth=(isH?1.5:.6)*sc;rr(x,y,cw,ch,4*sc);G.stroke();
-      G.shadowColor='transparent';G.shadowBlur=0;
-      // Top accent
-      var tg=G.createLinearGradient(x,y,x+cw,y);
-      tg.addColorStop(0,'rgba('+c[0]+','+c[1]+','+c[2]+','+alpha*.3+')');
-      tg.addColorStop(1,'rgba('+c[0]+','+c[1]+','+c[2]+','+alpha*.08+')');
-      G.fillStyle=tg;rrTop(x,y,cw,Math.min(ch*.3,10*sc),4*sc);G.fill();
-      // Usage indicator dot
-      if(udata&&udata.count>0){
-        var dotR=Math.max(1.5,2.5*sc);
-        var intensity=udata.count/MAX_USAGE;
-        G.fillStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+(0.3+intensity*0.6)+')';
-        G.beginPath();G.arc(x+cw-6*sc,y+6*sc,dotR,0,Math.PI*2);G.fill();
+    // EVA card: dark bg + colored border + glow
+    if(isH){G.shadowColor='rgba('+c[0]+','+c[1]+','+c[2]+',0.4)';G.shadowBlur=20*sc;}
+    // Background
+    G.fillStyle='rgba(2,10,8,'+alpha*.88+')';
+    rr(x,y,cw,ch,2*sc);G.fill();
+    // Border
+    G.strokeStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+(isH?alpha*.9:alpha*.35)+')';
+    G.lineWidth=(isH?1.5:.6)*sc;rr(x,y,cw,ch,2*sc);G.stroke();
+    G.shadowColor='transparent';G.shadowBlur=0;
+
+    // Top line accent (EVA style bar)
+    G.fillStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+(isH?alpha*.5:alpha*.2)+')';
+    G.fillRect(x+1*sc,y+0.5*sc,cw-2*sc,1.5*sc);
+
+    // Corner marks (EVA technical UI)
+    if(sc>0.3){
+      var cm=4*sc;
+      G.strokeStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+alpha*.25+')';G.lineWidth=0.5*sc;
+      G.beginPath();G.moveTo(x,y+cm);G.lineTo(x,y);G.lineTo(x+cm,y);G.stroke();
+      G.beginPath();G.moveTo(x+cw-cm,y);G.lineTo(x+cw,y);G.lineTo(x+cw,y+cm);G.stroke();
+      G.beginPath();G.moveTo(x+cw,y+ch-cm);G.lineTo(x+cw,y+ch);G.lineTo(x+cw-cm,y+ch);G.stroke();
+      G.beginPath();G.moveTo(x+cm,y+ch);G.lineTo(x,y+ch);G.lineTo(x,y+ch-cm);G.stroke();
+    }
+
+    // Usage dot indicator
+    if(udata&&udata.count>0){
+      var dotR=Math.max(1.2,2*sc);
+      var intensity=udata.count/MAX_USAGE;
+      var pulse=0.5+0.5*Math.sin(time*3+n.x);
+      G.fillStyle='rgba(255,180,40,'+(0.3+intensity*0.5)*pulse+')';
+      G.beginPath();G.arc(x+cw-4*sc,y+4*sc,dotR,0,Math.PI*2);G.fill();
+    }
+
+    // Text — EVA monospace style
+    if(sc>0.18){
+      G.fillStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+alpha*.9+')';
+      G.font=(isH?'700 ':'600 ')+Math.max(4.5,6.5*sc)+'px "Orbitron","Share Tech Mono",monospace';
+      G.textAlign='center';
+      var lines=(n.t||'').split('\n');
+      var ly=y+6*sc+8*sc;
+      for(var i=0;i<lines.length;i++){
+        G.fillText(lines[i],n._px,ly+8*sc*i,cw-6*sc);
       }
-      if(sc>0.2){
-        G.fillStyle='rgba(255,255,255,'+alpha*.88+')';
-        G.font=(isH?'600 ':'500 ')+Math.max(5,7*sc)+'px -apple-system,sans-serif';
-        G.textAlign='center';
-        var lines=(n.t||'').split('\n');
-        for(var i=0;i<lines.length;i++){G.fillText(lines[i],n._px,y+10*sc+9*sc*(i+1),cw-6*sc);}
-        G.textAlign='left';
-      }
-    } else {
-      // Light: white card with subtle shadow
-      if(isH){G.shadowColor='rgba('+c[0]+','+c[1]+','+c[2]+',0.2)';G.shadowBlur=16*sc;}
-      else{G.shadowColor='rgba(0,0,0,0.06)';G.shadowBlur=6*sc;}
-      G.fillStyle='rgba(255,255,255,'+alpha*.95+')';
-      rr(x,y,cw,ch,4*sc);G.fill();
-      G.strokeStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+(isH?alpha*.6:alpha*.2)+')';
-      G.lineWidth=(isH?1.5:.6)*sc;rr(x,y,cw,ch,4*sc);G.stroke();
-      G.shadowColor='transparent';G.shadowBlur=0;
-      // Top accent
-      var tg=G.createLinearGradient(x,y,x+cw,y);
-      tg.addColorStop(0,'rgba('+c[0]+','+c[1]+','+c[2]+','+alpha*.18+')');
-      tg.addColorStop(1,'rgba('+c[0]+','+c[1]+','+c[2]+','+alpha*.04+')');
-      G.fillStyle=tg;rrTop(x,y,cw,Math.min(ch*.3,10*sc),4*sc);G.fill();
-      // Usage indicator
-      if(udata&&udata.count>0){
-        var dotR=Math.max(1.5,2.5*sc);
-        var intensity=udata.count/MAX_USAGE;
-        G.fillStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+(0.2+intensity*0.5)+')';
-        G.beginPath();G.arc(x+cw-6*sc,y+6*sc,dotR,0,Math.PI*2);G.fill();
-      }
-      if(sc>0.2){
-        G.fillStyle='rgba('+Math.floor(c[0]*.35)+','+Math.floor(c[1]*.35)+','+Math.floor(c[2]*.35)+','+alpha*.95+')';
-        G.font=(isH?'600 ':'500 ')+Math.max(5,7*sc)+'px -apple-system,sans-serif';
-        G.textAlign='center';
-        var lines=(n.t||'').split('\n');
-        for(var i=0;i<lines.length;i++){G.fillText(lines[i],n._px,y+10*sc+9*sc*(i+1),cw-6*sc);}
-        G.textAlign='left';
-      }
+      G.textAlign='left';
     }
   });
+
+  // Center crosshair
+  var cx=W/2+pX,cy=H/2+pY;
+  G.strokeStyle='rgba(0,255,200,0.06)';G.lineWidth=0.5;
+  G.beginPath();G.moveTo(cx-15,cy);G.lineTo(cx+15,cy);G.stroke();
+  G.beginPath();G.moveTo(cx,cy-15);G.lineTo(cx,cy+15);G.stroke();
 }
 
 function rr(x,y,w,h,r){G.beginPath();G.moveTo(x+r,y);G.lineTo(x+w-r,y);G.quadraticCurveTo(x+w,y,x+w,y+r);G.lineTo(x+w,y+h-r);G.quadraticCurveTo(x+w,y+h,x+w-r,y+h);G.lineTo(x+r,y+h);G.quadraticCurveTo(x,y+h,x,y+h-r);G.lineTo(x,y+r);G.quadraticCurveTo(x,y,x+r,y);G.closePath();}
-function rrTop(x,y,w,h,r){G.beginPath();G.moveTo(x+r,y);G.lineTo(x+w-r,y);G.quadraticCurveTo(x+w,y,x+w,y+r);G.lineTo(x+w,y+h);G.lineTo(x,y+h);G.lineTo(x,y+r);G.quadraticCurveTo(x,y,x+r,y);G.closePath();}
 
 // Interaction
 var drag=false,rdrag=false,lx=0,ly=0;
@@ -478,17 +399,16 @@ C.addEventListener('mousemove',function(e){
     var h=hitTest(e.clientX,e.clientY);hov=h;
     if(h){
       tip.style.display='block';tip.style.left=(e.clientX+16)+'px';tip.style.top=(e.clientY-10)+'px';
-      var udata=getUsage(h.id);
-      var usageHtml='';
+      var udata=getUsage(h.id);var usageHtml='';
       if(udata&&udata.count>0){
         var pct=Math.round((udata.count/MAX_USAGE)*100);
-        var c=gc(h);
-        usageHtml='<div class="tp-usage"><span>참조 '+udata.count+'회</span><div class="tp-bar"><div class="tp-fill" style="width:'+pct+'%;background:rgb('+c+')"></div></div></div>';
+        usageHtml='<div class="tp-usage"><span>REF '+udata.count+'x</span><div class="tp-bar"><div class="tp-fill" style="width:'+pct+'%"></div></div></div>';
       }
-      tip.innerHTML='<div class="tp-group">'+(h.pg||'')+'</div><div class="tp-title">'+(h.t||'').replace(/\n/g,' ')+'</div>'+(h.d?'<div class="tp-desc">'+h.d.replace(/\n/g,' · ')+'</div>':'')+usageHtml;
+      var c=gc(h);
+      tip.innerHTML='<div class="tp-group">'+(h.pg||'').toUpperCase()+'</div><div class="tp-title" style="color:rgba('+c[0]+','+c[1]+','+c[2]+',0.95);text-shadow:0 0 8px rgba('+c[0]+','+c[1]+','+c[2]+',0.3)">'+(h.t||'').replace(/\n/g,' ')+'</div>'+(h.d?'<div class="tp-desc">'+h.d.replace(/\n/g,' · ')+'</div>':'')+usageHtml;
       C.style.cursor='pointer';
     }
-    else{tip.style.display='none';C.style.cursor='grab';}
+    else{tip.style.display='none';C.style.cursor='crosshair';}
   }
   lx=e.clientX;ly=e.clientY;
 });
@@ -501,11 +421,11 @@ function toggleRot(){aRot=!aRot;document.getElementById('bRot').classList.toggle
 function resetCam(){camD=900;rX=-0.15;rY=0.3;pX=0;pY=0;aRot=true;document.getElementById('bRot').classList.add('on');}
 
 // Legend
-var legNames={magi:'MAGI',dev_team:'DEV',qa_team:'QA',pm_team:'PM',process:'Process',ceo_rules:'CEO',hooks:'Hook',charter:'Charter',projects:'Project',files:'Files',presets:'Preset'};
+var legNames={magi:'MAGI',dev_team:'DEV',qa_team:'QA',pm_team:'PM',process:'PROC',ceo_rules:'CEO',hooks:'HOOK',charter:'CHART',projects:'PJ',files:'FILE',presets:'PRESET'};
 var leg=document.getElementById('leg');
-Object.keys(legNames).forEach(function(k){var c=COL[k]||[120,120,170];var d=document.createElement('div');d.className='li';d.innerHTML='<div class="ld" style="background:rgb('+c+')"></div>'+legNames[k];leg.appendChild(d);});
+Object.keys(legNames).forEach(function(k){var c=COL[k]||[0,255,200];var d=document.createElement('div');d.className='li';d.innerHTML='<div class="ld" style="background:rgb('+c+');box-shadow:0 0 4px rgba('+c+',0.4)"></div>'+legNames[k];leg.appendChild(d);});
 
-function loop(){if(aRot)rY+=.0025;draw();requestAnimationFrame(loop);}
+function loop(){if(aRot)rY+=.002;draw();requestAnimationFrame(loop);}
 loop();
 </script>
 </body>
