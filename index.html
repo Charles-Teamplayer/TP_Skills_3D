@@ -517,12 +517,18 @@ function showcaseNext(){
 ['mousemove','mousedown','wheel','keydown','touchstart'].forEach(function(evt){
   window.addEventListener(evt,resetIdle,{passive:true});
 });
-// Check idle every second
+// Start showcase immediately on load
+buildShowcaseList();showcaseActive=true;showcaseIdx=0;
+aRot=true;document.getElementById('bRot').classList.add('on');
+// First node after 2s (let scene render first)
+setTimeout(function(){if(showcaseActive)showcaseNext();},2000);
+// Check idle every second — restart showcase after 30s idle
 setInterval(function(){
   idleTime++;
   if(!showcaseActive&&idleTime>=30){
     showcaseActive=true;showcaseIdx=0;buildShowcaseList();
     aRot=true;document.getElementById('bRot').classList.add('on');
+    showcaseNext();
   }
 },1000);
 // Cycle showcase node every 4 seconds
