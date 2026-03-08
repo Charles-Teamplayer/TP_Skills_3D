@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code System — 3D Sphere</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{overflow:hidden;font-family:'SF Pro Display',-apple-system,'Segoe UI',sans-serif;transition:background .5s}
+body.dark{background:#000}
+body.light{background:#eef1f6}
+canvas{display:block;width:100vw;height:100vh}
+#ui{position:fixed;top:16px;left:16px;z-index:10;display:flex;gap:6px;align-items:center}
+#ui button{padding:5px 12px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:500;letter-spacing:.3px;transition:all .25s;border:none}
+.dark #ui button{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.6);box-shadow:0 1px 4px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.05)}
+.dark #ui button:hover{background:rgba(255,255,255,0.14);color:#fff}
+.dark #ui button.on{background:rgba(80,130,255,0.2);color:#8ab4ff;box-shadow:0 0 12px rgba(80,130,255,.15),inset 0 1px 0 rgba(255,255,255,.05)}
+.light #ui button{background:rgba(255,255,255,0.8);color:rgba(0,0,0,0.5);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.light #ui button:hover{background:#fff;color:#222}
+.light #ui button.on{background:rgba(50,100,220,0.1);color:#2255cc;box-shadow:0 1px 6px rgba(50,100,220,.12)}
+#hdr{position:fixed;top:16px;right:20px;z-index:10;text-align:right;transition:color .4s}
+.dark #hdr{color:rgba(255,255,255,0.4)} .dark #hdr h1{font-size:16px;font-weight:600;color:rgba(255,255,255,0.75);letter-spacing:.5px}
+.dark #hdr .sub{font-size:11px;margin-top:2px;opacity:.5}
+.light #hdr{color:rgba(0,0,0,0.35)} .light #hdr h1{font-size:16px;font-weight:600;color:rgba(0,0,0,0.6);letter-spacing:.5px}
+.light #hdr .sub{font-size:11px;margin-top:2px;opacity:.4}
+#tip{position:fixed;padding:10px 14px;border-radius:8px;font-size:11px;max-width:280px;pointer-events:none;display:none;z-index:20;line-height:1.6;transition:opacity .15s}
+.dark #tip{background:rgba(12,12,30,0.94);border:1px solid rgba(255,255,255,0.1);color:#ddd;box-shadow:0 4px 20px rgba(0,0,0,.5)}
+.light #tip{background:rgba(255,255,255,0.97);border:1px solid rgba(0,0,0,0.08);color:#222;box-shadow:0 4px 20px rgba(0,0,0,.1)}
+#tip .tp-group{font-size:9px;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
+.dark #tip .tp-group{color:rgba(255,255,255,.35)} .light #tip .tp-group{color:rgba(0,0,0,.3)}
+#tip .tp-title{font-weight:700;font-size:12px;margin-bottom:2px}
+#tip .tp-desc{font-size:10px;line-height:1.5;margin-top:4px}
+.dark #tip .tp-desc{color:rgba(255,255,255,.55)} .light #tip .tp-desc{color:rgba(0,0,0,.5)}
+#tip .tp-usage{margin-top:6px;padding-top:5px;font-size:9px;display:flex;align-items:center;gap:6px}
+.dark #tip .tp-usage{border-top:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.4)}
+.light #tip .tp-usage{border-top:1px solid rgba(0,0,0,.06);color:rgba(0,0,0,.35)}
+#tip .tp-bar{height:3px;border-radius:2px;flex:1;overflow:hidden}
+.dark #tip .tp-bar{background:rgba(255,255,255,.08)} .light #tip .tp-bar{background:rgba(0,0,0,.06)}
+#tip .tp-fill{height:100%;border-radius:2px;transition:width .3s}
+#leg{position:fixed;bottom:14px;left:16px;z-index:10;display:flex;gap:14px;flex-wrap:wrap}
+.li{display:flex;align-items:center;gap:5px;font-size:9px;letter-spacing:.3px;font-weight:500}
+.dark .li{color:rgba(255,255,255,0.35)} .light .li{color:rgba(0,0,0,0.35)}
+.ld{width:7px;height:7px;border-radius:50%}
+#foot{position:fixed;bottom:14px;right:20px;font-size:9px;z-index:10;letter-spacing:.5px}
+.dark #foot{color:rgba(255,255,255,0.2)} .light #foot{color:rgba(0,0,0,0.2)}
+</style>
+</head>
+<body class="dark">
+<div id="ui">
+  <button class="on" id="bRot" onclick="toggleRot()">Auto Rotate</button>
+  <button onclick="resetCam()">Reset</button>
+  <button id="bTheme" onclick="toggleTheme()">&#9788; Day</button>
+</div>
+<div id="hdr"><h1>Claude Code Work System</h1><div class="sub">TP_skills v2.1 &middot; 3D Sphere &middot; MAGI</div></div>
+<div id="tip"></div>
+<div id="leg"></div>
+<div id="foot">Drag: rotate &middot; Scroll: zoom &middot; Right-drag: pan</div>
+
+<script>
+var C=document.createElement('canvas');document.body.appendChild(C);
+var G=C.getContext('2d');var W,H,DPR;
+var isDark=true;
+function resize(){DPR=window.devicePixelRatio||1;W=window.innerWidth;H=window.innerHeight;C.width=W*DPR;C.height=H*DPR;C.style.width=W+'px';C.style.height=H+'px';G.setTransform(DPR,0,0,DPR,0,0);}
+resize();window.addEventListener('resize',resize);
+
+function toggleTheme(){
+  isDark=!isDark;
+  document.body.className=isDark?'dark':'light';
+  document.getElementById('bTheme').innerHTML=isDark?'&#9788; Day':'&#9790; Night';
+}
+
+// === SKILL USAGE DATA ===
+var USAGE={};
+var MAX_USAGE=1;
+(function loadUsage(){
+  var x=new XMLHttpRequest();
+  x.open('GET','skill_usage.json?t='+Date.now(),true);
+  x.onload=function(){
+    if(x.status===200){
+      try{
+        var d=JSON.parse(x.responseText);
+        USAGE=d.skills||{};
+        var mx=1;
+        for(var k in USAGE){if(USAGE[k].count>mx)mx=USAGE[k].count;}
+        MAX_USAGE=mx;
+      }catch(e){}
+    }
+  };
+  x.send();
+})();
+
+function getUsage(id){
+  var mappings={
+    'pj01':'01_imsms_console','pj02':'02_imsms_backend','pj03':'03_imsms_agent',
+    'pj04':'04_mdm','pj05':'05_imsms_demo','pj06':'06_imsms_website',
+    'pj10':'10_ai_chatbot','pj20':'20_teamplayer_site','pj30':'30_iros_extractor',
+    'pj31':'31_auto_contact','pj36':'36_a_imessage_claude','pj50':'50_session_manager',
+    'system':'index','ceo_rules':'ceo_protocol','charter':'magi_workflow_charter',
+    'qa_system':'qa_process','magi':'magi_analysis','team':'multi_agent_team'
+  };
+  var key=mappings[id]||id;
+  return USAGE[key]||null;
+}
+
+// === COLORS ===
+var COL={
+  system:[110,110,220], magi:[150,80,240], team:[70,130,250],
+  dev_team:[50,140,240], qa_team:[240,140,50], pm_team:[40,190,110],
+  deploy_policy:[130,130,210], presets:[190,190,50],
+  process:[220,185,40], ceo_rules:[200,70,200],
+  qa_system:[240,170,40], hooks:[50,190,190],
+  charter:[140,95,210], projects:[220,70,70],
+  imsms_core:[230,60,60], others:[190,80,80],
+  files:[120,120,170]
+};
+var COL_LIGHT={
+  system:[80,80,190], magi:[120,50,210], team:[40,100,220],
+  dev_team:[20,110,210], qa_team:[210,110,20], pm_team:[10,160,80],
+  deploy_policy:[100,100,180], presets:[160,160,20],
+  process:[190,155,10], ceo_rules:[170,40,170],
+  qa_system:[210,140,10], hooks:[20,160,160],
+  charter:[110,65,180], projects:[190,40,40],
+  imsms_core:[200,30,30], others:[160,50,50],
+  files:[90,90,140]
+};
+function gc(n){var p=isDark?COL:COL_LIGHT;return p[n.pg]||p[n.gid]||[120,120,170];}
+
+// === STARS (dark mode background) ===
+var STARS=[];
+for(var i=0;i<200;i++){
+  STARS.push({
+    x:Math.random()*2-1,y:Math.random()*2-1,z:Math.random()*2-1,
+    b:Math.random()*0.4+0.1,s:Math.random()*1.2+0.3
+  });
+}
+
+// === NODE DATA ===
+var ALL=[];var EDGES=[];
+ALL.push({id:'system',t:'Claude Code\nWork System',d:'TP_skills v2.1 기반 작업 체계',gid:'system',pg:'system',layer:0,sz:2.5});
+
+var L1=[
+  {id:'magi',t:'MAGI 3축 체계',d:'프로젝트 분석/의사결정\n(에이전트가 아닌 프로젝트에 적용)'},
+  {id:'team',t:'멀티에이전트 팀\n(10명)',d:'간단 1줄 수정 외\n모든 작업에 필수 투입'},
+  {id:'process',t:'작업 프로세스',d:'CEO 지시→실행→보고'},
+  {id:'ceo_rules',t:'CEO 대응 원칙\n(9개)',d:'CEO는 바꾸지 않는다\nClaude가 100% 적응'},
+  {id:'qa_system',t:'QA 체계',d:'브라우저 검증 3단계'},
+  {id:'hooks',t:'자동화 Hook',d:'세션 생명주기 자동 관리'},
+  {id:'charter',t:'워크플로우 헌장\n(8조)',d:''},
+  {id:'projects',t:'프로젝트 맵\n(9개)',d:''},
+  {id:'files',t:'파일 구조',d:''},
+];
+L1.forEach(function(n){n.layer=1;n.sz=1.4;n.gid=n.id;n.pg=n.id;ALL.push(n);EDGES.push({a:'system',b:n.id});});
+
+var L2=[
+  {id:'melchior',t:'Melchior (기술)',d:'코드 품질, 아키텍처, 기술 부채',pg:'magi'},
+  {id:'balthazar',t:'Balthazar (사업)',d:'ROI, 매출 기여, 비용 효과',pg:'magi'},
+  {id:'casper',t:'Casper (현실)',d:'1인 팀 실행 가능성, 유지보수',pg:'magi'},
+  {id:'dev_team',t:'DEV 팀 (4명)',d:'코드 구현 담당',pg:'team',sz:1.2},
+  {id:'qa_team',t:'QA 팀 (3명)',d:'검증 담당\nDEV에 최소 1명 동반',pg:'team',sz:1.2},
+  {id:'pm_team',t:'PM & 분석 (3명)',d:'조율, 분석, 기록',pg:'team',sz:1.2},
+  {id:'deploy_policy',t:'투입 정책',d:'작업 규모별 에이전트 수',pg:'team',sz:1.1},
+  {id:'presets',t:'조합 프리셋 (7종)',d:'시나리오별 최적 조합',pg:'team',sz:1.1},
+  {id:'step1',t:'1. 지시 접수',d:'ANCHOR가 CEO 의도 해석\n규모 판단 + 배정',pg:'process'},
+  {id:'step2',t:'2. 오지시 방어',d:'세션 맥락과 무관한 지시\n감지 시 확인',pg:'process'},
+  {id:'step3',t:'3. 병렬 실행\n(Split View)',d:'DEV+QA 동시 투입\nCEO에게 가시화',pg:'process'},
+  {id:'step4',t:'4. 검증',d:'QA 에이전트 검증\nPlaywright 스크린샷',pg:'process'},
+  {id:'step5',t:'5. 결과 보고',d:'결론 먼저(된다/안된다)\n→ 요약 → 확인경로',pg:'process'},
+  {id:'step6',t:'6. 기록',d:'SCRIBE가 TP_history\n+ TP_skills 업데이트',pg:'process'},
+  {id:'ceo1',t:"1. '해봐' = 실행+확인+보고",d:"'해봐' = 실행+확인+보고 한 세트",pg:'ceo_rules'},
+  {id:'ceo2',t:"2. '그리고' = 번호매기고 순서대로",d:"'그리고' 연쇄 = 번호 매기고 순서대로",pg:'ceo_rules'},
+  {id:'ceo3',t:'3. 감정 강도 = 버그 심각도',d:'감정 강도 = 버그 심각도',pg:'ceo_rules'},
+  {id:'ceo4',t:"4. '다 해' = 핵심 80% 먼저",d:"'다 해' = 핵심 80% 먼저",pg:'ceo_rules'},
+  {id:'ceo5',t:'5. 회귀 방지 > 신규 기능',d:'회귀 방지 > 신규 기능',pg:'ceo_rules'},
+  {id:'ceo6',t:'6. 보고 = 결론 먼저',d:'보고 = 결론 먼저',pg:'ceo_rules'},
+  {id:'ceo7',t:'7. 초단문=즉시 / 장문=분해',d:'초단문=즉시행동 / 장문=분해후행동',pg:'ceo_rules'},
+  {id:'ceo8',t:'8. 리스크때만 방향 확인',d:'리스크 높을 때만 방향 확인',pg:'ceo_rules'},
+  {id:'ceo9',t:'9. 오지시 방어',d:'맥락 무관 지시 시 확인',pg:'ceo_rules'},
+  {id:'qa1',t:'Quick: curl (10초)',d:'curl 상태 확인 (10초)',pg:'qa_system'},
+  {id:'qa2',t:'Standard: Playwright (30초)',d:'Playwright 스크린샷 (30초)',pg:'qa_system'},
+  {id:'qa3',t:'Full: Lighthouse (2-3분)',d:'전체 라우트 + Lighthouse (2-3분)',pg:'qa_system'},
+  {id:'hook1',t:'SessionStart\nGit + Notion',d:'Git 초기화 + Notion 기록',pg:'hooks'},
+  {id:'hook2',t:'PreCompact\n백업 + Notion',d:'SESSION_STATE.md 백업\nJSONL 백업 + Notion',pg:'hooks'},
+  {id:'hook3',t:'PostToolUse\nchanges.log',d:'Write/Edit 시 changes.log\n자동 추적',pg:'hooks'},
+  {id:'hook4',t:'Stop\nNotion 종료',d:'Notion 세션 종료 기록',pg:'hooks'},
+  {id:'wf1',t:'제1조: 세션 시작 (5분)',d:'세션 시작 프로토콜 (5분 체크)',pg:'charter'},
+  {id:'wf2',t:'제2조: Go/No-Go Gate',d:'IMSMS 매출 기여?\n기성 솔루션? 1일 PoC?',pg:'charter'},
+  {id:'wf3',t:'제3조: 분석 먼저',d:'분석 먼저, 코딩 나중',pg:'charter'},
+  {id:'wf4',t:'제4조: Contract-First',d:'Contract-First API',pg:'charter'},
+  {id:'wf5',t:'제5조: SESSION_HANDOFF',d:'SESSION_HANDOFF.md',pg:'charter'},
+  {id:'wf6',t:'제6조: 보안 근본원인',d:'보안 수정 근본원인 원칙',pg:'charter'},
+  {id:'wf7',t:'제7조: fix 커밋 품질',d:'fix 커밋 품질 관리',pg:'charter'},
+  {id:'wf8',t:'제8조: Critical Path',d:'Critical Path 태깅',pg:'charter'},
+  {id:'imsms_core',t:'IMSMS Core (핵심)',d:'Console, Backend, Agent\nMDM, Demo, Website',pg:'projects',sz:1.1},
+  {id:'others',t:'기타 프로젝트',d:'AI Chatbot, TP Site, IROS\nAutoContact, A.iMessage, Session Mgr',pg:'projects',sz:1.1},
+  {id:'f1',t:'index.md (2.6KB)',d:'자동로드 2.6KB',pg:'files'},
+  {id:'f2',t:'projects/ (9개)',d:'9개 프로젝트 스킬',pg:'files'},
+  {id:'f3',t:'_reference/',d:'헌장, 프로토콜, QA, 분석',pg:'files'},
+  {id:'f4',t:'_templates/',d:'MAGI 토론, 프로젝트 템플릿',pg:'files'},
+  {id:'f5',t:'_archive/',d:'구파일 12개',pg:'files'},
+  {id:'f6',t:'.claude/rules/',d:'자동로드 규칙 4개',pg:'files'},
+  {id:'f7',t:'CHANGELOG.md',d:'PM 이력',pg:'files'},
+];
+L2.forEach(function(n){n.layer=2;n.sz=n.sz||1;n.gid=n.id;ALL.push(n);EDGES.push({a:n.pg,b:n.id});});
+
+var L3=[
+  {id:'ag_jungsuk',t:'정석 — Backend',d:"Spring Boot, Java, API\n원칙주의 · '명세부터 봅시다'",pg:'dev_team'},
+  {id:'ag_haneul',t:'하늘 — Frontend',d:"React, Next.js, UI/UX\n사용자 관점 · '화면 띄워봅시다'",pg:'dev_team'},
+  {id:'ag_chulsoo',t:'철수 — DevOps',d:"AWS, Docker, CI/CD\n안정성 최우선 · '롤백 플랜 먼저'",pg:'dev_team'},
+  {id:'ag_minsoo',t:'민수 — Native',d:"Swift, macOS Agent, iMessage\n실용주의 · '실기기에서 돌려봐야'",pg:'dev_team'},
+  {id:'ag_gate',t:'보안 GATE',d:"OWASP, 인증/인가, 시크릿 노출\n'이 엔드포인트 인증 없이 열려있네요'",pg:'qa_team'},
+  {id:'ag_probe',t:'기능 PROBE',d:"회귀 테스트, 엣지케이스 발굴\n'CEO가 이렇게 쓸 때 터집니다'",pg:'qa_team'},
+  {id:'ag_perf',t:'성능 QA',d:"응답시간, 메모리, Lighthouse\n'응답 200ms 넘으면 안 됩니다'",pg:'qa_team'},
+  {id:'ag_scout',t:'SCOUT 정찰병',d:"코드 분석, 의존성 추적, 영향도\n'이 함수 호출하는 곳이 7군데'",pg:'pm_team'},
+  {id:'ag_anchor',t:'ANCHOR PM',d:"CEO 의도 해석, 작업 분해, 배정\n'3단계로 나눠서 갑시다'",pg:'pm_team'},
+  {id:'ag_scribe',t:'SCRIBE 기록',d:"세션 로그, TP_history, TP_skills\n'기록 안 남기면 다음에 또 삽질'",pg:'pm_team'},
+  {id:'dp1',t:'탐색/조사: 1-2명',d:'탐색/조사 작업',pg:'deploy_policy'},
+  {id:'dp2',t:'일반 개발: 2-3명',d:'일반 개발 (DEV+QA)',pg:'deploy_policy'},
+  {id:'dp3',t:'대규모: 3-5명',d:'대규모 변경',pg:'deploy_policy'},
+  {id:'dp4',t:'긴급: 2명',d:'긴급 대응',pg:'deploy_policy'},
+  {id:'dp5',t:'의사결정: MAGI',d:'MAGI 3축 토론',pg:'deploy_policy'},
+  {id:'ps1',t:'Backend API\n정석+보안+SCOUT',d:'Backend API 개발 프리셋',pg:'presets'},
+  {id:'ps2',t:'Frontend UI\n하늘+기능+성능',d:'Frontend UI 개발 프리셋',pg:'presets'},
+  {id:'ps3',t:'풀스택\n정석+하늘+기능+ANCHOR',d:'풀스택 개발 프리셋',pg:'presets'},
+  {id:'ps4',t:'Agent 수정\n민수+기능+SCRIBE',d:'Agent 수정 프리셋',pg:'presets'},
+  {id:'ps5',t:'배포/인프라\n철수+보안+ANCHOR',d:'배포/인프라 프리셋',pg:'presets'},
+  {id:'ps6',t:'코드 분석\nSCOUT+PROBE',d:'코드 분석 프리셋',pg:'presets'},
+  {id:'ps7',t:'대규모 리팩토링',d:'SCOUT + 정석 + 하늘 + 보안 + ANCHOR',pg:'presets'},
+  {id:'pj01',t:'01 Console',d:'React 18 + Express · Production',pg:'imsms_core'},
+  {id:'pj02',t:'02 Backend',d:'Spring Boot + Java 17 · Production',pg:'imsms_core'},
+  {id:'pj03',t:'03 Agent TP',d:'Swift 메뉴바앱 · Production',pg:'imsms_core'},
+  {id:'pj04',t:'04 MDM',d:'Node.js + React · Development',pg:'imsms_core'},
+  {id:'pj05',t:'05 Demo',d:'Next.js · Active',pg:'imsms_core'},
+  {id:'pj06',t:'06 Website',d:'Next.js + Tailwind · Production',pg:'imsms_core'},
+  {id:'pj10',t:'10 AI Chatbot',d:'React + Ollama · Inactive',pg:'others'},
+  {id:'pj20',t:'20 TP Site',d:'Next.js + Vercel · Stable',pg:'others'},
+  {id:'pj30',t:'30 IROS',d:'Python + Selenium · Utility',pg:'others'},
+  {id:'pj31',t:'31 AutoContact',d:'Python + PyQt · Production',pg:'others'},
+  {id:'pj36',t:'36 A.iMessage',d:'Node.js + TypeScript · Production',pg:'others'},
+  {id:'pj50',t:'50 Session Mgr',d:'Python + Shell · Production',pg:'others'},
+];
+L3.forEach(function(n){n.layer=3;n.sz=n.sz||0.85;n.gid=n.id;ALL.push(n);EDGES.push({a:n.pg,b:n.id});});
+
+var CROSS=[
+  ['step1','ag_anchor','ANCHOR가 접수'],['step2','ceo9','오지시 방어'],
+  ['step3','dev_team','DEV 투입'],['step3','qa_team','QA 동시 투입'],
+  ['step4','qa_system','QA 체계 적용'],['step5','ceo6','결론 먼저'],
+  ['step6','ag_scribe','SCRIBE 기록'],['dp5','magi','MAGI 토론'],
+  ['ag_anchor','ceo_rules','CEO 원칙'],['ag_scribe','f7','CHANGELOG'],
+  ['ag_gate','wf6','보안 근본원인'],['ag_probe','wf7','회귀 테스트'],
+  ['ag_jungsuk','wf4','Contract-First'],['qa2','ag_haneul','Playwright'],
+  ['hook2','pj50','Session Manager'],['ceo5','wf7','회귀=fix품질'],
+  ['pj01','ag_haneul','Frontend'],['pj02','ag_jungsuk','Backend'],
+  ['pj03','ag_minsoo','Native'],['pj36','ag_minsoo','Native'],
+  ['ps1','ag_jungsuk'],['ps1','ag_gate'],['ps1','ag_scout'],
+  ['ps2','ag_haneul'],['ps2','ag_probe'],['ps2','ag_perf'],
+  ['ps3','ag_jungsuk'],['ps3','ag_haneul'],['ps3','ag_probe'],['ps3','ag_anchor'],
+  ['ps5','ag_chulsoo'],['ps5','ag_gate'],
+];
+CROSS.forEach(function(c){EDGES.push({a:c[0],b:c[1],cr:1,label:c[2]||''});});
+
+var NM={};ALL.forEach(function(n){NM[n.id]=n;});
+
+// === SPHERE PLACEMENT ===
+var RADII=[0,180,340,500];
+
+function placeSphere(nodes,R){
+  var phi=(1+Math.sqrt(5))/2;
+  nodes.forEach(function(n,i){
+    var theta=2*Math.PI*i/phi;
+    var cp=1-(2*(i+0.5))/nodes.length;
+    var sp=Math.sqrt(1-cp*cp);
+    n.x=R*sp*Math.cos(theta);n.y=R*cp;n.z=R*sp*Math.sin(theta);
+  });
+}
+NM['system'].x=0;NM['system'].y=0;NM['system'].z=0;
+placeSphere(ALL.filter(function(n){return n.layer===1;}),RADII[1]);
+
+function placeNearParent(nodes,R){
+  var pgIdx={};
+  nodes.forEach(function(n){
+    if(!pgIdx[n.pg])pgIdx[n.pg]=0;
+    var idx=pgIdx[n.pg]++;
+    var p=NM[n.pg];if(!p){n.x=0;n.y=0;n.z=0;return;}
+    var pd=Math.sqrt(p.x*p.x+p.y*p.y+p.z*p.z)||1;
+    var bx=p.x/pd,by=p.y/pd,bz=p.z/pd;
+    var sib=nodes.filter(function(nn){return nn.pg===n.pg;}).length;
+    var ang=(idx/sib)*Math.PI*2;var sp=0.35;
+    var ax=0,ay=1,az=0;if(Math.abs(by)>0.9){ax=1;ay=0;az=0;}
+    var t1x=by*az-bz*ay,t1y=bz*ax-bx*az,t1z=bx*ay-by*ax;
+    var t1d=Math.sqrt(t1x*t1x+t1y*t1y+t1z*t1z)||1;
+    t1x/=t1d;t1y/=t1d;t1z/=t1d;
+    var t2x=by*t1z-bz*t1y,t2y=bz*t1x-bx*t1z,t2z=bx*t1y-by*t1x;
+    var dx=bx+Math.cos(ang)*sp*t1x+Math.sin(ang)*sp*t2x;
+    var dy=by+Math.cos(ang)*sp*t1y+Math.sin(ang)*sp*t2y;
+    var dz=bz+Math.cos(ang)*sp*t1z+Math.sin(ang)*sp*t2z;
+    var dd=Math.sqrt(dx*dx+dy*dy+dz*dz)||1;
+    n.x=(dx/dd)*R;n.y=(dy/dd)*R;n.z=(dz/dd)*R;
+  });
+}
+placeNearParent(ALL.filter(function(n){return n.layer===2;}),RADII[2]);
+placeNearParent(ALL.filter(function(n){return n.layer===3;}),RADII[3]);
+
+var edgesR=EDGES.map(function(e){return{a:NM[e.a],b:NM[e.b],cr:e.cr||0,label:e.label||''};}).filter(function(e){return e.a&&e.b;});
+
+// Camera
+var camD=900,rX=-0.15,rY=0.3,pX=0,pY=0,aRot=true;
+var time=0;
+
+function proj(x,y,z){
+  var cy=Math.cos(rY),sy=Math.sin(rY),cx=Math.cos(rX),sx=Math.sin(rX);
+  var x1=x*cy-z*sy,z1=x*sy+z*cy;
+  var y1=y*cx-z1*sx,z2=y*sx+z1*cx;
+  var f=camD/(camD+z2);
+  return{x:x1*f+W/2+pX,y:y1*f+H/2+pY,s:f,z:z2};
+}
+
+var hov=null,tip=document.getElementById('tip');
+
+function hitTest(mx,my){
+  var best=null,bestZ=99999;
+  ALL.forEach(function(n){
+    if(n._bx===undefined)return;
+    if(mx>=n._bx&&mx<=n._bx+n._bw&&my>=n._by&&my<=n._by+n._bh&&n._pz<bestZ){best=n;bestZ=n._pz;}
+  });
+  return best;
+}
+
+function draw(){
+  time+=0.016;
+  G.clearRect(0,0,W,H);
+
+  // Background
+  if(isDark){
+    var bg=G.createRadialGradient(W/2,H/2,0,W/2,H/2,W*.7);
+    bg.addColorStop(0,'#08081a');bg.addColorStop(0.5,'#040410');bg.addColorStop(1,'#010104');
+    G.fillStyle=bg;G.fillRect(0,0,W,H);
+    // Stars
+    STARS.forEach(function(s){
+      var p=proj(s.x*800,s.y*800,s.z*800);
+      if(p.z>-camD){
+        var twinkle=s.b*(0.7+0.3*Math.sin(time*2+s.x*10));
+        G.fillStyle='rgba(180,190,255,'+twinkle+')';
+        G.beginPath();G.arc(p.x,p.y,s.s*p.s,0,Math.PI*2);G.fill();
+      }
+    });
+  } else {
+    var bg=G.createRadialGradient(W/2,H/2,0,W/2,H/2,W*.7);
+    bg.addColorStop(0,'#f4f6fb');bg.addColorStop(0.5,'#eceef5');bg.addColorStop(1,'#e0e3ed');
+    G.fillStyle=bg;G.fillRect(0,0,W,H);
+  }
+
+  // Sphere wireframes with glow
+  [RADII[1],RADII[2],RADII[3]].forEach(function(R,ri){
+    var op=isDark?[0.05,0.035,0.025][ri]:[0.06,0.04,0.03][ri];
+    var wc=isDark?'100,100,200':'120,120,180';
+    G.strokeStyle='rgba('+wc+','+op+')';G.lineWidth=0.5;
+    for(var i=0;i<8;i++){
+      var a=i*Math.PI/4;G.beginPath();
+      for(var j=0;j<=48;j++){var ph=j/48*Math.PI*2;var p=proj(R*Math.cos(ph)*Math.cos(a),R*Math.sin(ph),R*Math.cos(ph)*Math.sin(a));if(j===0)G.moveTo(p.x,p.y);else G.lineTo(p.x,p.y);}
+      G.stroke();
+    }
+    for(var i=-1;i<=1;i++){
+      var lat=i*Math.PI/4;var r=R*Math.cos(lat);var yy=R*Math.sin(lat);
+      G.beginPath();
+      for(var j=0;j<=48;j++){var a=j/48*Math.PI*2;var p=proj(r*Math.cos(a),yy,r*Math.sin(a));if(j===0)G.moveTo(p.x,p.y);else G.lineTo(p.x,p.y);}
+      G.stroke();
+    }
+  });
+
+  ALL.forEach(function(n){var p=proj(n.x,n.y,n.z);n._px=p.x;n._py=p.y;n._ps=p.s;n._pz=p.z;});
+
+  // Edges
+  edgesR.forEach(function(e){
+    var pa=proj(e.a.x,e.a.y,e.a.z),pb=proj(e.b.x,e.b.y,e.b.z);
+    var c=gc(e.a);var as=(pa.s+pb.s)/2;
+    var isH=hov&&(e.a.id===hov.id||e.b.id===hov.id);
+    G.beginPath();G.moveTo(pa.x,pa.y);G.lineTo(pb.x,pb.y);
+    if(isDark){
+      if(e.cr){G.setLineDash([2,4]);G.strokeStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+(isH?.65:.2*as)+')';G.lineWidth=(isH?1.5:.5)*as;}
+      else{G.setLineDash([]);G.strokeStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+(isH?.75:.3*as)+')';G.lineWidth=(isH?2:0.8)*as;}
+    } else {
+      if(e.cr){G.setLineDash([2,4]);G.strokeStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+(isH?.5:.15*as)+')';G.lineWidth=(isH?1.5:.6)*as;}
+      else{G.setLineDash([]);G.strokeStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+(isH?.6:.22*as)+')';G.lineWidth=(isH?2:0.9)*as;}
+    }
+    G.stroke();G.setLineDash([]);
+  });
+
+  var sorted=ALL.slice().sort(function(a,b){return b._pz-a._pz;});
+
+  // Nodes
+  sorted.forEach(function(n){
+    var c=gc(n);var sc=(n.sz||1)*n._ps;
+    if(sc<0.06)return;
+
+    // Usage boost: nodes with higher usage are slightly larger
+    var usageBoost=1;
+    var udata=getUsage(n.id);
+    if(udata&&udata.count>0){usageBoost=1+Math.min(0.3,(udata.count/MAX_USAGE)*0.3);}
+
+    var cw=88*sc*usageBoost,ch=34*sc*usageBoost;
+    var x=n._px-cw/2,y=n._py-ch/2;
+    var alpha=Math.max(0.06,Math.min(1,n._ps*1.3));
+    var isH=hov&&hov.id===n.id;
+    n._bx=x;n._by=y;n._bw=cw;n._bh=ch;
+
+    if(isDark){
+      // Dark: glass card
+      if(isH){G.shadowColor='rgba('+c[0]+','+c[1]+','+c[2]+',0.5)';G.shadowBlur=20*sc;}
+      G.fillStyle='rgba('+Math.floor(c[0]*.15)+','+Math.floor(c[1]*.15)+','+Math.floor(c[2]*.15)+','+alpha*.8+')';
+      rr(x,y,cw,ch,4*sc);G.fill();
+      G.strokeStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+(isH?alpha*.8:alpha*.3)+')';
+      G.lineWidth=(isH?1.5:.6)*sc;rr(x,y,cw,ch,4*sc);G.stroke();
+      G.shadowColor='transparent';G.shadowBlur=0;
+      // Top accent
+      var tg=G.createLinearGradient(x,y,x+cw,y);
+      tg.addColorStop(0,'rgba('+c[0]+','+c[1]+','+c[2]+','+alpha*.3+')');
+      tg.addColorStop(1,'rgba('+c[0]+','+c[1]+','+c[2]+','+alpha*.08+')');
+      G.fillStyle=tg;rrTop(x,y,cw,Math.min(ch*.3,10*sc),4*sc);G.fill();
+      // Usage indicator dot
+      if(udata&&udata.count>0){
+        var dotR=Math.max(1.5,2.5*sc);
+        var intensity=udata.count/MAX_USAGE;
+        G.fillStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+(0.3+intensity*0.6)+')';
+        G.beginPath();G.arc(x+cw-6*sc,y+6*sc,dotR,0,Math.PI*2);G.fill();
+      }
+      if(sc>0.2){
+        G.fillStyle='rgba(255,255,255,'+alpha*.88+')';
+        G.font=(isH?'600 ':'500 ')+Math.max(5,7*sc)+'px -apple-system,sans-serif';
+        G.textAlign='center';
+        var lines=(n.t||'').split('\n');
+        for(var i=0;i<lines.length;i++){G.fillText(lines[i],n._px,y+10*sc+9*sc*(i+1),cw-6*sc);}
+        G.textAlign='left';
+      }
+    } else {
+      // Light: white card with subtle shadow
+      if(isH){G.shadowColor='rgba('+c[0]+','+c[1]+','+c[2]+',0.2)';G.shadowBlur=16*sc;}
+      else{G.shadowColor='rgba(0,0,0,0.06)';G.shadowBlur=6*sc;}
+      G.fillStyle='rgba(255,255,255,'+alpha*.95+')';
+      rr(x,y,cw,ch,4*sc);G.fill();
+      G.strokeStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+(isH?alpha*.6:alpha*.2)+')';
+      G.lineWidth=(isH?1.5:.6)*sc;rr(x,y,cw,ch,4*sc);G.stroke();
+      G.shadowColor='transparent';G.shadowBlur=0;
+      // Top accent
+      var tg=G.createLinearGradient(x,y,x+cw,y);
+      tg.addColorStop(0,'rgba('+c[0]+','+c[1]+','+c[2]+','+alpha*.18+')');
+      tg.addColorStop(1,'rgba('+c[0]+','+c[1]+','+c[2]+','+alpha*.04+')');
+      G.fillStyle=tg;rrTop(x,y,cw,Math.min(ch*.3,10*sc),4*sc);G.fill();
+      // Usage indicator
+      if(udata&&udata.count>0){
+        var dotR=Math.max(1.5,2.5*sc);
+        var intensity=udata.count/MAX_USAGE;
+        G.fillStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+(0.2+intensity*0.5)+')';
+        G.beginPath();G.arc(x+cw-6*sc,y+6*sc,dotR,0,Math.PI*2);G.fill();
+      }
+      if(sc>0.2){
+        G.fillStyle='rgba('+Math.floor(c[0]*.35)+','+Math.floor(c[1]*.35)+','+Math.floor(c[2]*.35)+','+alpha*.95+')';
+        G.font=(isH?'600 ':'500 ')+Math.max(5,7*sc)+'px -apple-system,sans-serif';
+        G.textAlign='center';
+        var lines=(n.t||'').split('\n');
+        for(var i=0;i<lines.length;i++){G.fillText(lines[i],n._px,y+10*sc+9*sc*(i+1),cw-6*sc);}
+        G.textAlign='left';
+      }
+    }
+  });
+}
+
+function rr(x,y,w,h,r){G.beginPath();G.moveTo(x+r,y);G.lineTo(x+w-r,y);G.quadraticCurveTo(x+w,y,x+w,y+r);G.lineTo(x+w,y+h-r);G.quadraticCurveTo(x+w,y+h,x+w-r,y+h);G.lineTo(x+r,y+h);G.quadraticCurveTo(x,y+h,x,y+h-r);G.lineTo(x,y+r);G.quadraticCurveTo(x,y,x+r,y);G.closePath();}
+function rrTop(x,y,w,h,r){G.beginPath();G.moveTo(x+r,y);G.lineTo(x+w-r,y);G.quadraticCurveTo(x+w,y,x+w,y+r);G.lineTo(x+w,y+h);G.lineTo(x,y+h);G.lineTo(x,y+r);G.quadraticCurveTo(x,y,x+r,y);G.closePath();}
+
+// Interaction
+var drag=false,rdrag=false,lx=0,ly=0;
+C.addEventListener('mousedown',function(e){lx=e.clientX;ly=e.clientY;if(e.button===2)rdrag=true;else drag=true;aRot=false;document.getElementById('bRot').classList.remove('on');});
+C.addEventListener('mousemove',function(e){
+  var dx=e.clientX-lx,dy=e.clientY-ly;
+  if(drag){rY+=dx*.005;rX+=dy*.005;rX=Math.max(-1.5,Math.min(1.5,rX));}
+  else if(rdrag){pX+=dx;pY+=dy;}
+  else{
+    var h=hitTest(e.clientX,e.clientY);hov=h;
+    if(h){
+      tip.style.display='block';tip.style.left=(e.clientX+16)+'px';tip.style.top=(e.clientY-10)+'px';
+      var udata=getUsage(h.id);
+      var usageHtml='';
+      if(udata&&udata.count>0){
+        var pct=Math.round((udata.count/MAX_USAGE)*100);
+        var c=gc(h);
+        usageHtml='<div class="tp-usage"><span>참조 '+udata.count+'회</span><div class="tp-bar"><div class="tp-fill" style="width:'+pct+'%;background:rgb('+c+')"></div></div></div>';
+      }
+      tip.innerHTML='<div class="tp-group">'+(h.pg||'')+'</div><div class="tp-title">'+(h.t||'').replace(/\n/g,' ')+'</div>'+(h.d?'<div class="tp-desc">'+h.d.replace(/\n/g,' · ')+'</div>':'')+usageHtml;
+      C.style.cursor='pointer';
+    }
+    else{tip.style.display='none';C.style.cursor='grab';}
+  }
+  lx=e.clientX;ly=e.clientY;
+});
+C.addEventListener('mouseup',function(){drag=false;rdrag=false;});
+C.addEventListener('mouseleave',function(){drag=false;rdrag=false;});
+C.addEventListener('contextmenu',function(e){e.preventDefault();});
+C.addEventListener('wheel',function(e){e.preventDefault();camD=Math.max(300,Math.min(2500,camD+e.deltaY*.7));},{passive:false});
+
+function toggleRot(){aRot=!aRot;document.getElementById('bRot').classList.toggle('on',aRot);}
+function resetCam(){camD=900;rX=-0.15;rY=0.3;pX=0;pY=0;aRot=true;document.getElementById('bRot').classList.add('on');}
+
+// Legend
+var legNames={magi:'MAGI',dev_team:'DEV',qa_team:'QA',pm_team:'PM',process:'Process',ceo_rules:'CEO',hooks:'Hook',charter:'Charter',projects:'Project',files:'Files',presets:'Preset'};
+var leg=document.getElementById('leg');
+Object.keys(legNames).forEach(function(k){var c=COL[k]||[120,120,170];var d=document.createElement('div');d.className='li';d.innerHTML='<div class="ld" style="background:rgb('+c+')"></div>'+legNames[k];leg.appendChild(d);});
+
+function loop(){if(aRot)rY+=.0025;draw();requestAnimationFrame(loop);}
+loop();
+</script>
+</body>
+</html>
