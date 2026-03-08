@@ -460,7 +460,92 @@ var legNames={magi:'MAGI',dev_team:'DEV',qa_team:'QA',pm_team:'PM',process:'PROC
 var leg=document.getElementById('leg');
 Object.keys(legNames).forEach(function(k){var c=COL[k]||[0,255,200];var d=document.createElement('div');d.className='li';d.innerHTML='<div class="ld" style="background:rgb('+c+');box-shadow:0 0 4px rgba('+c+',0.4)"></div>'+legNames[k];leg.appendChild(d);});
 
-function loop(){if(aRot)rY+=.002;draw();requestAnimationFrame(loop);}
+// === AUTO SHOWCASE (30s idle) ===
+var idleTime=0,showcaseActive=false,showcaseIdx=0,showcaseTimer=null;
+var SHOWCASE_NODES=[];
+function buildShowcaseList(){
+  SHOWCASE_NODES=[];
+  // L1 nodes first
+  L1.forEach(function(n){SHOWCASE_NODES.push(n.id);});
+  // Then nodes with usage data (sorted by count desc)
+  var usedNodes=[];
+  ALL.forEach(function(n){var u=getUsage(n.id);if(u&&u.count>0&&SHOWCASE_NODES.indexOf(n.id)===-1)usedNodes.push({id:n.id,count:u.count});});
+  usedNodes.sort(function(a,b){return b.count-a.count;});
+  usedNodes.forEach(function(u){SHOWCASE_NODES.push(u.id);});
+  // Add some interesting L2/L3 nodes
+  ['ag_anchor','ag_jungsuk','ag_haneul','ag_gate','melchior','balthazar','casper','step1','step3','step5'].forEach(function(id){
+    if(SHOWCASE_NODES.indexOf(id)===-1)SHOWCASE_NODES.push(id);
+  });
+}
+function resetIdle(){
+  idleTime=0;
+  if(showcaseActive){
+    showcaseActive=false;hov=null;tip.style.display='none';
+    C.style.cursor='crosshair';
+  }
+}
+function showcaseNext(){
+  if(!showcaseActive)return;
+  if(SHOWCASE_NODES.length===0)buildShowcaseList();
+  var nid=SHOWCASE_NODES[showcaseIdx%SHOWCASE_NODES.length];
+  var n=NM[nid];if(!n){showcaseIdx++;return;}
+  hov=n;
+  // Smoothly rotate camera toward this node
+  var targetRY=Math.atan2(n.x,n.z);
+  var targetRX=-Math.asin(n.y/(Math.sqrt(n.x*n.x+n.y*n.y+n.z*n.z)||1));
+  // Lerp toward target
+  var dY=targetRY-rY;while(dY>Math.PI)dY-=2*Math.PI;while(dY<-Math.PI)dY+=2*Math.PI;
+  rY+=dY*0.08;rX+=(targetRX-rX)*0.08;
+  // Show tooltip at node screen position
+  if(n._px!==undefined){
+    tip.style.display='block';
+    var tx=Math.min(W-320,Math.max(10,n._px+40));
+    var ty=Math.min(H-120,Math.max(10,n._py-20));
+    tip.style.left=tx+'px';tip.style.top=ty+'px';
+    var udata=getUsage(n.id);var usageHtml='';
+    if(udata&&udata.count>0){
+      var pct=Math.round((udata.count/MAX_USAGE)*100);
+      usageHtml='<div class="tp-usage"><span>REF '+udata.count+'x</span><div class="tp-bar"><div class="tp-fill" style="width:'+pct+'%"></div></div></div>';
+    }
+    var c=gc(n);
+    tip.innerHTML='<div class="tp-group">'+(n.pg||'').toUpperCase()+'</div><div class="tp-title" style="color:rgba('+c[0]+','+c[1]+','+c[2]+',0.95);text-shadow:0 0 8px rgba('+c[0]+','+c[1]+','+c[2]+',0.3)">'+(n.t||'').replace(/\n/g,' ')+'</div>'+(n.d?'<div class="tp-desc">'+n.d.replace(/\n/g,' · ')+'</div>':'')+usageHtml;
+    C.style.cursor='pointer';
+  }
+  showcaseIdx++;
+}
+// Idle detection — reset on any interaction
+['mousemove','mousedown','wheel','keydown','touchstart'].forEach(function(evt){
+  window.addEventListener(evt,resetIdle,{passive:true});
+});
+// Check idle every second
+setInterval(function(){
+  idleTime++;
+  if(!showcaseActive&&idleTime>=30){
+    showcaseActive=true;showcaseIdx=0;buildShowcaseList();
+    aRot=true;document.getElementById('bRot').classList.add('on');
+  }
+},1000);
+// Cycle showcase node every 4 seconds
+setInterval(function(){if(showcaseActive)showcaseNext();},4000);
+
+function loop(){
+  if(aRot)rY+=.002;
+  // Smooth camera lerp for showcase
+  if(showcaseActive&&hov){
+    var n=hov;
+    var targetRY=Math.atan2(n.x,n.z);
+    var targetRX=-Math.asin(n.y/(Math.sqrt(n.x*n.x+n.y*n.y+n.z*n.z)||1));
+    var dY=targetRY-rY;while(dY>Math.PI)dY-=2*Math.PI;while(dY<-Math.PI)dY+=2*Math.PI;
+    rY+=dY*0.03;rX+=(targetRX-rX)*0.03;
+    // Update tooltip position each frame
+    if(n._px!==undefined){
+      var tx=Math.min(W-320,Math.max(10,n._px+40));
+      var ty=Math.min(H-120,Math.max(10,n._py-20));
+      tip.style.left=tx+'px';tip.style.top=ty+'px';
+    }
+  }
+  draw();requestAnimationFrame(loop);
+}
 loop();
 </script>
 </body>
