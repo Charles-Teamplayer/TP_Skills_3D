@@ -354,7 +354,7 @@ function draw(){
     if(sc<0.06)return;
     var usageBoost=1;var udata=getUsage(n.id);
     if(udata&&udata.count>0){usageBoost=1+Math.min(0.25,(udata.count/MAX_USAGE)*0.25);}
-    var cw=90*sc*usageBoost,ch=36*sc*usageBoost;
+    var cw=90*sc*usageBoost,ch=40*sc*usageBoost;
     var x=n._px-cw/2,y=n._py-ch/2;
     var alpha=Math.max(0.06,Math.min(1,n._ps*1.3));
     var isH=hov&&hov.id===n.id;
@@ -374,9 +374,18 @@ function draw(){
     G.lineWidth=(isH?1.5:.6)*sc;rr(x,y,cw,ch,2*sc);G.stroke();
     G.shadowColor='transparent';G.shadowBlur=0;
 
-    // Top line accent (EVA style bar)
-    G.fillStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+(isH?alpha*(isDark?.5:.3):alpha*(isDark?.2:.1))+')';
-    G.fillRect(x+1*sc,y+0.5*sc,cw-2*sc,1.5*sc);
+    // Top color bar (EVA style — full color accent with count)
+    var barH=8*sc;
+    G.fillStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+(isH?alpha*(isDark?.7:.5):alpha*(isDark?.4:.25))+')';
+    G.fillRect(x+0.5*sc,y+0.5*sc,cw-1*sc,barH);
+    // Count text in bar
+    if(sc>0.25&&udata&&udata.count>0){
+      G.fillStyle=isDark?'rgba(0,0,0,'+alpha*.6+')':'rgba(255,255,255,'+alpha*.7+')';
+      G.font='600 '+Math.max(4,5*sc)+'px "Orbitron","Share Tech Mono",monospace';
+      G.textAlign='right';
+      G.fillText('x'+udata.count,x+cw-3*sc,y+0.5*sc+barH-1.5*sc);
+      G.textAlign='left';
+    }
 
     // Corner marks (EVA technical UI)
     if(sc>0.3){
@@ -388,14 +397,7 @@ function draw(){
       G.beginPath();G.moveTo(x+cm,y+ch);G.lineTo(x,y+ch);G.lineTo(x,y+ch-cm);G.stroke();
     }
 
-    // Usage dot indicator
-    if(udata&&udata.count>0){
-      var dotR=Math.max(1.2,2*sc);
-      var intensity=udata.count/MAX_USAGE;
-      var pulse=0.5+0.5*Math.sin(time*3+n.x);
-      G.fillStyle='rgba(255,180,40,'+(0.3+intensity*0.5)*pulse+')';
-      G.beginPath();G.arc(x+cw-4*sc,y+4*sc,dotR,0,Math.PI*2);G.fill();
-    }
+    // (count now shown in top bar)
 
     // Text — EVA monospace style
     if(sc>0.18){
@@ -404,7 +406,7 @@ function draw(){
       G.font=(isH?'700 ':'600 ')+Math.max(4.5,6.5*sc)+'px "Orbitron","Share Tech Mono",monospace';
       G.textAlign='center';
       var lines=(n.t||'').split('\n');
-      var ly=y+6*sc+8*sc;
+      var ly=y+barH+4*sc+7*sc;
       for(var i=0;i<lines.length;i++){
         G.fillText(lines[i],n._px,ly+8*sc*i,cw-6*sc);
       }
