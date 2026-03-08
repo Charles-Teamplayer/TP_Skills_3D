@@ -7,7 +7,22 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;600;700&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
-body{overflow:hidden;font-family:'Share Tech Mono','Courier New',monospace;background:#000}
+body{overflow:hidden;font-family:'Share Tech Mono','Courier New',monospace;background:#000;transition:background .4s}
+body.light #scanlines{opacity:0.3}
+body.light #vignette{background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,0.12) 100%)}
+body.light #ui button{background:rgba(0,60,50,0.06);border-color:rgba(0,120,100,0.25);color:rgba(0,100,80,0.6)}
+body.light #ui button:hover{background:rgba(0,120,100,0.1);color:rgba(0,100,80,0.9)}
+body.light #ui button.on{background:rgba(0,120,100,0.1);color:rgba(0,120,100,0.8);border-color:rgba(0,120,100,0.4)}
+body.light #hdr h1{color:rgba(0,100,80,0.7);text-shadow:none}
+body.light #hdr .sub{color:rgba(0,80,60,0.35)}
+body.light .m-mel{color:rgba(200,40,40,0.7)} body.light .m-bal{color:rgba(200,140,20,0.7)} body.light .m-cas{color:rgba(0,140,200,0.7)}
+body.light #tip{background:rgba(255,255,255,0.96);border-color:rgba(0,120,100,0.2);color:rgba(0,60,50,0.85);box-shadow:0 4px 20px rgba(0,0,0,0.1)}
+body.light #tip .tp-group{color:rgba(0,80,60,0.4)}
+body.light #tip .tp-title{color:rgba(0,80,60,0.9);text-shadow:none}
+body.light #tip .tp-desc{color:rgba(0,60,50,0.55)}
+body.light #tip .tp-usage{border-top-color:rgba(0,80,60,0.1);color:rgba(180,120,20,0.7)}
+body.light .li{color:rgba(0,80,60,0.35)}
+body.light #foot{color:rgba(0,80,60,0.2)}
 canvas{display:block;width:100vw;height:100vh}
 #ui{position:fixed;top:14px;left:14px;z-index:10;display:flex;gap:5px;align-items:center}
 #ui button{padding:4px 10px;border-radius:2px;cursor:pointer;font-size:10px;font-family:'Share Tech Mono',monospace;text-transform:uppercase;letter-spacing:1.5px;transition:all .2s;border:1px solid rgba(0,255,200,0.2);background:rgba(0,20,15,0.6);color:rgba(0,255,200,0.5)}
@@ -44,6 +59,7 @@ canvas{display:block;width:100vw;height:100vh}
 <div id="ui">
   <button class="on" id="bRot" onclick="toggleRot()">AUTO ROT</button>
   <button onclick="resetCam()">RESET</button>
+  <button id="bTheme" onclick="toggleTheme()">DAY MODE</button>
 </div>
 <div id="hdr">
   <h1>MAGI SYSTEM</h1>
@@ -61,6 +77,12 @@ canvas{display:block;width:100vw;height:100vh}
 <script>
 var C=document.createElement('canvas');document.body.appendChild(C);
 var G=C.getContext('2d');var W,H,DPR;
+var isDark=true;
+function toggleTheme(){
+  isDark=!isDark;
+  document.body.className=isDark?'':'light';
+  document.getElementById('bTheme').textContent=isDark?'DAY MODE':'NIGHT MODE';
+}
 function resize(){DPR=window.devicePixelRatio||1;W=window.innerWidth;H=window.innerHeight;C.width=W*DPR;C.height=H*DPR;C.style.width=W+'px';C.style.height=H+'px';G.setTransform(DPR,0,0,DPR,0,0);}
 resize();window.addEventListener('resize',resize);
 
@@ -102,9 +124,9 @@ var L1=[
   {id:'ceo_rules',t:'CEO PROTOCOL\n(9 RULES)',d:'CEO는 바꾸지 않는다\nClaude가 100% 적응'},
   {id:'qa_system',t:'QA SYSTEM',d:'브라우저 검증 3단계'},
   {id:'hooks',t:'AUTO HOOKS',d:'세션 생명주기 자동 관리'},
-  {id:'charter',t:'WORKFLOW\nCHARTER (8)',d:''},
-  {id:'projects',t:'PROJECT MAP\n(9 PJ)',d:''},
-  {id:'files',t:'FILE STRUCT',d:''},
+  {id:'charter',t:'WORKFLOW\nCHARTER (8)',d:'워크플로우 헌장 8개 조항\n세션/분석/보안/품질 규칙'},
+  {id:'projects',t:'PROJECT MAP\n(9 PJ)',d:'IMSMS Core 6개 + 기타 6개\n프로젝트 현황 맵'},
+  {id:'files',t:'FILE STRUCT',d:'TP_skills 파일 구조\nindex, projects, reference, templates'},
 ];
 L1.forEach(function(n){n.layer=1;n.sz=1.4;n.gid=n.id;n.pg=n.id;ALL.push(n);EDGES.push({a:'system',b:n.id});});
 
@@ -271,21 +293,27 @@ function hitTest(mx,my){
 function draw(){
   time+=0.016;G.clearRect(0,0,W,H);
 
-  // Background: deep dark teal
-  var bg=G.createRadialGradient(W/2,H/2,0,W/2,H/2,W*.75);
-  bg.addColorStop(0,'#051510');bg.addColorStop(0.4,'#030e0a');bg.addColorStop(1,'#010403');
-  G.fillStyle=bg;G.fillRect(0,0,W,H);
+  // Background
+  if(isDark){
+    var bg=G.createRadialGradient(W/2,H/2,0,W/2,H/2,W*.75);
+    bg.addColorStop(0,'#051510');bg.addColorStop(0.4,'#030e0a');bg.addColorStop(1,'#010403');
+    G.fillStyle=bg;G.fillRect(0,0,W,H);
+  } else {
+    var bg=G.createRadialGradient(W/2,H/2,0,W/2,H/2,W*.75);
+    bg.addColorStop(0,'#f2f7f5');bg.addColorStop(0.4,'#e8efec');bg.addColorStop(1,'#dde5e2');
+    G.fillStyle=bg;G.fillRect(0,0,W,H);
+  }
 
   // Grid overlay (EVA style)
-  G.strokeStyle='rgba(0,255,200,0.018)';G.lineWidth=0.5;
+  G.strokeStyle=isDark?'rgba(0,255,200,0.018)':'rgba(0,120,100,0.04)';G.lineWidth=0.5;
   var gs=40;
   for(var gx=0;gx<W;gx+=gs){G.beginPath();G.moveTo(gx,0);G.lineTo(gx,H);G.stroke();}
   for(var gy=0;gy<H;gy+=gs){G.beginPath();G.moveTo(0,gy);G.lineTo(W,gy);G.stroke();}
 
   // Sphere wireframes — teal glow
   [RADII[1],RADII[2],RADII[3]].forEach(function(R,ri){
-    var op=[0.06,0.04,0.03][ri];
-    G.strokeStyle='rgba(0,255,200,'+op+')';G.lineWidth=0.5;
+    var op=isDark?[0.06,0.04,0.03][ri]:[0.08,0.06,0.04][ri];
+    G.strokeStyle=isDark?'rgba(0,255,200,'+op+')':'rgba(0,120,100,'+op+')';G.lineWidth=0.5;
     for(var i=0;i<8;i++){
       var a=i*Math.PI/4;G.beginPath();
       for(var j=0;j<=48;j++){var ph=j/48*Math.PI*2;var p=proj(R*Math.cos(ph)*Math.cos(a),R*Math.sin(ph),R*Math.cos(ph)*Math.sin(a));if(j===0)G.moveTo(p.x,p.y);else G.lineTo(p.x,p.y);}
@@ -301,7 +329,7 @@ function draw(){
   // Animated ring pulse
   var pulseR=200+Math.sin(time*0.8)*60;
   var pulseOp=0.03+Math.sin(time*0.8)*0.015;
-  G.strokeStyle='rgba(0,255,200,'+pulseOp+')';G.lineWidth=1;G.beginPath();
+  G.strokeStyle=isDark?'rgba(0,255,200,'+pulseOp+')':'rgba(0,120,100,'+(pulseOp*1.5)+')';G.lineWidth=1;G.beginPath();
   for(var j=0;j<=48;j++){var a=j/48*Math.PI*2;var p=proj(pulseR*Math.cos(a),0,pulseR*Math.sin(a));if(j===0)G.moveTo(p.x,p.y);else G.lineTo(p.x,p.y);}
   G.stroke();
 
@@ -332,18 +360,22 @@ function draw(){
     var isH=hov&&hov.id===n.id;
     n._bx=x;n._by=y;n._bw=cw;n._bh=ch;
 
-    // EVA card: dark bg + colored border + glow
-    if(isH){G.shadowColor='rgba('+c[0]+','+c[1]+','+c[2]+',0.4)';G.shadowBlur=20*sc;}
-    // Background
-    G.fillStyle='rgba(2,10,8,'+alpha*.88+')';
+    // EVA card
+    if(isDark){
+      if(isH){G.shadowColor='rgba('+c[0]+','+c[1]+','+c[2]+',0.4)';G.shadowBlur=20*sc;}
+      G.fillStyle='rgba(2,10,8,'+alpha*.88+')';
+    } else {
+      if(isH){G.shadowColor='rgba('+c[0]+','+c[1]+','+c[2]+',0.2)';G.shadowBlur=14*sc;}
+      else{G.shadowColor='rgba(0,0,0,0.06)';G.shadowBlur=6*sc;}
+      G.fillStyle='rgba(255,255,255,'+alpha*.94+')';
+    }
     rr(x,y,cw,ch,2*sc);G.fill();
-    // Border
-    G.strokeStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+(isH?alpha*.9:alpha*.35)+')';
+    G.strokeStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+(isH?alpha*(isDark?.9:.6):alpha*(isDark?.35:.2))+')';
     G.lineWidth=(isH?1.5:.6)*sc;rr(x,y,cw,ch,2*sc);G.stroke();
     G.shadowColor='transparent';G.shadowBlur=0;
 
     // Top line accent (EVA style bar)
-    G.fillStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+(isH?alpha*.5:alpha*.2)+')';
+    G.fillStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+(isH?alpha*(isDark?.5:.3):alpha*(isDark?.2:.1))+')';
     G.fillRect(x+1*sc,y+0.5*sc,cw-2*sc,1.5*sc);
 
     // Corner marks (EVA technical UI)
@@ -367,7 +399,8 @@ function draw(){
 
     // Text — EVA monospace style
     if(sc>0.18){
-      G.fillStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+alpha*.9+')';
+      if(isDark){G.fillStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+alpha*.9+')';}
+      else{G.fillStyle='rgba('+Math.floor(c[0]*.4)+','+Math.floor(c[1]*.4)+','+Math.floor(c[2]*.4)+','+alpha*.95+')';}
       G.font=(isH?'700 ':'600 ')+Math.max(4.5,6.5*sc)+'px "Orbitron","Share Tech Mono",monospace';
       G.textAlign='center';
       var lines=(n.t||'').split('\n');
@@ -381,7 +414,7 @@ function draw(){
 
   // Center crosshair
   var cx=W/2+pX,cy=H/2+pY;
-  G.strokeStyle='rgba(0,255,200,0.06)';G.lineWidth=0.5;
+  G.strokeStyle=isDark?'rgba(0,255,200,0.06)':'rgba(0,120,100,0.08)';G.lineWidth=0.5;
   G.beginPath();G.moveTo(cx-15,cy);G.lineTo(cx+15,cy);G.stroke();
   G.beginPath();G.moveTo(cx,cy-15);G.lineTo(cx,cy+15);G.stroke();
 }
@@ -390,7 +423,7 @@ function rr(x,y,w,h,r){G.beginPath();G.moveTo(x+r,y);G.lineTo(x+w-r,y);G.quadrat
 
 // Interaction
 var drag=false,rdrag=false,lx=0,ly=0;
-C.addEventListener('mousedown',function(e){lx=e.clientX;ly=e.clientY;if(e.button===2)rdrag=true;else drag=true;aRot=false;document.getElementById('bRot').classList.remove('on');});
+C.addEventListener('mousedown',function(e){lx=e.clientX;ly=e.clientY;if(e.button===2)rdrag=true;else drag=true;});
 C.addEventListener('mousemove',function(e){
   var dx=e.clientX-lx,dy=e.clientY-ly;
   if(drag){rY+=dx*.005;rX+=dy*.005;rX=Math.max(-1.5,Math.min(1.5,rX));}
