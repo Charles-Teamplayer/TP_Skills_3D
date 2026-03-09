@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "last_updated": "2026-03-09T22:00:00+09:00",
+  "last_updated": "2026-03-09T22:04:39+09:00",
   "total_deliberations": 3,
   "deliberations": [
     {
@@ -71,12 +71,42 @@
           }
         ],
         "votes": [
-          {"axis": "melchior", "vote": "approve", "score": 5, "reason": "아키텍처 적절. 검색+아웃라인 모두 read-only 패턴으로 기존 코드에 침습 없음."},
-          {"axis": "balthazar", "vote": "approve", "score": 5, "reason": "CEO 직접 사용 기능. 추가 비용 0. ROI 무한대."},
-          {"axis": "casper", "vote": "conditional", "score": 4, "condition": "다음 기능 추가 시 JS 모듈 분리 검토. 1000줄 넘으면 필수."},
-          {"axis": "urd", "vote": "approve", "score": 5, "reason": "아웃라인 = 구조 파악 도구. 세션 인수인계 시간 단축."},
-          {"axis": "verdandi", "vote": "conditional", "score": 3, "condition": "브라우저 스크린샷 검증 완료 후 완료 선언 가능."},
-          {"axis": "skuld", "vote": "approve", "score": 5, "reason": "기존 데이터 read-only. searchMatches 빈 배열 시 기존 동작 100% 유지 확인."}
+          {
+            "axis": "melchior",
+            "vote": "approve",
+            "score": 5,
+            "reason": "아키텍처 적절. 검색+아웃라인 모두 read-only 패턴으로 기존 코드에 침습 없음."
+          },
+          {
+            "axis": "balthazar",
+            "vote": "approve",
+            "score": 5,
+            "reason": "CEO 직접 사용 기능. 추가 비용 0. ROI 무한대."
+          },
+          {
+            "axis": "casper",
+            "vote": "conditional",
+            "score": 4,
+            "condition": "다음 기능 추가 시 JS 모듈 분리 검토. 1000줄 넘으면 필수."
+          },
+          {
+            "axis": "urd",
+            "vote": "approve",
+            "score": 5,
+            "reason": "아웃라인 = 구조 파악 도구. 세션 인수인계 시간 단축."
+          },
+          {
+            "axis": "verdandi",
+            "vote": "conditional",
+            "score": 3,
+            "condition": "브라우저 스크린샷 검증 완료 후 완료 선언 가능."
+          },
+          {
+            "axis": "skuld",
+            "vote": "approve",
+            "score": 5,
+            "reason": "기존 데이터 read-only. searchMatches 빈 배열 시 기존 동작 100% 유지 확인."
+          }
         ]
       },
       "verdict": {
@@ -156,12 +186,42 @@
           }
         ],
         "votes": [
-          {"axis": "melchior", "vote": "approve", "score": 5, "reason": "트리 구조 자연스러움. 기존 렌더링 로직 재사용. 타입 안전."},
-          {"axis": "balthazar", "vote": "approve", "score": 5, "reason": "CEO 직접 사용. 비용 0. 30분 이내 완료."},
-          {"axis": "casper", "vote": "approve", "score": 5, "reason": "JSON 데이터 추가만. 유지보수 부담 증가 없음."},
-          {"axis": "urd", "vote": "approve", "score": 5, "reason": "관할 매핑 시각화 = 조직 구조 문서화. 인수인계 효율 향상."},
-          {"axis": "verdandi", "vote": "conditional", "score": 4, "condition": "노드 추가 후 레이아웃 겹침/성능 스크린샷 검증 필요."},
-          {"axis": "skuld", "vote": "approve", "score": 5, "reason": "영향 범위 skill_usage.json만. 다른 파일 수정 불필요 확인."}
+          {
+            "axis": "melchior",
+            "vote": "approve",
+            "score": 5,
+            "reason": "트리 구조 자연스러움. 기존 렌더링 로직 재사용. 타입 안전."
+          },
+          {
+            "axis": "balthazar",
+            "vote": "approve",
+            "score": 5,
+            "reason": "CEO 직접 사용. 비용 0. 30분 이내 완료."
+          },
+          {
+            "axis": "casper",
+            "vote": "approve",
+            "score": 5,
+            "reason": "JSON 데이터 추가만. 유지보수 부담 증가 없음."
+          },
+          {
+            "axis": "urd",
+            "vote": "approve",
+            "score": 5,
+            "reason": "관할 매핑 시각화 = 조직 구조 문서화. 인수인계 효율 향상."
+          },
+          {
+            "axis": "verdandi",
+            "vote": "conditional",
+            "score": 4,
+            "condition": "노드 추가 후 레이아웃 겹침/성능 스크린샷 검증 필요."
+          },
+          {
+            "axis": "skuld",
+            "vote": "approve",
+            "score": 5,
+            "reason": "영향 범위 skill_usage.json만. 다른 파일 수정 불필요 확인."
+          }
         ]
       },
       "verdict": {
@@ -251,12 +311,42 @@
           }
         ],
         "votes": [
-          {"axis": "melchior", "vote": "approve", "score": 3, "reason": "기술적으로 구현 가능. 하지만 '만들 수 있다' 함정 인정."},
-          {"axis": "balthazar", "vote": "reject", "score": 1, "reason": "Norton 360 연 $49.99. 30시간 투입 = 3년치 초과. IMSMS 기여 0. 즉시 폐기."},
-          {"axis": "casper", "vote": "reject", "score": 1, "reason": "1인 팀이 보안 SW 유지보수 불가능. Apple 정책 변경 대응 악몽."},
-          {"axis": "urd", "vote": "conditional", "score": 3, "condition": "폐기하되 10개 세션 기록 TP_history에 아카이브. 헌장 제2조 근거 자료로 보존."},
-          {"axis": "verdandi", "vote": "conditional", "score": 2, "condition": "실동작 증거 없이 30시간 투입. 검증 프로세스 부재가 근본 원인."},
-          {"axis": "skuld", "vote": "reject", "score": 1, "reason": "핵심 프로젝트(IMSMS) 시간 잠식. 코드 공유 0. 폐기 시 다른 시스템 영향 0."}
+          {
+            "axis": "melchior",
+            "vote": "approve",
+            "score": 3,
+            "reason": "기술적으로 구현 가능. 하지만 '만들 수 있다' 함정 인정."
+          },
+          {
+            "axis": "balthazar",
+            "vote": "reject",
+            "score": 1,
+            "reason": "Norton 360 연 $49.99. 30시간 투입 = 3년치 초과. IMSMS 기여 0. 즉시 폐기."
+          },
+          {
+            "axis": "casper",
+            "vote": "reject",
+            "score": 1,
+            "reason": "1인 팀이 보안 SW 유지보수 불가능. Apple 정책 변경 대응 악몽."
+          },
+          {
+            "axis": "urd",
+            "vote": "conditional",
+            "score": 3,
+            "condition": "폐기하되 10개 세션 기록 TP_history에 아카이브. 헌장 제2조 근거 자료로 보존."
+          },
+          {
+            "axis": "verdandi",
+            "vote": "conditional",
+            "score": 2,
+            "condition": "실동작 증거 없이 30시간 투입. 검증 프로세스 부재가 근본 원인."
+          },
+          {
+            "axis": "skuld",
+            "vote": "reject",
+            "score": 1,
+            "reason": "핵심 프로젝트(IMSMS) 시간 잠식. 코드 공유 0. 폐기 시 다른 시스템 영향 0."
+          }
         ]
       },
       "verdict": {
@@ -264,7 +354,11 @@
         "magi_votes": "1/3 approve (BALTHASAR, CASPER 반대)",
         "norn_votes": "1/3 reject, 2/3 conditional",
         "vetoes": [
-          {"axis": "balthazar", "type": "ROI<0.5 + 상용 대안 존재", "detail": "Norton 360 연 $49.99. ROI = -무한대. Go/No-Go Gate Q2 탈락."}
+          {
+            "axis": "balthazar",
+            "type": "ROI<0.5 + 상용 대안 존재",
+            "detail": "Norton 360 연 $49.99. ROI = -무한대. Go/No-Go Gate Q2 탈락."
+          }
         ],
         "summary": "MELCHIOR만 찬성. BALTHASAR ROI 거부권 발동. CASPER 유지보수 불가 판정. 즉시 폐기 → archive. URD: 10개 세션 기록 보존 + 헌장 제2조 제정 근거. 이 사건이 Go/No-Go Gate의 원점."
       },
