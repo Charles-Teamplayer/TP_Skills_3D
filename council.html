@@ -191,6 +191,35 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;point
 .vote-countdown.active{opacity:1}
 .vote-countdown-fill{height:100%;width:0;background:rgba(0,255,200,0.4);transition:width 1s linear}
 
+/* Approval request button */
+.approval-btn{font-family:'Orbitron',monospace;font-size:7px;font-weight:700;letter-spacing:2px;padding:4px 12px;
+  background:rgba(255,60,60,0.08);color:rgba(255,60,60,0.6);border:1px solid rgba(255,60,60,0.2);border-radius:1px;
+  cursor:pointer;transition:all 0.3s;text-transform:uppercase;margin-top:6px}
+.approval-btn:hover{background:rgba(255,60,60,0.15);color:#f44;border-color:rgba(255,60,60,0.4);
+  box-shadow:0 0 12px rgba(255,60,60,0.15);text-shadow:0 0 8px rgba(255,60,60,0.3)}
+
+/* Approval modal */
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:200;
+  display:none;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{background:var(--panel);border:1px solid rgba(0,255,200,0.15);padding:24px;width:480px;max-width:90vw;
+  box-shadow:0 0 40px rgba(0,255,200,0.05)}
+.modal h2{font-family:'Orbitron',monospace;font-size:12px;font-weight:700;letter-spacing:3px;color:rgba(0,255,200,0.6);margin-bottom:16px}
+.modal-field{margin-bottom:12px}
+.modal-field label{display:block;font-size:7px;letter-spacing:2px;text-transform:uppercase;opacity:0.3;margin-bottom:4px}
+.modal-field input,.modal-field select,.modal-field textarea{width:100%;background:rgba(0,255,200,0.03);border:1px solid rgba(0,255,200,0.1);
+  color:var(--text);font-family:'Share Tech Mono',monospace;font-size:10px;padding:6px 8px;outline:none;transition:border-color 0.3s}
+.modal-field input:focus,.modal-field select:focus,.modal-field textarea:focus{border-color:rgba(0,255,200,0.3)}
+.modal-field textarea{height:80px;resize:vertical}
+.modal-actions{display:flex;gap:8px;margin-top:16px}
+.modal-actions button{flex:1;font-family:'Orbitron',monospace;font-size:8px;font-weight:600;letter-spacing:2px;
+  padding:8px;border:1px solid;cursor:pointer;transition:all 0.3s}
+.btn-submit{background:rgba(0,255,128,0.08);color:#0f8;border-color:rgba(0,255,128,0.2)}
+.btn-submit:hover{background:rgba(0,255,128,0.15);box-shadow:0 0 12px rgba(0,255,128,0.1)}
+.btn-cancel{background:transparent;color:var(--dim);border-color:rgba(0,255,200,0.1)}
+.btn-cancel:hover{color:var(--text);border-color:rgba(0,255,200,0.2)}
+.modal-security{font-size:7px;opacity:0.25;letter-spacing:1px;margin-top:12px;text-align:center;text-transform:uppercase}
+
 /* Responsive */
 @media(max-width:900px){.main{grid-template-columns:1fr 1fr}.deliberation{grid-column:1/-1}}
 @media(max-width:600px){.main{grid-template-columns:1fr}.deliberation{flex-direction:column}.delib-right{width:100%}.header{flex-wrap:wrap;gap:8px}.header-right{flex-wrap:wrap}}
@@ -257,6 +286,54 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;point
     <div class="vote-countdown" id="voteCountdown"><div class="vote-countdown-fill" id="voteCountdownFill"></div></div>
     <div class="verdict deliberating" id="verdict">DELIBERATING</div>
     <div class="verdict-reason" id="verdictReason"></div>
+    <button class="approval-btn" id="approvalBtn" onclick="openApprovalModal()">🔒 REQUEST CEO APPROVAL</button>
+  </div>
+</div>
+
+<!-- Approval Modal -->
+<div class="modal-overlay" id="approvalModal">
+  <div class="modal">
+    <h2>🔒 CEO APPROVAL REQUEST</h2>
+    <div class="modal-field">
+      <label>AGENDA (안건)</label>
+      <input type="text" id="modalTitle" placeholder="TP-Firewall 개발 종료">
+    </div>
+    <div class="modal-field">
+      <label>TYPE</label>
+      <select id="modalType">
+        <option value="feature">Feature</option>
+        <option value="deploy">Deploy</option>
+        <option value="architecture">Architecture</option>
+        <option value="security">Security</option>
+        <option value="cost">Cost</option>
+        <option value="nogo">No-Go</option>
+        <option value="refactor">Refactor</option>
+        <option value="infra">Infra</option>
+        <option value="decision" selected>Decision</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <label>RISK</label>
+      <select id="modalRisk">
+        <option value="low">Low</option>
+        <option value="medium" selected>Medium</option>
+        <option value="high">High</option>
+        <option value="critical">Critical</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <label>PROJECT</label>
+      <input type="text" id="modalProject" placeholder="IMSMS Console">
+    </div>
+    <div class="modal-field">
+      <label>MAGI SUMMARY (심의 요약)</label>
+      <textarea id="modalSummary" placeholder="MELCHIOR: 可&#10;BALTHASAR: 否 (ROI < 0.5)&#10;CASPER: 否 (유지보수 불가)"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeApprovalModal()">CANCEL</button>
+      <button class="btn-submit" onclick="submitApproval()">CREATE ISSUE →</button>
+    </div>
+    <div class="modal-security">SECURED BY GITHUB 2FA · FUTURE: IMSMS OTP</div>
   </div>
 </div>
 
@@ -1159,6 +1236,76 @@ function updateClock(){
     +String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0')+':'+String(now.getSeconds()).padStart(2,'0');
 }
 setInterval(updateClock,1000);updateClock();
+
+// ==============================
+// === APPROVAL REQUEST ===
+// ==============================
+
+function openApprovalModal(){
+  var modal = document.getElementById('approvalModal');
+  modal.classList.add('show');
+  // Pre-fill from current agenda if available
+  if(currentMode === 'sim' && currentAgenda){
+    document.getElementById('modalTitle').value = currentAgenda.text.split('—')[0].trim();
+    document.getElementById('modalType').value = currentAgenda.type;
+    document.getElementById('modalRisk').value = currentAgenda.risk;
+    document.getElementById('modalProject').value = currentAgenda.project || '';
+  } else if(currentMode === 'live' && liveData[liveIndex]){
+    var d = liveData[liveIndex];
+    document.getElementById('modalTitle').value = d.agenda.title || d.agenda.text || '';
+    document.getElementById('modalType').value = d.agenda.type || 'decision';
+    document.getElementById('modalRisk').value = d.agenda.risk || 'medium';
+    document.getElementById('modalProject').value = d.agenda.project || '';
+  }
+}
+
+function closeApprovalModal(){
+  document.getElementById('approvalModal').classList.remove('show');
+}
+
+function submitApproval(){
+  var title = document.getElementById('modalTitle').value.trim();
+  var type = document.getElementById('modalType').value;
+  var risk = document.getElementById('modalRisk').value;
+  var project = document.getElementById('modalProject').value.trim();
+  var summary = document.getElementById('modalSummary').value.trim();
+
+  if(!title){
+    alert('안건 제목을 입력하세요');
+    return;
+  }
+
+  var body = encodeURIComponent(
+    '## MAGI Council 승인 요청\n\n' +
+    'AGENDA: ' + title + '\n' +
+    'TYPE: ' + type + '\n' +
+    'RISK: ' + risk + '\n' +
+    'PROJECT: ' + project + '\n\n' +
+    '### MAGI 심의 요약\n' + (summary || 'N/A') + '\n\n' +
+    '---\n' +
+    '### 승인 방법\n' +
+    '`승인` / `APPROVE` / `可` — 승인\n' +
+    '`거부` / `REJECT` / `否` — 거부\n' +
+    '`보류` / `HOLD` / `留` — 보류\n\n' +
+    '> MAGI Council: https://charles-teamplayer.github.io/TP_Skills_3D/council.html'
+  );
+
+  var issueTitle = encodeURIComponent('🔒 [MAGI] ' + title);
+  var url = 'https://github.com/Charles-Teamplayer/TP_Skills_3D/issues/new?title=' + issueTitle + '&body=' + body + '&labels=magi-approval';
+
+  window.open(url, '_blank');
+  closeApprovalModal();
+}
+
+// Close modal on overlay click
+document.getElementById('approvalModal').addEventListener('click', function(e){
+  if(e.target === this) closeApprovalModal();
+});
+
+// ESC to close modal
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape') closeApprovalModal();
+});
 
 // ==============================
 // === BOOT ===

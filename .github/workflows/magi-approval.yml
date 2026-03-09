@@ -1,0 +1,150 @@
+name: MAGI Council Approval
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  issues: write
+  contents: write
+
+jobs:
+  process-approval:
+    # Only run on issues with 'magi-approval' label
+    if: >-
+      contains(github.event.issue.labels.*.name, 'magi-approval') &&
+      github.event.issue.state == 'open'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check approver authorization
+        id: auth
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const comment = context.payload.comment.body.trim();
+            const author = context.payload.comment.user.login;
+
+            // Authorized approvers (CEO only)
+            const AUTHORIZED = ['Charles-Teamplayer'];
+
+            if (!AUTHORIZED.includes(author)) {
+              core.info(`Unauthorized user: ${author}`);
+              return;
+            }
+
+            // Parse approval command
+            const approveMatch = comment.match(/^(승인|APPROVE|可)(\s+.*)?$/im);
+            const rejectMatch = comment.match(/^(거부|REJECT|否)(\s+.*)?$/im);
+            const holdMatch = comment.match(/^(보류|HOLD|留)(\s+.*)?$/im);
+
+            let decision = null;
+            let reason = '';
+
+            if (approveMatch) {
+              decision = 'approved';
+              reason = approveMatch[2] ? approveMatch[2].trim() : '';
+            } else if (rejectMatch) {
+              decision = 'rejected';
+              reason = rejectMatch[2] ? rejectMatch[2].trim() : '';
+            } else if (holdMatch) {
+              decision = 'hold';
+              reason = holdMatch[2] ? holdMatch[2].trim() : '';
+            }
+
+            if (!decision) {
+              core.info('No approval command found in comment');
+              return;
+            }
+
+            core.setOutput('decision', decision);
+            core.setOutput('reason', reason);
+            core.setOutput('author', author);
+            core.setOutput('authorized', 'true');
+
+            // Extract agenda from issue body
+            const body = context.payload.issue.body || '';
+            const titleMatch = body.match(/AGENDA:\s*(.+)/);
+            const typeMatch = body.match(/TYPE:\s*(.+)/);
+            const riskMatch = body.match(/RISK:\s*(.+)/);
+            const projectMatch = body.match(/PROJECT:\s*(.+)/);
+
+            core.setOutput('agenda_title', titleMatch ? titleMatch[1].trim() : context.payload.issue.title);
+            core.setOutput('agenda_type', typeMatch ? typeMatch[1].trim() : 'decision');
+            core.setOutput('agenda_risk', riskMatch ? riskMatch[1].trim() : 'medium');
+            core.setOutput('agenda_project', projectMatch ? projectMatch[1].trim() : '');
+
+      - name: Record decision
+        if: steps.auth.outputs.authorized == 'true'
+        uses: actions/checkout@v4
+
+      - name: Write deliberation record
+        if: steps.auth.outputs.authorized == 'true'
+        run: |
+          chmod +x write-deliberation.sh
+          ./write-deliberation.sh \
+            --title "${{ steps.auth.outputs.agenda_title }}" \
+            --type "${{ steps.auth.outputs.agenda_type }}" \
+            --risk "${{ steps.auth.outputs.agenda_risk }}" \
+            --project "${{ steps.auth.outputs.agenda_project }}" \
+            --trigger "CEO-Remote" \
+            --result "${{ steps.auth.outputs.decision }}" \
+            --summary "CEO ${{ steps.auth.outputs.author }} — ${{ steps.auth.outputs.reason }}"
+
+      - name: Commit deliberation
+        if: steps.auth.outputs.authorized == 'true'
+        run: |
+          git config user.name "MAGI Council Bot"
+          git config user.email "magi@teamplayer.inc"
+          git add deliberations.json
+          git commit -m "council(${{ steps.auth.outputs.decision }}): ${{ steps.auth.outputs.agenda_title }}" || echo "No changes"
+          git push
+
+      - name: Update issue with result
+        if: steps.auth.outputs.authorized == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const decision = '${{ steps.auth.outputs.decision }}';
+            const kanji = {approved:'可',rejected:'否',hold:'留'};
+            const emoji = {approved:'✅',rejected:'❌',hold:'⏸️'};
+
+            const body = [
+              `## ${emoji[decision] || '📋'} MAGI VERDICT: ${kanji[decision] || ''} ${decision.toUpperCase()}`,
+              '',
+              `**Approved by:** @${{ steps.auth.outputs.author }}`,
+              `**Reason:** ${{ steps.auth.outputs.reason || 'N/A' }}`,
+              `**Recorded at:** ${new Date().toISOString()}`,
+              '',
+              '> 이 결정은 deliberations.json에 기록되었으며 MAGI Council에 반영됩니다.',
+              '> https://charles-teamplayer.github.io/TP_Skills_3D/council.html'
+            ].join('\n');
+
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: context.payload.issue.number,
+              body
+            });
+
+            // Close the issue
+            await github.rest.issues.update({
+              ...context.repo,
+              issue_number: context.payload.issue.number,
+              state: 'closed',
+              labels: ['magi-approval', `verdict-${decision}`]
+            });
+
+      - name: Label unauthorized attempt
+        if: steps.auth.outputs.authorized != 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const comment = context.payload.comment;
+            const approvePattern = /^(승인|APPROVE|可|거부|REJECT|否|보류|HOLD|留)/im;
+            if (approvePattern.test(comment.body)) {
+              await github.rest.issues.createComment({
+                ...context.repo,
+                issue_number: context.payload.issue.number,
+                body: `⚠️ **UNAUTHORIZED**: @${comment.user.login}은(는) 승인 권한이 없습니다. CEO만 승인할 수 있습니다.`
+              });
+            }

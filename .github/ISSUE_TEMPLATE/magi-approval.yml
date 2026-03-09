@@ -1,0 +1,82 @@
+name: "MAGI Council 승인 요청"
+description: "MAGI 심의 결과에 대한 CEO 승인 요청"
+title: "🔒 [MAGI] "
+labels: ["magi-approval"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## MAGI Council 승인 요청
+        아래 안건에 대해 CEO 승인이 필요합니다.
+
+  - type: input
+    id: agenda
+    attributes:
+      label: "AGENDA"
+      description: "심의 안건 제목"
+      placeholder: "TP-Firewall 개발 종료"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: "TYPE"
+      options:
+        - feature
+        - deploy
+        - architecture
+        - security
+        - cost
+        - nogo
+        - refactor
+        - infra
+        - decision
+    validations:
+      required: true
+
+  - type: dropdown
+    id: risk
+    attributes:
+      label: "RISK"
+      options:
+        - low
+        - medium
+        - high
+        - critical
+    validations:
+      required: true
+
+  - type: input
+    id: project
+    attributes:
+      label: "PROJECT"
+      description: "관련 프로젝트"
+      placeholder: "IMSMS Console"
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: "MAGI 심의 요약"
+      description: "6축 심의 결과 요약"
+      placeholder: |
+        MELCHIOR: 可 (기술적 문제 없음)
+        BALTHASAR: 否 (ROI < 0.5)
+        CASPER: 否 (유지보수 불가)
+        URD: 條 (기록 보완 필요)
+        VERDANDI: 條 (검증 부족)
+        SKULD: 否 (영향 범위 미파악)
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ### 승인 방법
+        Issue 코멘트에 다음 중 하나를 입력하세요:
+        - `승인` 또는 `APPROVE` 또는 `可` — 승인
+        - `거부` 또는 `REJECT` 또는 `否` — 거부
+        - `보류` 또는 `HOLD` 또는 `留` — 보류
+
+        사유를 추가할 수 있습니다: `승인 비용 절감 효과 확인됨`
