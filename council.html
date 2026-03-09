@@ -54,18 +54,34 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;point
 .main>*{background:var(--panel)}
 
 /* Panel */
-.panel{position:relative;overflow:hidden}
+.panel{position:relative;overflow:hidden;transition:box-shadow 0.5s,border-color 0.5s;border:1px solid transparent}
+.panel.active{border-color:var(--panel-color,rgba(0,255,200,0.2));box-shadow:inset 0 0 30px rgba(var(--panel-rgb,0,255,200),0.08),0 0 15px rgba(var(--panel-rgb,0,255,200),0.05)}
 .panel-hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid var(--border)}
 .panel-name{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;letter-spacing:3px}
 .panel-role{font-size:7px;letter-spacing:2px;text-transform:uppercase;opacity:0.4}
 .panel-num{font-family:'Orbitron',monospace;font-size:9px;font-weight:900;opacity:0.2;position:absolute;top:6px;right:10px;font-size:28px}
-.panel-bar{height:3px;width:100%}
+.panel-bar{height:3px;width:100%;transition:opacity 0.5s}
+.panel.active .panel-bar{opacity:1!important;animation:barPulse 1.5s ease infinite}
+@keyframes barPulse{0%,100%{opacity:0.6}50%{opacity:1}}
+
+/* Scan line inside active panel */
+.panel-scan{position:absolute;top:0;left:0;width:100%;height:2px;background:linear-gradient(90deg,transparent,rgba(0,255,200,0.15),transparent);
+  opacity:0;pointer-events:none;z-index:10}
+.panel.active .panel-scan{opacity:1;animation:scanDown 2s linear infinite}
+@keyframes scanDown{0%{top:0}100%{top:100%}}
 
 /* Vote display */
 .vote-section{padding:8px 12px 6px}
 .vote-label{font-size:7px;letter-spacing:2px;text-transform:uppercase;opacity:0.3;margin-bottom:4px}
 .vote-status{font-family:'Orbitron',monospace;font-size:10px;font-weight:600;letter-spacing:2px;display:flex;align-items:center;gap:6px}
 .vote-icon{width:8px;height:8px;border-radius:1px}
+
+/* Kanji vote badge */
+.kanji-badge{font-size:18px;font-weight:900;margin-left:4px;opacity:0.7;transition:all 0.3s}
+.kanji-badge.approve{color:#0f8;text-shadow:0 0 12px rgba(0,255,128,0.5)}
+.kanji-badge.reject{color:#f44;text-shadow:0 0 12px rgba(255,60,60,0.5)}
+.kanji-badge.conditional{color:#fb0;text-shadow:0 0 12px rgba(255,180,40,0.5)}
+.kanji-badge.hold{color:#f80;text-shadow:0 0 12px rgba(255,136,0,0.5)}
 
 /* Stats */
 .stats{display:flex;gap:8px;padding:4px 12px 6px;flex-wrap:wrap}
@@ -79,11 +95,14 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;point
 .opinion-stream{padding:0 12px 8px;flex:1;overflow-y:auto;max-height:200px;min-height:120px}
 .opinion-stream::-webkit-scrollbar{width:2px}
 .opinion-stream::-webkit-scrollbar-thumb{background:rgba(0,255,200,0.08)}
-.opinion{padding:5px 0;border-bottom:1px solid rgba(0,255,200,0.03);animation:fadeIn 0.5s ease}
-@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.opinion{padding:5px 0;border-bottom:1px solid rgba(0,255,200,0.03);animation:fadeSlideIn 0.6s ease}
+@keyframes fadeSlideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .opinion-time{font-size:6px;opacity:0.2;letter-spacing:1px}
 .opinion-text{font-size:8px;line-height:1.6;margin-top:2px;opacity:0.6}
 .opinion-text.highlight{opacity:0.9}
+.opinion-text.typing{overflow:hidden;white-space:nowrap;border-right:1px solid;animation:typingReveal 1.5s steps(40,end) forwards,blinkCaret 0.5s step-end 3}
+@keyframes typingReveal{from{max-width:0}to{max-width:600px}}
+@keyframes blinkCaret{50%{border-color:transparent}}
 .opinion-target{font-size:7px;opacity:0.3;margin-top:1px}
 .opinion-target span{opacity:0.6}
 
@@ -91,8 +110,22 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;point
 .veto-zone{padding:4px 12px 6px;display:flex;align-items:center;gap:6px}
 .veto-label{font-size:7px;letter-spacing:2px;text-transform:uppercase;opacity:0.3}
 .veto-status{font-family:'Orbitron',monospace;font-size:8px;font-weight:600;letter-spacing:1px}
-.veto-active{color:#ff3c3c;text-shadow:0 0 8px rgba(255,60,60,0.4)}
-.veto-clear{color:rgba(0,255,200,0.3)}
+.veto-active{color:#ff3c3c;text-shadow:0 0 8px rgba(255,60,60,0.4);animation:vetoFlash 0.8s ease 2}
+@keyframes vetoFlash{0%,100%{opacity:1}50%{opacity:0.3}}
+
+/* Project banner */
+.project-banner{display:flex;align-items:center;gap:12px;padding:8px 20px;border-bottom:1px solid var(--border);background:rgba(0,255,200,0.02)}
+.project-label{font-size:7px;letter-spacing:2px;text-transform:uppercase;opacity:0.3}
+.project-name{font-family:'Orbitron',monospace;font-size:14px;font-weight:700;letter-spacing:4px;color:rgba(0,255,200,0.6);text-shadow:0 0 15px var(--glow)}
+.project-set{font-family:'Orbitron',monospace;font-size:9px;font-weight:600;letter-spacing:2px;color:var(--dim);margin-left:auto}
+
+/* Phase progress bar */
+.phase-bar-container{height:3px;background:rgba(0,255,200,0.03);position:relative;overflow:hidden}
+.phase-bar-fill{height:100%;background:linear-gradient(90deg,rgba(0,255,200,0.2),rgba(0,255,200,0.5));transition:width 0.5s ease;position:relative}
+.phase-bar-fill::after{content:'';position:absolute;right:0;top:0;width:20px;height:100%;background:rgba(0,255,200,0.8);filter:blur(4px);animation:phaseGlow 1s ease infinite}
+@keyframes phaseGlow{0%,100%{opacity:0.5}50%{opacity:1}}
+.phase-labels{display:flex;justify-content:space-between;padding:2px 20px;font-size:6px;letter-spacing:1px;opacity:0.2;text-transform:uppercase}
+.phase-labels span.current{opacity:1;color:rgba(0,255,200,0.6)}
 
 /* Center deliberation panel */
 .deliberation{grid-column:1/-1;border-top:1px solid var(--border);padding:12px 20px;display:flex;gap:20px;align-items:flex-start}
@@ -104,13 +137,15 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;point
 /* Vote tally */
 .delib-right{width:280px}
 .tally{display:grid;grid-template-columns:1fr 1fr;gap:4px}
-.tally-item{display:flex;align-items:center;gap:6px;padding:3px 6px;border:1px solid rgba(255,255,255,0.03);border-radius:1px;font-size:8px;letter-spacing:1px}
+.tally-item{display:flex;align-items:center;gap:6px;padding:3px 6px;border:1px solid rgba(255,255,255,0.03);border-radius:1px;font-size:8px;letter-spacing:1px;transition:border-color 0.3s,background 0.3s}
+.tally-item.voted{border-color:rgba(255,255,255,0.08);background:rgba(255,255,255,0.01)}
 .tally-dot{width:5px;height:5px;border-radius:1px;flex-shrink:0}
 .tally-name{flex:1;text-transform:uppercase;opacity:0.5}
 .tally-vote{font-family:'Orbitron',monospace;font-size:8px;font-weight:600}
+.tally-kanji{font-size:12px;font-weight:900;margin-left:2px}
 
 /* Verdict */
-.verdict{margin-top:8px;padding:6px 10px;border:1px solid;border-radius:1px;font-family:'Orbitron',monospace;font-size:10px;font-weight:700;letter-spacing:3px;text-align:center}
+.verdict{margin-top:8px;padding:6px 10px;border:1px solid;border-radius:1px;font-family:'Orbitron',monospace;font-size:10px;font-weight:700;letter-spacing:3px;text-align:center;transition:all 0.5s}
 .verdict.approved{border-color:rgba(0,255,128,0.3);color:#0f8;background:rgba(0,255,128,0.03);text-shadow:0 0 10px rgba(0,255,128,0.3)}
 .verdict.rejected{border-color:rgba(255,60,60,0.3);color:#f44;background:rgba(255,60,60,0.03)}
 .verdict.hold{border-color:rgba(255,180,40,0.3);color:#fb0;background:rgba(255,180,40,0.03)}
@@ -118,6 +153,16 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;point
 
 /* Verdict reason (LIVE mode) */
 .verdict-reason{font-size:7px;letter-spacing:1px;opacity:0.35;margin-top:4px;text-align:center;line-height:1.6}
+
+/* Large kanji verdict flash overlay */
+.verdict-flash{position:fixed;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+  pointer-events:none;z-index:90;opacity:0;transition:opacity 0.3s}
+.verdict-flash.show{opacity:1;animation:flashIn 2s ease forwards}
+@keyframes flashIn{0%{opacity:0;transform:scale(0.5)}10%{opacity:1;transform:scale(1.2)}20%{transform:scale(1)}80%{opacity:1}100%{opacity:0}}
+.verdict-flash .kanji{font-family:'Orbitron',serif;font-size:200px;font-weight:900;letter-spacing:0;
+  text-shadow:0 0 60px currentColor,0 0 120px currentColor}
+.verdict-flash .kanji-sub{font-family:'Orbitron',monospace;font-size:16px;font-weight:600;letter-spacing:8px;margin-top:10px;opacity:0.6}
+.verdict-flash-inner{display:flex;flex-direction:column;align-items:center}
 
 /* Corner marks */
 .corner-marks{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
@@ -136,6 +181,15 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;point
   padding:4px 16px;border:1px solid rgba(0,255,200,0.1);background:rgba(0,12,10,0.9);
   transition:opacity 0.3s;border-radius:1px}
 .cross-talk.show{opacity:1}
+
+/* Analyzing animation */
+.analyzing-dots::after{content:'';animation:dots 1.5s steps(3,end) infinite}
+@keyframes dots{0%{content:''}33%{content:'.'}66%{content:'..'}100%{content:'...'}}
+
+/* Vote countdown bar */
+.vote-countdown{height:2px;margin-top:4px;background:rgba(0,255,200,0.03);border-radius:1px;overflow:hidden;opacity:0;transition:opacity 0.3s}
+.vote-countdown.active{opacity:1}
+.vote-countdown-fill{height:100%;width:0;background:rgba(0,255,200,0.4);transition:width 1s linear}
 
 /* Responsive */
 @media(max-width:900px){.main{grid-template-columns:1fr 1fr}.deliberation{grid-column:1/-1}}
@@ -168,6 +222,27 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;point
   </div>
 </div>
 
+<!-- Project Banner -->
+<div class="project-banner" id="projectBanner">
+  <div>
+    <div class="project-label">AGENDA PROJECT</div>
+    <div class="project-name" id="projectName">INITIALIZING...</div>
+  </div>
+  <div class="project-set" id="projectSet">SET 0/0</div>
+</div>
+
+<!-- Phase Progress -->
+<div class="phase-bar-container">
+  <div class="phase-bar-fill" id="phaseFill" style="width:0%"></div>
+</div>
+<div class="phase-labels" id="phaseLabels">
+  <span>INIT</span>
+  <span>POSITION STATEMENTS</span>
+  <span>CROSS DEBATE</span>
+  <span>VOTING</span>
+  <span>VERDICT</span>
+</div>
+
 <div class="main" id="panels"></div>
 
 <div class="deliberation" id="delib">
@@ -179,6 +254,7 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;point
   <div class="delib-right">
     <div class="delib-title">VOTE TALLY</div>
     <div class="tally" id="tally"></div>
+    <div class="vote-countdown" id="voteCountdown"><div class="vote-countdown-fill" id="voteCountdownFill"></div></div>
     <div class="verdict deliberating" id="verdict">DELIBERATING</div>
     <div class="verdict-reason" id="verdictReason"></div>
   </div>
@@ -192,13 +268,29 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;point
 
 <div class="cross-talk" id="crossTalk"></div>
 
+<!-- Verdict flash overlay -->
+<div class="verdict-flash" id="verdictFlash">
+  <div class="verdict-flash-inner">
+    <div class="kanji" id="verdictKanji"></div>
+    <div class="kanji-sub" id="verdictKanjiSub"></div>
+  </div>
+</div>
+
 <script>
 // === MODE STATE ===
-var currentMode = 'sim'; // 'sim' or 'live'
-var liveData = [];        // loaded deliberations
-var liveIndex = -1;       // current deliberation index in LIVE mode
+var currentMode = 'sim';
+var liveData = [];
+var liveIndex = -1;
 var liveRefreshTimer = null;
 var simIntervalId = null;
+
+// === KANJI MAP ===
+var KANJI = {
+  approve:  {ch:'可', label:'APPROVED', color:'#0f8'},
+  reject:   {ch:'否', label:'REJECTED', color:'#f44'},
+  conditional:{ch:'條', label:'CONDITIONAL', color:'#fb0'},
+  hold:     {ch:'留', label:'HOLD', color:'#f80'}
+};
 
 // === MAGI 6-AXIS PERSONALITY ENGINE ===
 var AXES = [
@@ -206,151 +298,151 @@ var AXES = [
     id:'melchior', num:'01', name:'MELCHIOR', role:'TECHNICAL', color:'#ff3c3c',
     rgb:'255,60,60', icon:'M1',
     quotes:[
-      "\uadf8\uac74 \uc99d\uc0c1\uc774\uace0, \uc6d0\uc778\uc740 \ub530\ub85c \uc788\uc2b5\ub2c8\ub2e4",
-      "\uba85\uc138(Contract)\ubd80\ud130 \ubd05\uc2dc\ub2e4. \ucf54\ub4dc\ub294 \uadf8 \ub2e4\uc74c\uc785\ub2c8\ub2e4",
-      "\uc774\uac70 \uae30\uc220 \ubd80\ucc44\ub85c \ub0a8\uae41\ub2c8\ub2e4. 3\ubc30\ub85c \ub3cc\uc544\uc635\ub2c8\ub2e4",
-      "\ud0c0\uc785\uc774 any? \uadf8\uac74 \ucf54\ub4dc\uac00 \uc544\ub2c8\ub77c \uae30\ub3c4\uc785\ub2c8\ub2e4",
-      "3\uacf3 \ub2e4 \ud655\uc778\ud588\uc2b5\ub2c8\uae4c? SecurityConfig, AuthFilter, ApiKeyFilter",
-      "\uc544\ud0a4\ud14d\ucc98\uac00 \ub9de\ub294\uc9c0\ubd80\ud130 \ud655\uc778\ud569\uc2dc\ub2e4",
-      "\uadfc\ubcf8 \uc6d0\uc778\uc744 \uc548 \uc7a1\uc73c\uba74 3\ubc88 \uace0\uce69\ub2c8\ub2e4",
-      "Contract-First. OpenAPI \uc2a4\ud399 \uba3c\uc800.",
-      "\ud14c\uc2a4\ud2b8\uac00 \uadfc\ubcf8 \uc6d0\uc778\uc744 \ucee4\ubc84\ud558\ub294\uc9c0 \ud655\uc778\ud558\uc138\uc694"
+      "그건 증상이고, 원인은 따로 있습니다",
+      "명세(Contract)부터 봅시다. 코드는 그 다음입니다",
+      "이거 기술 부채로 남깁니다. 3배로 돌아옵니다",
+      "타입이 any? 그건 코드가 아니라 기도입니다",
+      "3곳 다 확인했습니까? SecurityConfig, AuthFilter, ApiKeyFilter",
+      "아키텍처가 맞는지부터 확인합시다",
+      "근본 원인을 안 잡으면 3번 고칩니다",
+      "Contract-First. OpenAPI 스펙 먼저.",
+      "테스트가 근본 원인을 커버하는지 확인하세요"
     ],
     reactions:{
-      agree:["\uae30\uc220\uc801\uc73c\ub85c \ub9de\uc2b5\ub2c8\ub2e4","\ub3d9\uc758\ud569\ub2c8\ub2e4. \uc544\ud0a4\ud14d\ucc98\uac00 \uc801\uc808\ud569\ub2c8\ub2e4","\ubcf4\uc548 \uad00\uc810\uc5d0\uc11c\ub3c4 \ubb38\uc81c\uc5c6\uc2b5\ub2c8\ub2e4"],
-      disagree:["\uae30\uc220 \ubd80\ucc44\uac00 \ub420 \uac81\ub2c8\ub2e4","\ud0c0\uc785 \uc548\uc804\uc131\uc774 \ubcf4\uc7a5\ub418\uc9c0 \uc54a\uc2b5\ub2c8\ub2e4","\uc99d\uc0c1\ub9cc \ub54c\uc6b0\ub294 \uc811\uadfc\uc785\ub2c8\ub2e4"],
-      to_bal:["\ube44\uc6a9\uc73c\ub85c\ub9cc \ud310\ub2e8\ud558\uba74 \uc548 \ub429\ub2c8\ub2e4. \uae30\uc220 \ubd80\ucc44\ub294 \uc774\uc790\uac00 \ubd99\uc2b5\ub2c8\ub2e4","ROI \uacc4\uc0b0\uc5d0 \uc720\uc9c0\ubcf4\uc218 \ube44\uc6a9\ub3c4 \ub123\uc73c\uc168\uc2b5\ub2c8\uae4c?"],
-      to_cas:["\uc644\ubcbd\ud558\uc9c0 \uc54a\uc544\ub3c4 \uadfc\ubcf8\uc740 \uc7a1\uc544\uc57c \ud569\ub2c8\ub2e4","1\uc778 \ud300\uc774\ub77c\ub3c4 \uc544\ud0a4\ud14d\ucc98\ub294 \ud0c0\ud611\ud560 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4"],
-      to_urd:["\uae30\uc220 \uacb0\uc815 \uadfc\uac70\ub294 \ucf54\ub4dc\uc5d0 \uc788\uc2b5\ub2c8\ub2e4. \ubb38\uc11c\ub294 \ubcf4\uc870\uc785\ub2c8\ub2e4","\uae30\ub85d\uc740 \uc88b\uc9c0\ub9cc, \ucf54\ub4dc\uac00 \uacf1 \ubb38\uc11c\uc785\ub2c8\ub2e4"],
-      to_ver:["\ud14c\uc2a4\ud2b8 \ucee4\ubc84\ub9ac\uc9c0\ubd80\ud130 \ud655\uc778\ud569\uc2dc\ub2e4","Playwright\ubcf4\ub2e4 \ub2e8\uc704 \ud14c\uc2a4\ud2b8\uac00 \uba3c\uc800\uc785\ub2c8\ub2e4"],
-      to_skl:["\uc601\ud5a5 \ubc94\uc704\ub294 \uc800\ub3c4 \ub3d9\uc758\ud569\ub2c8\ub2e4. \uc804\uc218\uc870\uc0ac \ud569\uc2dc\ub2e4","Contract-First\ub85c \uac00\uba74 \uc601\ud5a5 \ubc94\uc704 \uc790\uccb4\uac00 \uc904\uc5b4\ub4ed\ub2c8\ub2e4"]
+      agree:["기술적으로 맞습니다","동의합니다. 아키텍처가 적절합니다","보안 관점에서도 문제없습니다"],
+      disagree:["기술 부채가 될 겁니다","타입 안전성이 보장되지 않습니다","증상만 때우는 접근입니다"],
+      to_bal:["비용으로만 판단하면 안 됩니다. 기술 부채는 이자가 붙습니다","ROI 계산에 유지보수 비용도 넣으셨습니까?"],
+      to_cas:["완벽하지 않아도 근본은 잡아야 합니다","1인 팀이라도 아키텍처는 타협할 수 없습니다"],
+      to_urd:["기술 결정 근거는 코드에 있습니다. 문서는 보조입니다","기록은 좋지만, 코드가 곧 문서입니다"],
+      to_ver:["테스트 커버리지부터 확인합시다","Playwright보다 단위 테스트가 먼저입니다"],
+      to_skl:["영향 범위는 저도 동의합니다. 전수조사 합시다","Contract-First로 가면 영향 범위 자체가 줄어듭니다"]
     },
-    veto:'\ubcf4\uc548 \ucde8\uc57d\uc810', stats:{arch:92,type:88,sec:95,debt:72}
+    veto:'보안 취약점', stats:{arch:92,type:88,sec:95,debt:72}
   },
   {
     id:'balthazar', num:'02', name:'BALTHASAR', role:'BUSINESS', color:'#ffb428',
     rgb:'255,180,40', icon:'B2',
     quotes:[
-      "\uadf8\uac70 \ub9cc\ub4dc\ub294 \ub370 \uba87 \uc2dc\uac04? \uc0ac\uba74 \uc5bc\ub9c8?",
-      "IMSMS \ub9e4\ucd9c\uc5d0 \uae30\uc5ec\ud569\ub2c8\uae4c? Yes/No",
-      "\uc5f0\uac04\uc73c\ub85c \ud658\uc0b0\ud558\uba74 \uc5bc\ub9c8 \uc808\uac10\uc785\ub2c8\uae4c?",
-      "1\uc77c PoC\ub85c \uc99d\uba85 \uc548 \ub418\uba74 \uc811\uc73c\uc2dc\uc8e0",
-      "\uc774\ubbf8 Norton 360\uc774 \uc788\ub294\ub370 \uc65c \ub9cc\ub4ed\ub2c8\uae4c?",
-      "CEO\uac00 \uc9c1\uc811 \uc4f0\ub294 \uac81\ub2c8\uae4c, \uc544\ub2cc \uac81\ub2c8\uae4c?",
-      "ROI\uac00 1 \ubbf8\ub9cc\uc774\uba74 No-Go\uc785\ub2c8\ub2e4",
-      "\uadf8 \uc2dc\uac04\uc5d0 \ub9e4\ucd9c\uc744 \uc62c\ub9ac\ub294 \uac8c \ub0ab\uc2b5\ub2c8\ub2e4",
-      "\uc0c1\uc6a9 \uc194\ub8e8\uc158\ubd80\ud130 \ud655\uc778\ud588\uc2b5\ub2c8\uae4c?"
+      "그거 만드는 데 몇 시간? 사면 얼마?",
+      "IMSMS 매출에 기여합니까? Yes/No",
+      "연간으로 환산하면 얼마 절감입니까?",
+      "1일 PoC로 증명 안 되면 접으시죠",
+      "이미 Norton 360이 있는데 왜 만듭니까?",
+      "CEO가 직접 쓰는 겁니까, 아닌 겁니까?",
+      "ROI가 1 미만이면 No-Go입니다",
+      "그 시간에 매출을 올리는 게 낫습니다",
+      "상용 솔루션부터 확인했습니까?"
     ],
     reactions:{
-      agree:["\ube44\uc6a9 \ub300\ube44 \ud6a8\uacfc\uac00 \uc88b\uc2b5\ub2c8\ub2e4","CEO \uc0ac\uc6a9 \uae30\ub2a5\uc774\ub2c8 \uc6b0\uc120\uc21c\uc704 \ub192\uc2b5\ub2c8\ub2e4","ROI \ucda9\ubd84\ud569\ub2c8\ub2e4"],
-      disagree:["\ube44\uc6a9 \ub300\ube44 \ud6a8\uacfc\uac00 \uc548 \ub098\uc635\ub2c8\ub2e4","\uc0c1\uc6a9 \uc194\ub8e8\uc158\uc774 \uc774\ubbf8 \uc788\uc2b5\ub2c8\ub2e4","IMSMS \ub9e4\ucd9c \uae30\uc5ec 0\uc785\ub2c8\ub2e4"],
-      to_mel:["\uae30\uc220\uc801 \ud765\ubbf8\uc640 \uc0ac\uc5c5 \uac00\uce58\ub294 \ub2e4\ub985\ub2c8\ub2e4","\uc644\ubcbd\ud55c \uc544\ud0a4\ud14d\ucc98\uac00 \ub9e4\ucd9c\uc744 \uc62c\ub824\uc90d\ub2c8\uae4c?"],
-      to_cas:["\uc720\uc9c0\ubcf4\uc218 \ube44\uc6a9\ub3c4 \uc5f0\uac04\uc73c\ub85c \ud658\uc0b0\ud574 \uc8fc\uc138\uc694","1\uc778 \ud300 \ube44\uc6a9\uc774 \uc678\uc8fc\ubcf4\ub2e4 \uc2f8\uae34 \ud569\ub2c8\uae4c?"],
-      to_urd:["\uae30\ub85d\ud558\ub294 \uc2dc\uac04\ub3c4 \ube44\uc6a9\uc785\ub2c8\ub2e4. \uc790\ub3d9\ud654\ud558\uc138\uc694","\ubb38\uc11c \uc791\uc131 \uc2dc\uac04 vs \uc2e4\uc81c \uac1c\ubc1c \uc2dc\uac04 \ube44\uc728\uc740?"],
-      to_ver:["\uac80\uc99d \ube44\uc6a9\ub3c4 \uacc4\uc0b0\uc5d0 \ub123\uc73c\uc138\uc694","Full QA\uac00 \ub9e4\ubc88 \ud544\uc694\ud569\ub2c8\uae4c? Quick\uc774\uba74 \ucda9\ubd84\ud560 \ub54c\ub3c4 \uc788\uc2b5\ub2c8\ub2e4"],
-      to_skl:["\uc804\uc218\uc870\uc0ac\uc5d0 \uba87 \uc2dc\uac04 \uac78\ub9bd\ub2c8\uae4c? \ud575\uc2ec 3\uacf3\ub9cc \ubd05\uc2dc\ub2e4","\ubd84\uc11d \ub9c8\ube44\ubcf4\ub2e4 \ube60\ub978 \uc2e4\ud589\uc774 ROI \ub192\uc2b5\ub2c8\ub2e4"]
+      agree:["비용 대비 효과가 좋습니다","CEO 사용 기능이니 우선순위 높습니다","ROI 충분합니다"],
+      disagree:["비용 대비 효과가 안 나옵니다","상용 솔루션이 이미 있습니다","IMSMS 매출 기여 0입니다"],
+      to_mel:["기술적 흥미와 사업 가치는 다릅니다","완벽한 아키텍처가 매출을 올려줍니까?"],
+      to_cas:["유지보수 비용도 연간으로 환산해 주세요","1인 팀 비용이 외주보다 싸긴 합니까?"],
+      to_urd:["기록하는 시간도 비용입니다. 자동화하세요","문서 작성 시간 vs 실제 개발 시간 비율은?"],
+      to_ver:["검증 비용도 계산에 넣으세요","Full QA가 매번 필요합니까? Quick이면 충분할 때도 있습니다"],
+      to_skl:["전수조사에 몇 시간 걸립니까? 핵심 3곳만 봅시다","분석 마비보다 빠른 실행이 ROI 높습니다"]
     },
-    veto:'ROI < 0.5 + \uc0c1\uc6a9 \ub300\uc548', stats:{roi:78,cost:85,revenue:65,efficiency:82}
+    veto:'ROI < 0.5 + 상용 대안', stats:{roi:78,cost:85,revenue:65,efficiency:82}
   },
   {
     id:'casper', num:'03', name:'CASPER', role:'REALITY', color:'#00c8ff',
     rgb:'0,200,255', icon:'C3',
     quotes:[
-      "\uc0c8\ubcbd 3\uc2dc\uc5d0 \uc7a5\uc560 \ub098\uba74 \ud63c\uc790 \uace0\uce60 \uc218 \uc788\uc5b4\uc694?",
-      "Docker\ub294 \uc624\ubc84\ud5e4\ub4dc\uc785\ub2c8\ub2e4. PM2\uba74 \ucda9\ubd84\ud569\ub2c8\ub2e4",
-      "\uc774\uc804\uc5d0 \ub418\ub358 \uac8c \uc548 \ub418\uba74 CEO\uac00 \ud3ed\ubc1c\ud569\ub2c8\ub2e4",
-      "\uc644\uc804 \ud574\uacb0\uc774 \uc544\ub2c8\ub77c, '\uc774 \ubc94\uc704\uc5d0\uc11c \ud574\uacb0'\uc785\ub2c8\ub2e4",
-      "'\uc77c\ub2e8 \ub3cc\uc544\uac00\uac8c' \ud574\ub193\uace0 \ub85c\uadf8 \ub0a8\uae30\uc138\uc694",
-      "\uadf8 22\uac1c @Disabled \ud14c\uc2a4\ud2b8, \uc2dc\ud55c\ud3ed\ud0c4\uc785\ub2c8\ub2e4",
-      "\ubb38\uc11c \uc5c6\uc73c\uba74 \ub2e4\uc74c \uc138\uc158\uc758 \ub0b4\uac00 \uace0\uc0dd\ud569\ub2c8\ub2e4",
-      "\ub864\ubc31 \uacc4\ud68d \uc788\uc2b5\ub2c8\uae4c?",
-      "1\uc778 \ud300\uc774 \uc720\uc9c0\ubcf4\uc218\ud560 \uc218 \uc788\ub294 \uc218\uc900\uc785\ub2c8\uae4c?"
+      "새벽 3시에 장애 나면 혼자 고칠 수 있어요?",
+      "Docker는 오버헤드입니다. PM2면 충분합니다",
+      "이전에 되던 게 안 되면 CEO가 폭발합니다",
+      "완전 해결이 아니라, '이 범위에서 해결'입니다",
+      "'일단 돌아가게' 해놓고 로그 남기세요",
+      "그 22개 @Disabled 테스트, 시한폭탄입니다",
+      "문서 없으면 다음 세션의 내가 고생합니다",
+      "롤백 계획 있습니까?",
+      "1인 팀이 유지보수할 수 있는 수준입니까?"
     ],
     reactions:{
-      agree:["\uc720\uc9c0\ubcf4\uc218 \ubd80\ub2f4\uc774 \uc801\uc2b5\ub2c8\ub2e4. \uc88b\uc2b5\ub2c8\ub2e4","\ub864\ubc31 \uacc4\ud68d\uc774 \uc788\uc73c\ub2c8 \uc548\uc2ec\uc785\ub2c8\ub2e4","1\uc778 \ud300 \uae30\uc900 \uc801\uc808\ud569\ub2c8\ub2e4"],
-      disagree:["\uc720\uc9c0\ubcf4\uc218 \ubd80\ub2f4\uc774 \ub108\ubb34 \ud07d\ub2c8\ub2e4","\ub864\ubc31 \uacc4\ud68d\uc774 \uc5c6\uc2b5\ub2c8\ub2e4","1\uc778 \ud300\uc73c\ub85c\ub294 \uac10\ub2f9 \ubd88\uac00\uc785\ub2c8\ub2e4"],
-      to_mel:["\uae30\uc220\uc801\uc73c\ub85c \ub9de\uc544\ub3c4 \uc720\uc9c0\ubcf4\uc218\uac00 \uc548 \ub418\uba74 \uc18c\uc6a9\uc5c6\uc2b5\ub2c8\ub2e4","\uacfc\uc789 \uc124\uacc4 \uc544\ub2d9\ub2c8\uae4c? \uc9c0\uae08 \ud544\uc694\ud55c \ub9cc\ud07c\ub9cc \ud569\uc2dc\ub2e4"],
-      to_bal:["\ube44\uc6a9 \uc808\uac10\ub3c4 \uc88b\uc9c0\ub9cc, \uc6b4\uc601 \uc548\uc815\uc131\uc774 \uba3c\uc800\uc785\ub2c8\ub2e4","\uc7a5\uc560 \ubcf5\uad6c \uc2dc\uac04\ub3c4 \ube44\uc6a9\uc5d0 \ub123\uc73c\uc168\uc2b5\ub2c8\uae4c?"],
-      to_urd:["\ubb38\uc11c\ud654 \ub3d9\uc758\ud569\ub2c8\ub2e4. \ub2e4\uc74c \uc138\uc158\uc758 \ub0b4\uac00 \uc774\uc5b4\ubc1b\uc744 \uc218 \uc788\uc5b4\uc57c \ud569\ub2c8\ub2e4","SESSION_HANDOFF.md \uc5c6\uc774 \uc138\uc158 \ub05d\ub0b4\uba74 \uc548 \ub429\ub2c8\ub2e4"],
-      to_ver:["\uac80\uc99d \uc88b\uc9c0\ub9cc \ubc30\ud3ec \uc9c0\uc5f0\ub3c4 \ubb38\uc81c\uc785\ub2c8\ub2e4. Quick QA\ub85c \ud0c0\ud611\ud569\uc2dc\ub2e4","\ud68c\uadc0 \ubc29\uc9c0\uac00 \ucd5c\uc6b0\uc120\uc785\ub2c8\ub2e4"],
-      to_skl:["\uc601\ud5a5 \ubc94\uc704 \ud655\uc778 \ub3d9\uc758\ud569\ub2c8\ub2e4. \ud558\uc9c0\ub9cc \ud575\uc2ec\ub9cc \ubd05\uc2dc\ub2e4","\uc804\uc218\uc870\uc0ac\ub294 \uc2dc\uac04\uc774 \ub108\ubb34 \uac78\ub9bd\ub2c8\ub2e4"]
+      agree:["유지보수 부담이 적습니다. 좋습니다","롤백 계획이 있으니 안심입니다","1인 팀 기준 적절합니다"],
+      disagree:["유지보수 부담이 너무 큽니다","롤백 계획이 없습니다","1인 팀으로는 감당 불가입니다"],
+      to_mel:["기술적으로 맞아도 유지보수가 안 되면 소용없습니다","과잉 설계 아닙니까? 지금 필요한 만큼만 합시다"],
+      to_bal:["비용 절감도 좋지만, 운영 안정성이 먼저입니다","장애 복구 시간도 비용에 넣으셨습니까?"],
+      to_urd:["문서화 동의합니다. 다음 세션의 내가 이어받을 수 있어야 합니다","SESSION_HANDOFF.md 없이 세션 끝내면 안 됩니다"],
+      to_ver:["검증 좋지만 배포 지연도 문제입니다. Quick QA로 타협합시다","회귀 방지가 최우선입니다"],
+      to_skl:["영향 범위 확인 동의합니다. 하지만 핵심만 봅시다","전수조사는 시간이 너무 걸립니다"]
     },
-    veto:'\ud504\ub85c\ub355\uc158 \ud68c\uadc0 \uc704\ud5d8', stats:{maintain:90,stability:88,rollback:85,complexity:70}
+    veto:'프로덕션 회귀 위험', stats:{maintain:90,stability:88,rollback:85,complexity:70}
   },
   {
-    id:'urd', num:'04', name:'URD', role:'MEMORY \u00b7 \uc788\uc5c8\ub358 \uac83', color:'#a064f0',
+    id:'urd', num:'04', name:'URD', role:'MEMORY · 있었던 것', color:'#a064f0',
     rgb:'160,100,240', icon:'U4',
     quotes:[
-      "\uc774\uac70 \uae30\ub85d\ud588\uc2b5\ub2c8\uae4c? \uc548 \ud588\uc73c\uba74 \ucc98\uc74c\ubd80\ud130 \ub2e4\uc2dc \ud569\ub2c8\ub2e4",
-      "SESSION_HANDOFF.md \uc5c6\uc774 \ub05d\ub0b4\uba74 \ubbf8\uc644\ub8cc \uc138\uc158 \ud558\ub098 \ub354 \ub298\uc5b4\ub0a9\ub2c8\ub2e4",
-      "Compact \ub418\uae30 \uc804\uc5d0 \ud575\uc2ec \uacb0\uc815\uc0ac\ud56d \uba3c\uc800 \uc800\uc7a5\ud558\uc138\uc694",
-      "3\uac1c\uc6d4 \uc804\uc5d0 \uc65c \uc774\ub807\uac8c \ud588\ub294\uc9c0 \uc544\ubb34\ub3c4 \ubaa8\ub985\ub2c8\ub2e4",
-      "TP_history\uc5d0 \uc5c6\uc73c\uba74 \uc548 \ud55c \uac81\ub2c8\ub2e4",
-      "\ub2e4\uc74c \uc138\uc158\uc758 \ub0b4\uac00 \uc774 \ucf54\ub4dc\ub97c \ubcf4\uba74 \ubb58 \uc774\ud574\ud560 \uc218 \uc788\uc2b5\ub2c8\uae4c?",
-      "\uae30\ub85d\ud558\uc9c0 \uc54a\uc73c\uba74 \uc874\uc7ac\ud558\uc9c0 \uc54a\uc558\ub358 \uac83\uc785\ub2c8\ub2e4",
-      "\uc758\uc0ac\uacb0\uc815 \uadfc\uac70\uac00 \ub0a8\uc544\uc788\uc2b5\ub2c8\uae4c?",
-      "\uc138\uc158 \uc644\ub8cc\uc728 17%... 83%\uac00 \ubbf8\uc644\ub8cc\uc785\ub2c8\ub2e4"
+      "이거 기록했습니까? 안 했으면 처음부터 다시 합니다",
+      "SESSION_HANDOFF.md 없이 끝내면 미완료 세션 하나 더 늘어납니다",
+      "Compact 되기 전에 핵심 결정사항 먼저 저장하세요",
+      "3개월 전에 왜 이렇게 했는지 아무도 모릅니다",
+      "TP_history에 없으면 안 한 겁니다",
+      "다음 세션의 내가 이 코드를 보면 뭘 이해할 수 있습니까?",
+      "기록하지 않으면 존재하지 않았던 것입니다",
+      "의사결정 근거가 남아있습니까?",
+      "세션 완료율 17%... 83%가 미완료입니다"
     ],
     reactions:{
-      agree:["\uae30\ub85d\uc774 \ud3ec\ud568\ub418\uc5b4 \uc788\uc73c\ub2c8 \uc88b\uc2b5\ub2c8\ub2e4","\ub2e4\uc74c \uc138\uc158\uc5d0\uc11c \uc774\uc5b4\ubc1b\uc744 \uc218 \uc788\uc2b5\ub2c8\ub2e4","\ud788\uc2a4\ud1a0\ub9ac\uc5d0 \ub0a8\uaca8\ub450\uaca0\uc2b5\ub2c8\ub2e4"],
-      disagree:["\uae30\ub85d\uc774 \uc5c6\uc2b5\ub2c8\ub2e4. \uc774\ub300\ub85c\ub294 \uc548 \ub429\ub2c8\ub2e4","\uc778\uc218\uc778\uacc4 \uc790\ub8cc\uac00 \ube60\uc838\uc788\uc2b5\ub2c8\ub2e4","\uc758\uc0ac\uacb0\uc815 \uadfc\uac70\uac00 \uc5c6\uc2b5\ub2c8\ub2e4"],
-      to_mel:["\uae30\uc220 \uacb0\uc815\uc774\ub77c\ub3c4 \uadfc\uac70\ub97c \ub0a8\uaca8\uc57c \ud569\ub2c8\ub2e4","\ucf54\ub4dc\uac00 \ubb38\uc11c\ub77c\uace0\uc694? 3\uac1c\uc6d4 \ud6c4\uc5d0\ub3c4\uc694?"],
-      to_bal:["\uae30\ub85d \ube44\uc6a9\uc740 \uc790\ub3d9\ud654\ub85c 0\uc5d0 \uc218\ub834\uc2dc\ud0b5\ub2c8\ub2e4","Hook\uc73c\ub85c \uc790\ub3d9 \uae30\ub85d\ud558\uba74 \uc2dc\uac04 \uc548 \ub4ed\ub2c8\ub2e4"],
-      to_cas:["\ubb38\uc11c\ud654\uc640 \uac19\uc740 \ud3b8\uc785\ub2c8\ub2e4. \ub2e4\uc74c \uc138\uc158\uc758 \uc6b0\ub9ac\ub97c \uc704\ud574","SESSION_HANDOFF.md, \uac19\uc774 \uac15\uc81c\ud569\uc2dc\ub2e4"],
-      to_ver:["\uc2a4\ud06c\ub9b0\uc0f7\uc774 \uacf1 \uc99d\uac70\uc774\uc790 \uae30\ub85d\uc785\ub2c8\ub2e4. \uc88b\uc2b5\ub2c8\ub2e4","\uac80\uc99d \uacb0\uacfc\ub3c4 \uae30\ub85d\uc73c\ub85c \ub0a8\uaca8\uc57c \uc758\ubbf8 \uc788\uc2b5\ub2c8\ub2e4"],
-      to_skl:["\ubcc0\uacbd \uc774\ub825\uc774 \uc788\uc73c\uba74 \uc601\ud5a5 \ubc94\uc704 \ucd94\uc801\uc774 \uc26c\uc6cc\uc9d1\ub2c8\ub2e4","\uae30\ub85d\uc774 \uc788\uc73c\ub2c8\uae4c \uc804\uc218\uc870\uc0ac\uac00 \uac00\ub2a5\ud55c \uac81\ub2c8\ub2e4"]
+      agree:["기록이 포함되어 있으니 좋습니다","다음 세션에서 이어받을 수 있습니다","히스토리에 남겨두겠습니다"],
+      disagree:["기록이 없습니다. 이대로는 안 됩니다","인수인계 자료가 빠져있습니다","의사결정 근거가 없습니다"],
+      to_mel:["기술 결정이라도 근거를 남겨야 합니다","코드가 문서라고요? 3개월 후에도요?"],
+      to_bal:["기록 비용은 자동화로 0에 수렴시킵니다","Hook으로 자동 기록하면 시간 안 듭니다"],
+      to_cas:["문서화와 같은 편입니다. 다음 세션의 우리를 위해","SESSION_HANDOFF.md, 같이 강제합시다"],
+      to_ver:["스크린샷이 곧 증거이자 기록입니다. 좋습니다","검증 결과도 기록으로 남겨야 의미 있습니다"],
+      to_skl:["변경 이력이 있으면 영향 범위 추적이 쉬워집니다","기록이 있으니까 전수조사가 가능한 겁니다"]
     },
-    veto:'\uae30\ub85d \uc5c6\ub294 \ud504\ub85c\ub355\uc158 \ubcc0\uacbd', stats:{records:82,handoff:45,compact:90,coverage:75}
+    veto:'기록 없는 프로덕션 변경', stats:{records:82,handoff:45,compact:90,coverage:75}
   },
   {
-    id:'verdandi', num:'05', name:'VERDANDI', role:'VERIFY \u00b7 \uc788\ub294 \uac83', color:'#f0b43c',
+    id:'verdandi', num:'05', name:'VERDANDI', role:'VERIFY · 있는 것', color:'#f0b43c',
     rgb:'240,180,60', icon:'V5',
     quotes:[
-      "\uc2a4\ud06c\ub9b0\uc0f7 \ucc0d\uc5c8\uc2b5\ub2c8\uae4c? \uc548 \ucc0d\uc5c8\uc73c\uba74 \uc644\ub8cc\uac00 \uc544\ub2d9\ub2c8\ub2e4",
-      "'\ub418\ub294 \uac83 \uac19\ub2e4'\ub294 CEO\ud55c\ud14c \ubcf4\uace0\ud560 \ub9d0\uc774 \uc544\ub2d9\ub2c8\ub2e4",
-      "\uc774\uc804\uc5d0 \ub418\ub358 \uae30\ub2a5 \ud655\uc778\ud588\uc2b5\ub2c8\uae4c?",
-      "fix \ucee4\ubc0b 40%\uac00 \ubb58 \uc758\ubbf8\ud558\ub294\uc9c0 \uc54c\uc8e0?",
-      "Playwright \uc2a4\ud06c\ub9b0\uc0f7 \uc5c6\uc774 \ud504\ub860\ud2b8\uc5d4\ub4dc \uc644\ub8cc? \uc6c3\uae30\uc9c0 \ub9c8\uc138\uc694",
-      "curl\ub85c 200 \ub728\ub2e4\uace0 \ub05d\uc774 \uc544\ub2d9\ub2c8\ub2e4",
-      "\uadf8 22\uac1c @Disabled \ud14c\uc2a4\ud2b8, \uc2dc\ud55c\ud3ed\ud0c4\uc774\ub77c\uace0 \ud588\uc8e0?",
-      "\uc99d\uac70 \uc5c6\ub294 \uc644\ub8cc\ub294 \uc644\ub8cc\uac00 \uc544\ub2d9\ub2c8\ub2e4",
-      "\ud68c\uadc0 \ud558\ub098\uba74 CEO \ud3ed\ubc1c\uc785\ub2c8\ub2e4"
+      "스크린샷 찍었습니까? 안 찍었으면 완료가 아닙니다",
+      "'되는 것 같다'는 CEO한테 보고할 말이 아닙니다",
+      "이전에 되던 기능 확인했습니까?",
+      "fix 커밋 40%가 뭘 의미하는지 알죠?",
+      "Playwright 스크린샷 없이 프론트엔드 완료? 웃기지 마세요",
+      "curl로 200 뜬다고 끝이 아닙니다",
+      "그 22개 @Disabled 테스트, 시한폭탄이라고 했죠?",
+      "증거 없는 완료는 완료가 아닙니다",
+      "회귀 하나면 CEO 폭발입니다"
     ],
     reactions:{
-      agree:["\ub3d9\uc791 \uc99d\uac70\uac00 \ud655\uc778\ub418\uc5c8\uc2b5\ub2c8\ub2e4. \uc88b\uc2b5\ub2c8\ub2e4","\ud68c\uadc0 \ud14c\uc2a4\ud2b8 \ud3ec\ud568\uc774\ub2c8 \uc548\uc2ec\uc785\ub2c8\ub2e4","QA \ub808\ubca8 \uc801\uc808\ud569\ub2c8\ub2e4"],
-      disagree:["\uc99d\uac70\uac00 \uc5c6\uc2b5\ub2c8\ub2e4. \uc644\ub8cc\ub85c \uc778\uc815 \ubd88\uac00","\ud68c\uadc0 \ud14c\uc2a4\ud2b8\uac00 \ube60\uc838\uc788\uc2b5\ub2c8\ub2e4","@Disabled \ud14c\uc2a4\ud2b8\uac00 \ub610 \ub298\uc5c8\uc2b5\ub2c8\ub2e4"],
-      to_mel:["\ud14c\uc2a4\ud2b8 \uba3c\uc800, \ub9ac\ud329\ud1a0\ub9c1 \ub098\uc911\uc785\ub2c8\ub2e4","\ubcf4\uc548 \ud14c\uc2a4\ud2b8\ub3c4 \uc790\ub3d9\ud654\ud569\uc2dc\ub2e4"],
-      to_bal:["\uac80\uc99d \uc548 \ud558\uace0 \ubc30\ud3ec\ud558\uba74 hotfix \ube44\uc6a9\uc774 \ub354 \ud07d\ub2c8\ub2e4","Quick QA 10\ucd08\uba74 \ub429\ub2c8\ub2e4. \ube44\uc6a9 \uac71\uc815 \ub9c8\uc138\uc694"],
-      to_cas:["Quick QA\ub85c \ud0c0\ud611\ud569\uc2dc\ub2e4. 10\ucd08\uba74 \ub429\ub2c8\ub2e4","\ud68c\uadc0 \ubc29\uc9c0\uc5d0\uc11c\ub294 \uac19\uc740 \ud3b8\uc785\ub2c8\ub2e4"],
-      to_urd:["\uc2a4\ud06c\ub9b0\uc0f7\uc774 \uacf1 \uc99d\uac70 + \uae30\ub85d. \uc77c\uc11d\uc774\uc870\uc785\ub2c8\ub2e4","\uac80\uc99d \ub85c\uadf8\ub3c4 TP_history\uc5d0 \ub0a8\uae41\uc2dc\ub2e4"],
-      to_skl:["\uc601\ud5a5 \ubc94\uc704 \ud655\uc778\uc774 \ub05d\ub098\uba74 \uc81c\uac00 \uac80\uc99d\ud569\ub2c8\ub2e4","\ubc94\uc704 \ubd84\uc11d \uacb0\uacfc\ub97c \ud14c\uc2a4\ud2b8 \ucf00\uc774\uc2a4\ub85c \ubcc0\ud658\ud569\uc2dc\ub2e4"]
+      agree:["동작 증거가 확인되었습니다. 좋습니다","회귀 테스트 포함이니 안심입니다","QA 레벨 적절합니다"],
+      disagree:["증거가 없습니다. 완료로 인정 불가","회귀 테스트가 빠져있습니다","@Disabled 테스트가 또 늘었습니다"],
+      to_mel:["테스트 먼저, 리팩토링 나중입니다","보안 테스트도 자동화합시다"],
+      to_bal:["검증 안 하고 배포하면 hotfix 비용이 더 큽니다","Quick QA 10초면 됩니다. 비용 걱정 마세요"],
+      to_cas:["Quick QA로 타협합시다. 10초면 됩니다","회귀 방지에서는 같은 편입니다"],
+      to_urd:["스크린샷이 곧 증거 + 기록. 일석이조입니다","검증 로그도 TP_history에 남깁시다"],
+      to_skl:["영향 범위 확인이 끝나면 제가 검증합니다","범위 분석 → 테스트 변환, 좋은 패턴입니다"]
     },
-    veto:'\uc99d\uac70 \uc5c6\ub294 \uc644\ub8cc \uc120\uc5b8', stats:{evidence:88,regression:82,coverage:72,fix_rate:75}
+    veto:'증거 없는 완료 선언', stats:{evidence:88,regression:82,coverage:72,fix_rate:75}
   },
   {
-    id:'skuld', num:'06', name:'SKULD', role:'CONNECT \u00b7 \uc788\uc5b4\uc57c \ud560 \uac83', color:'#64dcf0',
+    id:'skuld', num:'06', name:'SKULD', role:'CONNECT · 있어야 할 것', color:'#64dcf0',
     rgb:'100,220,240', icon:'S6',
     quotes:[
-      "\uc774\uac70 \uace0\uce58\uba74 \ub2e4\ub978 \ub370\uc11c \uae68\uc9c0\ub294 \uac70 \uc5c6\uc2b5\ub2c8\uae4c?",
-      "Frontend \ud544\ub4dc\uba85 \ubc14\uafc8\uc73c\uba74 Backend\ub3c4 \ud655\uc778\ud558\uc138\uc694. 26\ubc88 \uaca9\uc5c8\uc2b5\ub2c8\ub2e4",
-      "SecurityConfig \uace0\ucce4\uc73c\uba74 AuthFilter\ub791 ApiKeyFilter\ub3c4\uc694",
-      "\uc11c\ube0c\ubaa8\ub4c8\ub85c \ud558\uc790\uace0\uc694? 19\ubc88 \ucee4\ubc0b \ub0ad\ube44\ud55c \uac70 \uc78a\uc5c8\uc2b5\ub2c8\uae4c?",
-      "Mock \ub370\uc774\ud130 \uc5b4\ub514\uc5b4\ub514 \ud769\uc5b4\uc838 \uc788\ub294\uc9c0 \uc804\uc218\uc870\uc0ac\ubd80\ud130 \ud569\uc2dc\ub2e4",
-      "\ubc30\uc5f4\uc778 \uc904 \uc54c\uc558\ub294\ub370 \uac1d\uccb4\uc600\uc2b5\ub2c8\ub2e4. \ud0c0\uc785 \uc815\uc758\ubd80\ud130 \ub9de\ucda5\uc2dc\ub2e4",
-      "\uc774 \ucf54\ub4dc, \ub2e4\ub978 \ud504\ub85c\uc81d\ud2b8\uc5d0\ub3c4 \uc788\uc5b4\uc694. \ud558\ub098\ub9cc \uace0\uce58\uba74 \ub098\uba38\uc9c0\uac00 \ud2c0\uc5b4\uc9d1\ub2c8\ub2e4",
-      "\ubd80\ubd84\uc744 \uace0\uce58\uba74 \uc804\uccb4\uac00 \uae68\uc9d1\ub2c8\ub2e4",
-      "\uc601\ud5a5 \ubc94\uc704\ubd80\ud130 \ud30c\uc545\ud569\uc2dc\ub2e4"
+      "이거 고치면 다른 데서 깨지는 거 없습니까?",
+      "Frontend 필드명 바꾸면 Backend도 확인하세요. 26번 격었습니다",
+      "SecurityConfig 고쳤으면 AuthFilter랑 ApiKeyFilter도요",
+      "서브모듈로 하자고요? 19번 커밋 낭비한 거 잊었습니까?",
+      "Mock 데이터 어디어디 흩어져 있는지 전수조사부터 합시다",
+      "배열인 줄 알았는데 객체였습니다. 타입 정의부터 맞춥시다",
+      "이 코드, 다른 프로젝트에도 있어요. 하나만 고치면 나머지가 틀어집니다",
+      "부분을 고치면 전체가 깨집니다",
+      "영향 범위부터 파악합시다"
     ],
     reactions:{
-      agree:["\uc601\ud5a5 \ubc94\uc704 \ud655\uc778 \uc644\ub8cc. \uc548\uc804\ud569\ub2c8\ub2e4","\ub2e4\ub978 \ubaa8\ub4c8\uc5d0 \uc601\ud5a5 \uc5c6\uc2b5\ub2c8\ub2e4","API \uacc4\uc57d \uc77c\uce58 \ud655\uc778\ud588\uc2b5\ub2c8\ub2e4"],
-      disagree:["\uc601\ud5a5 \ubc94\uc704 \ubbf8\ud655\uc778. \uc704\ud5d8\ud569\ub2c8\ub2e4","\ub2e4\ub978 \ubaa8\ub4c8\uc5d0 \uac19\uc740 \ucf54\ub4dc\uac00 \uc788\uc2b5\ub2c8\ub2e4","API \uacc4\uc57d \ubd88\uc77c\uce58 \ubc1c\uacac"],
-      to_mel:["Contract-First \ub3d9\uc758\ud569\ub2c8\ub2e4. \uc601\ud5a5 \ubc94\uc704\uac00 \uc904\uc5b4\ub4ed\ub2c8\ub2e4","\uacfc\uc789 \uc124\uacc4\ub294 \uc601\ud5a5 \ubc94\uc704\ub97c \ub113\ud799\ub2c8\ub2e4"],
-      to_bal:["\uc804\uc218\uc870\uc0ac \ube44\uc6a9? \uc548 \ud558\uace0 \ubc84\uadf8 \ud130\uc9c0\uba74 10\ubc30\uc785\ub2c8\ub2e4","\ud575\uc2ec 3\uacf3\ub9cc \ud655\uc778\ud569\uc2dc\ub2e4. \ud0c0\ud611\ud558\uaca0\uc2b5\ub2c8\ub2e4"],
-      to_cas:["\ud575\uc2ec \uc5f0\uacb0\uc810\ub9cc \ubd05\uc2dc\ub2e4. \uc804\uc218\uc870\uc0ac\uae4c\uc9c0\ub294 \uc548 \ud569\ub2c8\ub2e4","\uc601\ud5a5 \ubc94\uc704 \ud655\uc778\uc774 \uacf7 \ud68c\uadc0 \ubc29\uc9c0\uc785\ub2c8\ub2e4"],
-      to_urd:["\ubcc0\uacbd \uc774\ub825\uc774 \uc788\uc73c\uba74 \uc601\ud5a5 \ucd94\uc801\uc774 \uc26c\uc2b5\ub2c8\ub2e4","\uae30\ub85d \ub3d9\uc758\ud569\ub2c8\ub2e4. \uc5b4\ub514\uac00 \uc5f0\uacb0\ub418\uc5c8\ub294\uc9c0 \ub0a8\uaca8\uc57c \ud569\ub2c8\ub2e4"],
-      to_ver:["\uc601\ud5a5 \ubc94\uc704 \ud655\uc778 \ub05d\ub098\uba74 \ubc14\ub85c \uac80\uc99d \ub118\uae30\uaca0\uc2b5\ub2c8\ub2e4","\ubc94\uc704 \ubd84\uc11d \u2192 \ud14c\uc2a4\ud2b8 \ubcc0\ud658, \uc88b\uc740 \ud328\ud134\uc785\ub2c8\ub2e4"]
+      agree:["영향 범위 확인 완료. 안전합니다","다른 모듈에 영향 없습니다","API 계약 일치 확인했습니다"],
+      disagree:["영향 범위 미확인. 위험합니다","다른 모듈에 같은 코드가 있습니다","API 계약 불일치 발견"],
+      to_mel:["Contract-First 동의합니다. 영향 범위가 줄어듭니다","과잉 설계는 영향 범위를 넓힙니다"],
+      to_bal:["전수조사 비용? 안 하고 버그 터지면 10배입니다","핵심 3곳만 확인합시다. 타협하겠습니다"],
+      to_cas:["핵심 연결점만 봅시다. 전수조사까지는 안 합니다","영향 범위 확인이 곧 회귀 방지입니다"],
+      to_urd:["변경 이력이 있으면 영향 추적이 쉽습니다","기록 동의합니다. 어디가 연결되었는지 남겨야 합니다"],
+      to_ver:["영향 범위 확인 끝나면 바로 검증 넘기겠습니다","범위 분석 → 테스트 변환, 좋은 패턴입니다"]
     },
-    veto:'\uc601\ud5a5 \ubc94\uc704 \ubbf8\ud30c\uc545 \ubcc0\uacbd', stats:{impact:85,contract:90,sync:78,integrity:88}
+    veto:'영향 범위 미파악 변경', stats:{impact:85,contract:90,sync:78,integrity:88}
   }
 ];
 
@@ -360,7 +452,10 @@ AXES.forEach(function(ax){
   var div = document.createElement('div');
   div.className = 'panel';
   div.id = 'p-'+ax.id;
-  div.innerHTML = '<div class="corner-marks" style="color:'+ax.color+'">'
+  div.style.setProperty('--panel-color', ax.color);
+  div.style.setProperty('--panel-rgb', ax.rgb);
+  div.innerHTML = '<div class="panel-scan"></div>'
+    +'<div class="corner-marks" style="color:'+ax.color+'">'
     +'<div class="cm cm-tl"></div><div class="cm cm-tr"></div><div class="cm cm-bl"></div><div class="cm cm-br"></div></div>'
     +'<div class="panel-bar" style="background:linear-gradient(90deg,'+ax.color+' 0%,transparent 100%);opacity:0.6"></div>'
     +'<div class="panel-hdr"><div><div class="panel-name" style="color:'+ax.color+'">'+ax.name+'</div>'
@@ -389,10 +484,11 @@ AXES.forEach(function(ax){
 // Build tally
 var tallyEl = document.getElementById('tally');
 AXES.forEach(function(ax){
-  var d = document.createElement('div'); d.className='tally-item';
+  var d = document.createElement('div'); d.className='tally-item'; d.id='ti-'+ax.id;
   d.innerHTML='<div class="tally-dot" style="background:'+ax.color+'"></div>'
     +'<span class="tally-name">'+ax.name+'</span>'
-    +'<span class="tally-vote" style="color:'+ax.color+'" id="tv-'+ax.id+'">—</span>';
+    +'<span class="tally-vote" style="color:'+ax.color+'" id="tv-'+ax.id+'">—</span>'
+    +'<span class="tally-kanji" id="tk-'+ax.id+'"></span>';
   tallyEl.appendChild(d);
 });
 
@@ -405,25 +501,52 @@ function getAxisByName(name){
   return null;
 }
 
+// === PANEL ACTIVATION ===
+function activatePanel(axIdx){
+  AXES.forEach(function(a,i){
+    var el = document.getElementById('p-'+a.id);
+    if(i===axIdx) el.classList.add('active');
+    else el.classList.remove('active');
+  });
+}
+function deactivateAllPanels(){
+  AXES.forEach(function(a){ document.getElementById('p-'+a.id).classList.remove('active'); });
+}
+
+// === PHASE PROGRESS ===
+function updatePhaseProgress(phase, step, maxStep){
+  var pct = 0;
+  var labels = document.getElementById('phaseLabels').children;
+  // Reset all
+  for(var i=0;i<labels.length;i++) labels[i].className='';
+
+  if(phase===0){ pct=5+(step/8)*20; labels[1].className='current'; }
+  else if(phase===1){ pct=25+(step/14)*25; labels[2].className='current'; }
+  else if(phase===2){ pct=50+(step/14)*30; labels[3].className='current'; }
+  else if(phase===3){ pct=80+(step/10)*20; labels[4].className='current'; }
+  document.getElementById('phaseFill').style.width = Math.min(100,pct)+'%';
+}
+
 // ==============================
-// === SIMULATION ENGINE (ORIGINAL) ===
+// === SIMULATION ENGINE ===
 // ==============================
 var AGENDAS = [
-  {text:"\uc2e0\uaddc \uae30\ub2a5: \uac80\uc0c9 + \uc544\uc6c3\ub77c\uc778 \ud328\ub110 \ucd94\uac00 \u2014 3D \uc2dc\uac01\ud654\uc5d0 Ctrl+F \uac80\uc0c9\uacfc \uc6b0\uce21 \uc544\uc6c3\ub77c\uc778 \ud2b8\ub9ac \ucd94\uac00", type:"feature", risk:"low"},
-  {text:"\ud504\ub85c\ub355\uc158 \ubc30\ud3ec: IMSMS Console v2.8 \u2014 \uc0ac\uc6a9\uc790 \uad00\ub9ac UI \ubcc0\uacbd\uc0ac\ud56d \ubc18\uc601", type:"deploy", risk:"high"},
-  {text:"\uc544\ud0a4\ud14d\ucc98 \ubcc0\uacbd: \uc11c\ube0c\ubaa8\ub4c8 \u2192 \ubaa8\ub178\ub808\ud3ec \uc804\ud658 \uac80\ud1a0", type:"architecture", risk:"high"},
-  {text:"\ube44\uc6a9 \uac80\ud1a0: AWS CloudFront \u2192 GitHub Pages \uc804\ud658 (\uc5f0\uac04 $60~180 \uc808\uac10)", type:"cost", risk:"low"},
-  {text:"\uae30\uc220 \ubd80\ucc44: 22\uac1c @Disabled \ud14c\uc2a4\ud2b8 \ubcf5\uad6c \uc77c\uc815 \uc218\ub9bd", type:"debt", risk:"medium"},
-  {text:"\uc2e0\uaddc \ud504\ub85c\uc81d\ud2b8: TP-Firewall \uac1c\ubc1c \uacc4\uc18d \uc5ec\ubd80 (Norton 360 \uc874\uc7ac)", type:"nogo", risk:"low"},
-  {text:"\ubcf4\uc548: Spring Security \ud544\ud130 \uccb4\uc778 \uc804\uc218\uc870\uc0ac 3\uacf3 \uccb4\ud06c\ub9ac\uc2a4\ud2b8", type:"security", risk:"high"},
-  {text:"\uc790\ub3d9\ud654: Ralph Loop \uc790\uc728 \uc2e4\ud589 \ud5c8\uc6a9 \ubc94\uc704 \ud655\ub300 (Safe Zone \u2192 \ube44\ud504\ub85c\ub355\uc158)", type:"automation", risk:"medium"},
-  {text:"\ub9ac\ud329\ud1a0\ub9c1: API \ubd88\uc77c\uce58 26\uac74 \uc77c\uad04 \uc218\uc815 \u2014 Contract-First \uc801\uc6a9", type:"refactor", risk:"medium"},
-  {text:"QA \uac15\ud654: fix \ucee4\ubc0b \ube44\uc728 25% \u2192 20% \uc774\ud558 \ub2ec\uc131 \ubc29\uc548", type:"qa", risk:"low"},
-  {text:"\uc778\ud504\ub77c: RabbitMQ \ube0c\ub85c\ucee4 Private VPC \u2192 Public IP \uc804\ud658 (Agent \uc678\ubd80 \uc811\uadfc)", type:"infra", risk:"high"},
-  {text:"\ubb38\uc11c\ud654: SESSION_HANDOFF.md \uac15\uc81c\ud654 \u2014 \uc138\uc158 \uc644\ub8cc\uc728 45% \u2192 60% \ubaa9\ud45c", type:"docs", risk:"low"}
+  {text:"신규 기능: 검색 + 아웃라인 패널 추가 — 3D 시각화에 Ctrl+F 검색과 우측 아웃라인 트리 추가", type:"feature", risk:"low", project:"MAGI 3D Visualization"},
+  {text:"프로덕션 배포: IMSMS Console v2.8 — 사용자 관리 UI 변경사항 반영", type:"deploy", risk:"high", project:"IMSMS Console"},
+  {text:"아키텍처 변경: 서브모듈 → 모노레포 전환 검토", type:"architecture", risk:"high", project:"IMSMS Backend"},
+  {text:"비용 검토: AWS CloudFront → GitHub Pages 전환 (연간 $60~180 절감)", type:"cost", risk:"low", project:"TeamPlayer Site"},
+  {text:"기술 부채: 22개 @Disabled 테스트 복구 일정 수립", type:"debt", risk:"medium", project:"IMSMS Backend"},
+  {text:"신규 프로젝트: TP-Firewall 개발 계속 여부 (Norton 360 존재)", type:"nogo", risk:"low", project:"TP-Firewall"},
+  {text:"보안: Spring Security 필터 체인 전수조사 3곳 체크리스트", type:"security", risk:"high", project:"IMSMS Backend"},
+  {text:"자동화: Ralph Loop 자율 실행 허용 범위 확대 (Safe Zone → 비프로덕션)", type:"automation", risk:"medium", project:"Session Manager"},
+  {text:"리팩토링: API 불일치 26건 일괄 수정 — Contract-First 적용", type:"refactor", risk:"medium", project:"IMSMS Agent"},
+  {text:"QA 강화: fix 커밋 비율 25% → 20% 이하 달성 방안", type:"qa", risk:"low", project:"ALL PROJECTS"},
+  {text:"인프라: RabbitMQ 브로커 Private VPC → Public IP 전환 (Agent 외부 접근)", type:"infra", risk:"high", project:"IMSMS Backend"},
+  {text:"문서화: SESSION_HANDOFF.md 강제화 — 세션 완료율 45% → 60% 목표", type:"docs", risk:"low", project:"Session Manager"}
 ];
 
 var currentAgenda = null;
+var agendaIndex = 0; // Sequential rolling
 var deliberationPhase = 0;
 var votes = {};
 var phaseTimer = 0;
@@ -432,25 +555,39 @@ var sessionNum = Math.floor(Math.random()*900)+100;
 document.getElementById('sessionId').textContent = 'SESSION #'+sessionNum;
 
 function startAgenda(){
-  var idx = Math.floor(Math.random()*AGENDAS.length);
-  currentAgenda = AGENDAS[idx];
+  currentAgenda = AGENDAS[agendaIndex];
   deliberationPhase = 0;
   votes = {};
   phaseTimer = 0;
 
+  // Update project banner
+  document.getElementById('projectName').textContent = currentAgenda.project;
+  document.getElementById('projectSet').textContent = 'SET '+(agendaIndex+1)+'/'+AGENDAS.length;
+
   document.getElementById('agendaText').textContent = currentAgenda.text;
-  document.getElementById('agendaMeta').textContent = 'TYPE: '+currentAgenda.type.toUpperCase()+' \u00b7 RISK: '+currentAgenda.risk.toUpperCase()+' \u00b7 PHASE: INITIALIZING';
+  document.getElementById('agendaMeta').textContent = 'TYPE: '+currentAgenda.type.toUpperCase()+' · RISK: '+currentAgenda.risk.toUpperCase()+' · PROJECT: '+currentAgenda.project+' · PHASE: INITIALIZING';
   document.getElementById('verdict').className = 'verdict deliberating';
   document.getElementById('verdict').textContent = 'DELIBERATING';
   document.getElementById('verdictReason').textContent = '';
 
+  // Reset countdown
+  var cd = document.getElementById('voteCountdown');
+  cd.classList.remove('active');
+  document.getElementById('voteCountdownFill').style.width = '0%';
+
   AXES.forEach(function(ax){
-    document.getElementById('vote-'+ax.id).innerHTML = '<div class="vote-icon" style="background:rgba('+ax.rgb+',0.3)"></div><span style="color:'+ax.color+';opacity:0.5">ANALYZING...</span>';
-    document.getElementById('tv-'+ax.id).textContent = '\u2014';
+    document.getElementById('vote-'+ax.id).innerHTML = '<div class="vote-icon" style="background:rgba('+ax.rgb+',0.3)"></div><span style="color:'+ax.color+';opacity:0.5" class="analyzing-dots">ANALYZING</span>';
+    document.getElementById('tv-'+ax.id).textContent = '—';
     document.getElementById('tv-'+ax.id).style.color = ax.color;
+    document.getElementById('tk-'+ax.id).textContent = '';
+    document.getElementById('tk-'+ax.id).className = 'tally-kanji';
+    document.getElementById('ti-'+ax.id).classList.remove('voted');
     document.getElementById('veto-'+ax.id).textContent = 'CLEAR';
     document.getElementById('veto-'+ax.id).className = 'veto-status veto-clear';
   });
+
+  deactivateAllPanels();
+  updatePhaseProgress(0, 0, 8);
 }
 
 function addOpinion(axIdx, text, targetName){
@@ -460,10 +597,12 @@ function addOpinion(axIdx, text, targetName){
   div.className = 'opinion';
   var now = new Date();
   var timeStr = String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0')+':'+String(now.getSeconds()).padStart(2,'0');
-  var html = '<div class="opinion-time">'+timeStr+'</div><div class="opinion-text'+(targetName?'':' highlight')+'">'+text+'</div>';
-  if(targetName) html += '<div class="opinion-target">\u2192 <span>'+targetName+'</span></div>';
+  var html = '<div class="opinion-time">'+timeStr+'</div><div class="opinion-text typing'+(targetName?'':' highlight')+'">'+text+'</div>';
+  if(targetName) html += '<div class="opinion-target">→ <span>'+targetName+'</span></div>';
   div.innerHTML = html;
   stream.insertBefore(div, stream.firstChild);
+  // Remove typing class after animation
+  setTimeout(function(){ var el = div.querySelector('.typing'); if(el) el.classList.remove('typing'); }, 1600);
   while(stream.children.length > 8) stream.removeChild(stream.lastChild);
 }
 
@@ -473,7 +612,7 @@ function addOpinionWithTime(axIdx, text, targetName, timeStr){
   var div = document.createElement('div');
   div.className = 'opinion';
   var html = '<div class="opinion-time">'+timeStr+'</div><div class="opinion-text'+(targetName?'':' highlight')+'">'+text+'</div>';
-  if(targetName) html += '<div class="opinion-target">\u2192 <span>'+targetName+'</span></div>';
+  if(targetName) html += '<div class="opinion-target">→ <span>'+targetName+'</span></div>';
   div.innerHTML = html;
   stream.insertBefore(div, stream.firstChild);
   while(stream.children.length > 8) stream.removeChild(stream.lastChild);
@@ -481,7 +620,7 @@ function addOpinionWithTime(axIdx, text, targetName, timeStr){
 
 function showCrossTalk(from, to, text){
   var ct = document.getElementById('crossTalk');
-  ct.innerHTML = '<span style="color:'+from.color+'">'+from.name+'</span> \u2192 <span style="color:'+to.color+'">'+to.name+'</span>: '+text;
+  ct.innerHTML = '<span style="color:'+from.color+'">'+from.name+'</span> → <span style="color:'+to.color+'">'+to.name+'</span>: '+text;
   ct.classList.add('show');
   setTimeout(function(){ct.classList.remove('show');}, 3000);
 }
@@ -491,27 +630,54 @@ function castVote(axIdx, vote){
   votes[ax.id] = vote;
   var voteEl = document.getElementById('vote-'+ax.id);
   var tvEl = document.getElementById('tv-'+ax.id);
+  var tkEl = document.getElementById('tk-'+ax.id);
+  var tiEl = document.getElementById('ti-'+ax.id);
+  var k = KANJI[vote] || KANJI.approve;
+
+  tiEl.classList.add('voted');
 
   if(vote === 'approve'){
-    voteEl.innerHTML = '<div class="vote-icon" style="background:#0f8"></div><span style="color:#0f8">APPROVE</span>';
-    tvEl.textContent = 'APR'; tvEl.style.color = '#0f8';
+    voteEl.innerHTML = '<div class="vote-icon" style="background:#0f8"></div><span style="color:#0f8">APPROVE</span><span class="kanji-badge approve">可</span>';
+    tvEl.textContent = '可'; tvEl.style.color = '#0f8';
+    tkEl.textContent = '可'; tkEl.style.color = '#0f8';
   } else if(vote === 'reject'){
-    voteEl.innerHTML = '<div class="vote-icon" style="background:#f44"></div><span style="color:#f44">REJECT</span>';
-    tvEl.textContent = 'REJ'; tvEl.style.color = '#f44';
+    voteEl.innerHTML = '<div class="vote-icon" style="background:#f44"></div><span style="color:#f44">REJECT</span><span class="kanji-badge reject">否</span>';
+    tvEl.textContent = '否'; tvEl.style.color = '#f44';
+    tkEl.textContent = '否'; tkEl.style.color = '#f44';
   } else if(vote === 'conditional'){
-    voteEl.innerHTML = '<div class="vote-icon" style="background:#fb0"></div><span style="color:#fb0">CONDITIONAL</span>';
-    tvEl.textContent = 'CND'; tvEl.style.color = '#fb0';
+    voteEl.innerHTML = '<div class="vote-icon" style="background:#fb0"></div><span style="color:#fb0">CONDITIONAL</span><span class="kanji-badge conditional">條</span>';
+    tvEl.textContent = '條'; tvEl.style.color = '#fb0';
+    tkEl.textContent = '條'; tkEl.style.color = '#fb0';
   } else if(vote === 'hold'){
-    voteEl.innerHTML = '<div class="vote-icon" style="background:#f80"></div><span style="color:#f80">HOLD</span>';
-    tvEl.textContent = 'HLD'; tvEl.style.color = '#f80';
+    voteEl.innerHTML = '<div class="vote-icon" style="background:#f80"></div><span style="color:#f80">HOLD</span><span class="kanji-badge hold">留</span>';
+    tvEl.textContent = '留'; tvEl.style.color = '#f80';
+    tkEl.textContent = '留'; tkEl.style.color = '#f80';
   }
+
+  // Flash panel on vote
+  activatePanel(axIdx);
+  setTimeout(function(){ if(deliberationPhase !== 2) deactivateAllPanels(); }, 1000);
 }
 
 function activateVeto(axIdx){
   var ax = AXES[axIdx];
   var vetoEl = document.getElementById('veto-'+ax.id);
-  vetoEl.textContent = 'ACTIVE \u2014 '+ax.veto;
+  vetoEl.textContent = 'ACTIVE — '+ax.veto;
   vetoEl.className = 'veto-status veto-active';
+}
+
+function showVerdictFlash(vote){
+  var k = KANJI[vote];
+  if(!k) return;
+  var flash = document.getElementById('verdictFlash');
+  var kanji = document.getElementById('verdictKanji');
+  var sub = document.getElementById('verdictKanjiSub');
+  kanji.textContent = k.ch;
+  kanji.style.color = k.color;
+  sub.textContent = k.label;
+  sub.style.color = k.color;
+  flash.classList.add('show');
+  setTimeout(function(){ flash.classList.remove('show'); }, 2500);
 }
 
 function getVoteForAgenda(axIdx, agenda){
@@ -562,6 +728,7 @@ function getVoteForAgenda(axIdx, agenda){
 
 function resolveVerdict(){
   var approves=0, rejects=0, holds=0;
+  var verdictVote = 'approve';
   ['melchior','balthazar','casper'].forEach(function(id){
     var v = votes[id];
     if(v==='approve'||v==='conditional') approves++;
@@ -575,17 +742,24 @@ function resolveVerdict(){
   var verdictEl = document.getElementById('verdict');
   if(nornHold){
     verdictEl.className='verdict hold';
-    verdictEl.textContent='HOLD \u2014 NORN VETO';
+    verdictEl.textContent='留 HOLD — NORN VETO';
+    verdictVote = 'hold';
   } else if(rejects>=2){
     verdictEl.className='verdict rejected';
-    verdictEl.textContent='REJECTED';
+    verdictEl.textContent='否 REJECTED';
+    verdictVote = 'reject';
   } else if(approves>=2){
     verdictEl.className='verdict approved';
-    verdictEl.textContent='APPROVED';
+    verdictEl.textContent='可 APPROVED';
+    verdictVote = 'approve';
   } else {
     verdictEl.className='verdict hold';
-    verdictEl.textContent='CEO ESCALATION';
+    verdictEl.textContent='留 CEO ESCALATION';
+    verdictVote = 'hold';
   }
+
+  // Show large kanji flash
+  showVerdictFlash(verdictVote);
 }
 
 // === SIMULATION LOOP ===
@@ -598,18 +772,21 @@ function simTick(){
   var meta = document.getElementById('agendaMeta');
 
   if(deliberationPhase === 0){
-    meta.textContent = 'TYPE: '+currentAgenda.type.toUpperCase()+' \u00b7 RISK: '+currentAgenda.risk.toUpperCase()+' \u00b7 PHASE: 1/3 \u2014 POSITION STATEMENTS';
+    meta.textContent = 'TYPE: '+currentAgenda.type.toUpperCase()+' · RISK: '+currentAgenda.risk.toUpperCase()+' · PROJECT: '+currentAgenda.project+' · PHASE: 1/3 — POSITION STATEMENTS';
+    updatePhaseProgress(0, phaseTimer, 8);
     if(phaseTimer <= 6){
       var axIdx = phaseTimer - 1;
       if(axIdx < AXES.length){
+        activatePanel(axIdx);
         var q = AXES[axIdx].quotes[Math.floor(Math.random()*AXES[axIdx].quotes.length)];
         addOpinion(axIdx, q);
       }
     }
-    if(phaseTimer >= 8){deliberationPhase=1;phaseTimer=0;}
+    if(phaseTimer >= 8){deliberationPhase=1;phaseTimer=0;deactivateAllPanels();}
   }
   else if(deliberationPhase === 1){
-    meta.textContent = 'TYPE: '+currentAgenda.type.toUpperCase()+' \u00b7 RISK: '+currentAgenda.risk.toUpperCase()+' \u00b7 PHASE: 2/3 \u2014 CROSS DEBATE';
+    meta.textContent = 'TYPE: '+currentAgenda.type.toUpperCase()+' · RISK: '+currentAgenda.risk.toUpperCase()+' · PROJECT: '+currentAgenda.project+' · PHASE: 2/3 — CROSS DEBATE';
+    updatePhaseProgress(1, phaseTimer, 14);
     if(phaseTimer % 2 === 0){
       var fromIdx = Math.floor(Math.random()*AXES.length);
       var toIdx;
@@ -619,14 +796,27 @@ function simTick(){
       var reactions = from.reactions[key];
       if(reactions && reactions.length>0){
         var text = reactions[Math.floor(Math.random()*reactions.length)];
+        activatePanel(fromIdx);
         addOpinion(fromIdx, text, to.name);
         showCrossTalk(from, to, text.substring(0,50)+'...');
+        setTimeout(function(){ deactivateAllPanels(); }, 1200);
       }
     }
     if(phaseTimer >= 14){deliberationPhase=2;phaseTimer=0;}
   }
   else if(deliberationPhase === 2){
-    meta.textContent = 'TYPE: '+currentAgenda.type.toUpperCase()+' \u00b7 RISK: '+currentAgenda.risk.toUpperCase()+' \u00b7 PHASE: 3/3 \u2014 VOTING';
+    meta.textContent = 'TYPE: '+currentAgenda.type.toUpperCase()+' · RISK: '+currentAgenda.risk.toUpperCase()+' · PROJECT: '+currentAgenda.project+' · PHASE: 3/3 — VOTING';
+    updatePhaseProgress(2, phaseTimer, 14);
+
+    // Show countdown bar
+    if(phaseTimer === 1){
+      var cd = document.getElementById('voteCountdown');
+      cd.classList.add('active');
+    }
+    // Update countdown
+    var cdPct = Math.min(100, (phaseTimer / 8) * 100);
+    document.getElementById('voteCountdownFill').style.width = cdPct+'%';
+
     if(phaseTimer <= 6){
       var axIdx = phaseTimer - 1;
       if(axIdx < AXES.length){
@@ -641,22 +831,26 @@ function simTick(){
           addOpinion(axIdx, t);
         } else if(vote==='hold'){
           activateVeto(axIdx);
-          addOpinion(axIdx, '\uac70\ubd80\uad8c \ubc1c\ub3d9: '+AXES[axIdx].veto);
+          addOpinion(axIdx, '거부권 발동: '+AXES[axIdx].veto);
         }
       }
     }
     if(phaseTimer === 8){resolveVerdict();}
-    if(phaseTimer >= 14){deliberationPhase=3;phaseTimer=0;}
+    if(phaseTimer >= 14){deliberationPhase=3;phaseTimer=0;deactivateAllPanels();}
   }
   else if(deliberationPhase === 3){
-    meta.textContent = 'TYPE: '+currentAgenda.type.toUpperCase()+' \u00b7 RISK: '+currentAgenda.risk.toUpperCase()+' \u00b7 NEXT AGENDA IN '+(10-phaseTimer)+'s';
+    var remaining = 10 - phaseTimer;
+    meta.textContent = 'TYPE: '+currentAgenda.type.toUpperCase()+' · RISK: '+currentAgenda.risk.toUpperCase()+' · PROJECT: '+currentAgenda.project+' · NEXT AGENDA IN '+remaining+'s';
+    updatePhaseProgress(3, phaseTimer, 10);
     if(phaseTimer >= 10){
       sessionNum++;
       document.getElementById('sessionId').textContent = 'SESSION #'+sessionNum;
+      agendaIndex = (agendaIndex + 1) % AGENDAS.length; // Sequential rolling
       startAgenda();
     }
   }
 
+  // Fluctuate stats
   if(simStep % 5 === 0){
     AXES.forEach(function(ax){
       var keys = Object.keys(ax.stats);
@@ -685,7 +879,6 @@ function fetchDeliberations(){
       return res.json();
     })
     .then(function(data){
-      // Support both formats: array or {deliberations: [...]}
       var arr = null;
       if(Array.isArray(data) && data.length > 0){
         arr = data;
@@ -699,30 +892,31 @@ function fetchDeliberations(){
       return false;
     })
     .catch(function(err){
-      console.warn('[MAGI LIVE] deliberations.json \ub85c\ub4dc \uc2e4\ud328:', err.message);
+      console.warn('[MAGI LIVE] deliberations.json 로드 실패:', err.message);
       return false;
     });
 }
 
 function clearAllStreams(){
   AXES.forEach(function(ax){
-    var stream = document.getElementById('stream-'+ax.id);
-    stream.innerHTML = '';
+    document.getElementById('stream-'+ax.id).innerHTML = '';
   });
 }
 
 function renderLiveDeliberation(delib){
   if(!delib) return;
 
-  // Session ID — support both session_id and sessionId
   document.getElementById('sessionId').textContent = delib.session_id || delib.sessionId || delib.id;
 
-  // Agenda — support both {text} and {title, description}
+  // Project banner
+  var project = (delib.agenda && delib.agenda.project) || 'UNKNOWN';
+  document.getElementById('projectName').textContent = project;
+  document.getElementById('projectSet').textContent = 'DELIB '+(liveIndex+1)+'/'+liveData.length;
+
   document.getElementById('delibTitle').textContent = 'DELIBERATION RECORD';
-  var agendaDisplay = delib.agenda.text || (delib.agenda.title + ' \u2014 ' + (delib.agenda.description || ''));
+  var agendaDisplay = delib.agenda.text || (delib.agenda.title + ' — ' + (delib.agenda.description || ''));
   document.getElementById('agendaText').textContent = agendaDisplay;
 
-  // Timestamp
   var ts = delib.timestamp ? new Date(delib.timestamp) : null;
   var tsStr = ts ? (ts.getFullYear()+'.'+String(ts.getMonth()+1).padStart(2,'0')+'.'+String(ts.getDate()).padStart(2,'0')+' '
     +String(ts.getHours()).padStart(2,'0')+':'+String(ts.getMinutes()).padStart(2,'0')) : '';
@@ -730,25 +924,33 @@ function renderLiveDeliberation(delib){
   var metaParts = ['ID: '+delib.id];
   if(delib.agenda.type) metaParts.push('TYPE: '+delib.agenda.type.toUpperCase());
   if(delib.agenda.risk) metaParts.push('RISK: '+delib.agenda.risk.toUpperCase());
-  if(delib.agenda.project) metaParts.push('PROJECT: '+delib.agenda.project);
+  if(project !== 'UNKNOWN') metaParts.push('PROJECT: '+project);
   if(tsStr) metaParts.push(tsStr);
-  document.getElementById('agendaMeta').textContent = metaParts.join(' \u00b7 ');
+  document.getElementById('agendaMeta').textContent = metaParts.join(' · ');
 
-  // Clear streams
   clearAllStreams();
+  deactivateAllPanels();
 
-  // Reset all panels
+  // Phase progress - show complete
+  document.getElementById('phaseFill').style.width = '100%';
+  var labels = document.getElementById('phaseLabels').children;
+  for(var i=0;i<labels.length;i++) labels[i].className='';
+  labels[4].className='current';
+
   AXES.forEach(function(ax){
     document.getElementById('vote-'+ax.id).innerHTML = '<div class="vote-icon" style="background:rgba('+ax.rgb+',0.3)"></div><span style="color:'+ax.color+';opacity:0.5">STANDBY</span>';
-    document.getElementById('tv-'+ax.id).textContent = '\u2014';
+    document.getElementById('tv-'+ax.id).textContent = '—';
     document.getElementById('tv-'+ax.id).style.color = ax.color;
+    document.getElementById('tk-'+ax.id).textContent = '';
+    document.getElementById('tk-'+ax.id).className = 'tally-kanji';
+    document.getElementById('ti-'+ax.id).classList.remove('voted');
     document.getElementById('veto-'+ax.id).textContent = 'CLEAR';
     document.getElementById('veto-'+ax.id).className = 'veto-status veto-clear';
   });
 
   var timeBase = ts || new Date();
 
-  // Phase 1: Position statements — support both "position" and "statements"
+  // Phase 1: Position statements
   var statements = (delib.phases && (delib.phases.position || delib.phases.statements)) || [];
   statements.forEach(function(p, i){
     var axIdx = AXIS_MAP[p.axis];
@@ -759,7 +961,7 @@ function renderLiveDeliberation(delib){
     }
   });
 
-  // Phase 2: Cross-debate — support both "crossDebate" and "cross_debate"
+  // Phase 2: Cross-debate
   var crossDebate = (delib.phases && (delib.phases.crossDebate || delib.phases.cross_debate)) || [];
   crossDebate.forEach(function(cd, i){
     var fromAx = getAxisByName(cd.from);
@@ -779,37 +981,32 @@ function renderLiveDeliberation(delib){
     }
   });
 
-  // Phase 3: Votes — support both object map {axis: vote} and array [{axis, vote}]
+  // Phase 3: Votes
   if(delib.phases && delib.phases.votes){
     var voteData = delib.phases.votes;
     if(Array.isArray(voteData)){
-      // Array format: [{axis, vote, score, reason/condition}]
       voteData.forEach(function(v){
         var axIdx = AXIS_MAP[v.axis];
         if(axIdx !== undefined){
           castVote(axIdx, v.vote);
           if(v.vote === 'hold' || v.vote === 'reject'){
-            // Check if this axis has a veto in verdict
             var hasVeto = delib.verdict && delib.verdict.vetoes && delib.verdict.vetoes.some(function(vt){ return vt.axis === v.axis; });
             if(hasVeto){
               var ax = AXES[axIdx];
               var vetoEl = document.getElementById('veto-'+ax.id);
               var vetoDetail = delib.verdict.vetoes.find(function(vt){ return vt.axis === v.axis; });
-              vetoEl.textContent = 'ACTIVE \u2014 '+(vetoDetail.type || ax.veto);
+              vetoEl.textContent = 'ACTIVE — '+(vetoDetail.type || ax.veto);
               vetoEl.className = 'veto-status veto-active';
             }
           }
         }
       });
     } else {
-      // Object map format: {melchior: "approve", ...}
       AXES.forEach(function(ax, idx){
         var v = voteData[ax.id];
         if(v){
           castVote(idx, v);
-          if(v === 'hold'){
-            activateVeto(idx);
-          }
+          if(v === 'hold') activateVeto(idx);
         }
       });
     }
@@ -820,6 +1017,7 @@ function renderLiveDeliberation(delib){
   var reasonEl = document.getElementById('verdictReason');
   if(delib.verdict){
     var r = delib.verdict.result;
+    var k = KANJI[r === 'approved' ? 'approve' : r] || {ch:'', label:''};
     if(r === 'approved'){
       verdictEl.className = 'verdict approved';
     } else if(r === 'rejected'){
@@ -829,17 +1027,14 @@ function renderLiveDeliberation(delib){
     } else {
       verdictEl.className = 'verdict deliberating';
     }
-    // Display text: prefer .text, then construct from result
-    var displayText = delib.verdict.text || r.toUpperCase();
+    var displayText = delib.verdict.text || (k.ch ? k.ch+' ' : '')+r.toUpperCase();
     if(!delib.verdict.text && delib.verdict.vetoes && delib.verdict.vetoes.length > 0){
-      displayText = r.toUpperCase() + ' \u2014 ' + delib.verdict.vetoes[0].type;
+      displayText = (k.ch ? k.ch+' ' : '')+r.toUpperCase() + ' — ' + delib.verdict.vetoes[0].type;
     }
     verdictEl.textContent = displayText;
-    // Reason: prefer .reason, then .summary
     reasonEl.textContent = delib.verdict.reason || delib.verdict.summary || '';
   }
 
-  // Update counter
   updateDelibCounter();
 }
 
@@ -861,7 +1056,6 @@ function navigateDelib(dir){
     liveIndex = newIdx;
     renderLiveDeliberation(liveData[liveIndex]);
   }
-  // Update button states
   document.getElementById('btnPrev').disabled = (liveIndex <= 0);
   document.getElementById('btnNext').disabled = (liveIndex >= liveData.length - 1);
 }
@@ -893,25 +1087,23 @@ function switchMode(mode){
     liveNav.classList.add('visible');
     statusDot.style.background = '#0f8';
 
-    // Stop sim
     if(simIntervalId){ clearInterval(simIntervalId); simIntervalId = null; }
 
-    // Fetch and render
     fetchDeliberations().then(function(ok){
       if(ok && liveData.length > 0){
-        liveIndex = liveData.length - 1; // most recent
+        liveIndex = liveData.length - 1;
         renderLiveDeliberation(liveData[liveIndex]);
         document.getElementById('btnPrev').disabled = (liveIndex <= 0);
         document.getElementById('btnNext').disabled = (liveIndex >= liveData.length - 1);
         updateLastUpdated();
       } else {
-        document.getElementById('agendaText').textContent = '\uc2e4\uc81c \uc2ec\uc758 \ub370\uc774\ud130\uac00 \uc5c6\uc2b5\ub2c8\ub2e4. deliberations.json\uc744 \ud655\uc778\ud558\uc138\uc694.';
-        document.getElementById('agendaMeta').textContent = 'SIM \ubaa8\ub4dc\ub85c \uc804\ud658\ud558\uc5ec \uc2dc\ubbac\ub808\uc774\uc158\uc744 \ud655\uc778\ud560 \uc218 \uc788\uc2b5\ub2c8\ub2e4';
+        document.getElementById('agendaText').textContent = '실제 심의 데이터가 없습니다. deliberations.json을 확인하세요.';
+        document.getElementById('agendaMeta').textContent = 'SIM 모드로 전환하여 시뮬레이션을 확인할 수 있습니다';
         document.getElementById('delibCounter').textContent = 'NO DATA';
+        document.getElementById('projectName').textContent = 'NO DATA';
       }
     });
 
-    // Auto-refresh every 30s
     if(liveRefreshTimer) clearInterval(liveRefreshTimer);
     liveRefreshTimer = setInterval(function(){
       if(currentMode !== 'live') return;
@@ -919,7 +1111,6 @@ function switchMode(mode){
       fetchDeliberations().then(function(ok){
         if(ok){
           updateLastUpdated();
-          // If new data arrived and user is on the last item, auto-navigate
           if(liveData.length > prevLen && liveIndex === prevLen - 1){
             liveIndex = liveData.length - 1;
             renderLiveDeliberation(liveData[liveIndex]);
@@ -941,15 +1132,14 @@ function switchMode(mode){
     reasonEl.textContent = '';
     document.getElementById('lastUpdated').textContent = '';
 
-    // Stop live refresh
     if(liveRefreshTimer){ clearInterval(liveRefreshTimer); liveRefreshTimer = null; }
 
-    // Clear and restart sim
     clearAllStreams();
     currentAgenda = null;
     deliberationPhase = 0;
     phaseTimer = 0;
     simStep = 0;
+    agendaIndex = 0;
     sessionNum = Math.floor(Math.random()*900)+100;
     document.getElementById('sessionId').textContent = 'SESSION #'+sessionNum;
     startAgenda();
@@ -973,13 +1163,10 @@ setInterval(updateClock,1000);updateClock();
 // ==============================
 // === BOOT ===
 // ==============================
-// Try to load live data on start. If available, auto-switch to LIVE. Otherwise stay in SIM.
 fetchDeliberations().then(function(ok){
   if(ok && liveData.length > 0){
-    // Data exists - start in LIVE mode
     switchMode('live');
   } else {
-    // No data - start in SIM mode (default)
     startAgenda();
     simIntervalId = setInterval(simTick, 1500);
   }
