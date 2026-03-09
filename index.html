@@ -128,7 +128,10 @@ var COL={
   qa_system:[255,180,40],hooks:[0,220,200],
   charter:[140,180,255],projects:[255,100,80],
   imsms_core:[255,80,60],others:[220,120,80],
-  files:[120,200,180]
+  files:[120,200,180],
+  norn:[180,120,255],tools_gov:[255,160,100],
+  urd:[160,100,240],verdandi:[240,180,60],skuld:[100,220,240],
+  melchior:[255,60,60],balthazar:[255,180,40],casper:[0,200,255]
 };
 var COL_DAY={
   system:[0,130,90],magi:[200,20,20],team:[0,100,180],
@@ -138,7 +141,10 @@ var COL_DAY={
   qa_system:[190,120,0],hooks:[0,140,120],
   charter:[60,100,200],projects:[200,50,30],
   imsms_core:[200,40,20],others:[180,70,30],
-  files:[40,130,110]
+  files:[40,130,110],
+  norn:[120,60,180],tools_gov:[190,100,50],
+  urd:[100,50,170],verdandi:[180,120,10],skuld:[30,140,160],
+  melchior:[200,20,20],balthazar:[190,120,0],casper:[0,100,180]
 };
 function gc(n){var p=isDark?COL:COL_DAY;return p[n.pg]||p[n.gid]||(isDark?[0,255,200]:[0,130,90]);}
 
@@ -148,6 +154,8 @@ ALL.push({id:'system',t:'MAGI SYSTEM\nTEAMPLAYER.INC',d:'TP_skills v2.1 기반 �
 
 var L1=[
   {id:'magi',t:'MAGI 3-AXIS',d:'프로젝트 분석/의사결정\nMELCHIOR · BALTHASAR · CASPER'},
+  {id:'norn',t:'NORN 3-AXIS',d:'자문 + 거부권\nURD · VERDANDI · SKULD'},
+  {id:'tools_gov',t:'TOOL\nGOVERNANCE',d:'도구별 권한 관리\nRalph Loop · /simplify'},
   {id:'team',t:'AGENT TEAM\n(10 UNITS)',d:'간단 1줄 수정 외\n모든 작업에 필수 투입'},
   {id:'process',t:'WORK PROCESS',d:'CEO 지시→실행→보고'},
   {id:'ceo_rules',t:'CEO PROTOCOL\n(9 RULES)',d:'CEO는 바꾸지 않는다\nClaude가 100% 적응'},
@@ -160,9 +168,14 @@ var L1=[
 L1.forEach(function(n){n.layer=1;n.sz=1.4;n.gid=n.id;n.pg=n.id;ALL.push(n);EDGES.push({a:'system',b:n.id});});
 
 var L2=[
-  {id:'melchior',t:'MELCHIOR',d:'코드 품질, 아키텍처, 기술 부채',pg:'magi'},
-  {id:'balthazar',t:'BALTHASAR',d:'ROI, 매출 기여, 비용 효과',pg:'magi'},
-  {id:'casper',t:'CASPER',d:'1인 팀 실행 가능성, 유지보수',pg:'magi'},
+  {id:'melchior',t:'MELCHIOR-1',d:'기술 · 근본을 안 잡으면\n3번 고친다',pg:'magi'},
+  {id:'balthazar',t:'BALTHASAR-2',d:'사업 · 그 시간에\n매출을 올려라',pg:'magi'},
+  {id:'casper',t:'CASPER-3',d:'현실 · 내일의 나도\n유지할 수 있어야',pg:'magi'},
+  {id:'urd',t:'URD-4',d:"기억 · 있었던 것\n기록 안 하면 없었던 것",pg:'norn'},
+  {id:'verdandi',t:'VERDANDI-5',d:"검증 · 있는 것\n되는 것 같다 ≠ 진짜 된다",pg:'norn'},
+  {id:'skuld',t:'SKULD-6',d:"연결 · 있어야 할 것\n부분 고치면 전체 깨진다",pg:'norn'},
+  {id:'ralph_loop',t:'RALPH LOOP',d:'자율 무한 루프 플러그인\nVERDANDI 게이트키퍼',pg:'tools_gov'},
+  {id:'simplify',t:'/SIMPLIFY',d:'코드 품질 검토\nMELCHIOR 정 · SKULD 부',pg:'tools_gov'},
   {id:'dev_team',t:'DEV TEAM (4)',d:'코드 구현 담당',pg:'team',sz:1.2},
   {id:'qa_team',t:'QA TEAM (3)',d:'검증 담당\nDEV에 최소 1명 동반',pg:'team',sz:1.2},
   {id:'pm_team',t:'PM TEAM (3)',d:'조율, 분석, 기록',pg:'team',sz:1.2},
@@ -207,6 +220,37 @@ var L2=[
   {id:'f5',t:'_ARCHIVE/',d:'구파일 12개',pg:'files'},
   {id:'f6',t:'RULES/',d:'자동로드 규칙 4개',pg:'files'},
   {id:'f7',t:'CHANGELOG',d:'PM 이력',pg:'files'},
+  // MELCHIOR 관할
+  {id:'mel_arch',t:'ARCHITECTURE',d:'아키텍처 설계\n기술 부채 관리',pg:'melchior'},
+  {id:'mel_type',t:'TYPE SAFETY',d:'타입 시스템\n컴파일 타임 검증',pg:'melchior'},
+  {id:'mel_api',t:'API CONTRACT',d:'Contract-First\n명세 기반 개발',pg:'melchior'},
+  {id:'mel_sec',t:'SEC REVIEW',d:'OWASP 보안 검토\n취약점 거부권',pg:'melchior'},
+  {id:'mel_simp',t:'/SIMPLIFY 正',d:'코드 품질 검토\n주 담당',pg:'melchior'},
+  // BALTHASAR 관할
+  {id:'bal_roi',t:'ROI CALC',d:'투자 대비 수익\n비용 환산 중재',pg:'balthazar'},
+  {id:'bal_gate',t:'GO/NO-GO\nGATE',d:'신규 프로젝트\n진입 심사',pg:'balthazar'},
+  {id:'bal_cost',t:'COST ANALYSIS',d:'상용 대안 비교\n시간 vs 비용',pg:'balthazar'},
+  {id:'bal_biz',t:'BIZ PRIORITY',d:'매출 기여도\n우선순위 판단',pg:'balthazar'},
+  // CASPER 관할
+  {id:'cas_maint',t:'MAINTENANCE',d:'1인 팀 유지보수\n복잡도 관리',pg:'casper'},
+  {id:'cas_roll',t:'ROLLBACK\nPLAN',d:'되돌리기 전략\n안전망 확보',pg:'casper'},
+  {id:'cas_regr',t:'REGRESSION\nGUARD',d:'회귀 방지 최우선\n기존 기능 보호',pg:'casper'},
+  {id:'cas_prod',t:'PROD SAFETY',d:'프로덕션 회귀\n위험 시 거부권',pg:'casper'},
+  // URD 관할
+  {id:'urd_session',t:'SESSION LOG',d:'세션 기록 관리\nSESSION_HANDOFF.md',pg:'urd'},
+  {id:'urd_compact',t:'COMPACT\nPRESERVE',d:'컨텍스트 압축 시\n핵심 정보 보존',pg:'urd'},
+  {id:'urd_history',t:'TP_HISTORY',d:'작업 이력 기록\n인수인계 보장',pg:'urd'},
+  {id:'urd_veto',t:'RECORD VETO',d:'기록 없는 변경\n→ HOLD',pg:'urd'},
+  // VERDANDI 관할
+  {id:'ver_qa3',t:'QA 3-LEVEL',d:'Quick/Standard/Full\n검증 단계 관리',pg:'verdandi'},
+  {id:'ver_ralph',t:'RALPH GATE',d:'자율 루프 게이트키퍼\n과반수 투표 필요',pg:'verdandi'},
+  {id:'ver_fix',t:'FIX COMMIT\nTRACK',d:'fix 커밋 품질\n회귀 테스트 필수',pg:'verdandi'},
+  {id:'ver_veto',t:'EVIDENCE\nVETO',d:'증거 없는 완료\n→ HOLD',pg:'verdandi'},
+  // SKULD 관할
+  {id:'skl_impact',t:'IMPACT\nANALYSIS',d:'변경 영향 범위\n사전 파악',pg:'skuld'},
+  {id:'skl_contract',t:'CONTRACT\nFIRST',d:'API 변경 시\n계약 우선',pg:'skuld'},
+  {id:'skl_simp',t:'/SIMPLIFY 副',d:'코드 품질 검토\n부 담당',pg:'skuld'},
+  {id:'skl_veto',t:'INTEGRITY\nVETO',d:'영향 미파악 변경\n→ HOLD',pg:'skuld'},
 ];
 L2.forEach(function(n){n.layer=2;n.sz=n.sz||1;n.gid=n.id;ALL.push(n);EDGES.push({a:n.pg,b:n.id});});
 
@@ -263,6 +307,18 @@ var CROSS=[
   ['ps2','ag_haneul'],['ps2','ag_probe'],['ps2','ag_perf'],
   ['ps3','ag_jungsuk'],['ps3','ag_haneul'],['ps3','ag_probe'],['ps3','ag_anchor'],
   ['ps5','ag_chulsoo'],['ps5','ag_gate'],
+  ['verdandi','ralph_loop','GATEKEEPER'],['verdandi','qa_system','QA VERIFY'],
+  ['skuld','simplify','副'],['melchior','simplify','正'],
+  ['urd','ag_scribe','RECORD'],['urd','hook2','COMPACT'],
+  ['skuld','wf4','CONTRACT'],['verdandi','wf7','FIX QA'],
+  ['norn','magi','6-AXIS'],
+  // Personality jurisdiction cross-links
+  ['mel_api','wf4','CONTRACT'],['mel_sec','ag_gate','SEC SYNC'],
+  ['bal_gate','wf2','GO/NOGO'],['bal_roi','step5','REPORT'],
+  ['cas_regr','ceo5','NO REGRESS'],['cas_regr','wf7','FIX QA'],
+  ['urd_session','hook1','SESSION'],['urd_compact','hook2','COMPACT'],['urd_history','ag_scribe','SCRIBE'],
+  ['ver_qa3','qa_system','QA LEVEL'],['ver_ralph','ralph_loop','GATE'],['ver_fix','wf7','FIX'],
+  ['skl_contract','wf4','CONTRACT'],['skl_impact','ag_scout','SCOUT'],
 ];
 CROSS.forEach(function(c){EDGES.push({a:c[0],b:c[1],cr:1,label:c[2]||''});});
 
@@ -486,7 +542,7 @@ function toggleRot(){aRot=!aRot;document.getElementById('bRot').classList.toggle
 function resetCam(){camD=900;rX=-0.15;rY=0.3;pX=0;pY=0;aRot=true;document.getElementById('bRot').classList.add('on');}
 
 // Legend
-var legNames={magi:'MAGI',dev_team:'DEV',qa_team:'QA',pm_team:'PM',process:'PROC',ceo_rules:'CEO',hooks:'HOOK',charter:'CHART',projects:'PJ',files:'FILE',presets:'PRESET'};
+var legNames={magi:'MAGI',norn:'NORN',tools_gov:'TOOLS',dev_team:'DEV',qa_team:'QA',pm_team:'PM',process:'PROC',ceo_rules:'CEO',hooks:'HOOK',charter:'CHART',projects:'PJ',files:'FILE'};
 var leg=document.getElementById('leg');
 Object.keys(legNames).forEach(function(k){var c=COL[k]||[0,255,200];var d=document.createElement('div');d.className='li';d.innerHTML='<div class="ld" style="background:rgb('+c+');box-shadow:0 0 4px rgba('+c+',0.4)"></div>'+legNames[k];leg.appendChild(d);});
 
@@ -503,7 +559,7 @@ function buildShowcaseList(){
   usedNodes.sort(function(a,b){return b.count-a.count;});
   usedNodes.forEach(function(u){SHOWCASE_NODES.push(u.id);});
   // Add some interesting L2/L3 nodes
-  ['ag_anchor','ag_jungsuk','ag_haneul','ag_gate','melchior','balthazar','casper','step1','step3','step5'].forEach(function(id){
+  ['melchior','balthazar','casper','urd','verdandi','skuld','ralph_loop','simplify','ag_anchor','ag_jungsuk','ag_haneul','ag_gate','step1','step3','step5'].forEach(function(id){
     if(SHOWCASE_NODES.indexOf(id)===-1)SHOWCASE_NODES.push(id);
   });
 }
