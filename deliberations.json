@@ -1,0 +1,274 @@
+{
+  "version": "1.0",
+  "last_updated": "2026-03-09T22:00:00+09:00",
+  "total_deliberations": 3,
+  "deliberations": [
+    {
+      "id": "delib-001",
+      "timestamp": "2026-03-09T21:30:00+09:00",
+      "session_id": "SESSION #387",
+      "agenda": {
+        "title": "검색 + 아웃라인 패널 추가",
+        "description": "3D 시각화에 Ctrl+F 검색과 우측 아웃라인 트리 추가",
+        "type": "feature",
+        "risk": "low",
+        "project": "TP_Skills_3D",
+        "triggered_by": "CEO"
+      },
+      "phases": {
+        "statements": [
+          {
+            "axis": "melchior",
+            "text": "112개 노드에서 검색은 필수입니다. Ctrl+F 키바인드, 실시간 필터링, 하이라이트 — 아키텍처상 올바른 접근입니다. searchMatches 배열로 상태 관리 깔끔하고 타입 안전성 문제 없습니다.",
+            "stance": "approve"
+          },
+          {
+            "axis": "balthazar",
+            "text": "CEO가 직접 사용하는 시각화입니다. 검색 없으면 112개 노드에서 원하는 걸 못 찾아요. 사용성 0이면 만든 의미도 0. 추가 비용 0원, ROI = 무한대.",
+            "stance": "approve"
+          },
+          {
+            "axis": "casper",
+            "text": "단일 HTML이 800줄을 넘어가고 있습니다. 지금은 괜찮지만, 다음 기능 하나만 더 붙으면 유지보수 악몽입니다. 새벽 3시에 800줄 단일 파일 디버깅하고 싶지 않습니다.",
+            "stance": "conditional"
+          },
+          {
+            "axis": "urd",
+            "text": "아웃라인 트리는 구조 파악 도구입니다. 다음 세션에서 이 시각화를 처음 보는 내가 전체 구조를 즉시 파악할 수 있습니다. 인수인계 시간 50% 단축 예상. TP_history에 기록합시다.",
+            "stance": "approve"
+          },
+          {
+            "axis": "verdandi",
+            "text": "프론트엔드 UI 변경입니다. 스크린샷 없이 완료 선언 불가. 레이아웃 깨짐, 검색 동작, 아웃라인 렌더링 전부 브라우저에서 확인해야 합니다. Playwright 스크린샷 없이 프론트엔드 완료? 웃기지 마세요.",
+            "stance": "conditional"
+          },
+          {
+            "axis": "skuld",
+            "text": "이 변경은 기존 데이터를 읽기만 하고 수정하지 않습니다. skill_usage.json은 read-only. searchMatches 배열이 비어있을 때 기존 노드 렌더링 100% 유지되는지 확인했습니다. 영향 범위 제한적.",
+            "stance": "approve"
+          }
+        ],
+        "cross_debate": [
+          {
+            "from": "verdandi",
+            "to": "casper",
+            "text": "outline-panel은 CSS position:fixed이고 Three.js 캔버스와 완전 독립입니다. DOM 조작 1회뿐이라 기존 3D 렌더링에 영향 0."
+          },
+          {
+            "from": "casper",
+            "to": "melchior",
+            "text": "800줄 단일 파일 문제를 제기합니다. 다음 기능 추가 시 JS 모듈 분리를 권고합니다. 지금은 통과시키되 기술 부채로 기록해주세요."
+          },
+          {
+            "from": "melchior",
+            "to": "casper",
+            "text": "동의합니다. 하지만 단일 파일의 장점 — 배포가 HTML 하나 복사면 끝 — 이 현재로서는 우세합니다. 분리는 1000줄 넘을 때로 합시다."
+          },
+          {
+            "from": "skuld",
+            "to": "all",
+            "text": "searchMatches가 비어있을 때 filterNodes() 함수가 전체 노드를 반환하는 것 확인했습니다. 기존 동작 100% 유지."
+          }
+        ],
+        "votes": [
+          {"axis": "melchior", "vote": "approve", "score": 5, "reason": "아키텍처 적절. 검색+아웃라인 모두 read-only 패턴으로 기존 코드에 침습 없음."},
+          {"axis": "balthazar", "vote": "approve", "score": 5, "reason": "CEO 직접 사용 기능. 추가 비용 0. ROI 무한대."},
+          {"axis": "casper", "vote": "conditional", "score": 4, "condition": "다음 기능 추가 시 JS 모듈 분리 검토. 1000줄 넘으면 필수."},
+          {"axis": "urd", "vote": "approve", "score": 5, "reason": "아웃라인 = 구조 파악 도구. 세션 인수인계 시간 단축."},
+          {"axis": "verdandi", "vote": "conditional", "score": 3, "condition": "브라우저 스크린샷 검증 완료 후 완료 선언 가능."},
+          {"axis": "skuld", "vote": "approve", "score": 5, "reason": "기존 데이터 read-only. searchMatches 빈 배열 시 기존 동작 100% 유지 확인."}
+        ]
+      },
+      "verdict": {
+        "result": "approved",
+        "magi_votes": "3/3 approve (CASPER conditional)",
+        "norn_votes": "3/3 approve (VERDANDI conditional)",
+        "vetoes": [],
+        "summary": "전원 찬성. CASPER 조건: 1000줄 넘으면 JS 분리 필수. VERDANDI 조건: 브라우저 스크린샷 검증 후 완료."
+      },
+      "status": "completed"
+    },
+    {
+      "id": "delib-002",
+      "timestamp": "2026-03-09T21:45:00+09:00",
+      "session_id": "SESSION #387",
+      "agenda": {
+        "title": "MAGI+NORN 6축 인격체 L3 관할 노드 추가",
+        "description": "3D 시각화의 MAGI Council 노드 아래에 6축 인격체별 관할 영역(L3)을 트리 노드로 추가",
+        "type": "feature",
+        "risk": "low",
+        "project": "TP_Skills_3D",
+        "triggered_by": "CEO"
+      },
+      "phases": {
+        "statements": [
+          {
+            "axis": "melchior",
+            "text": "명세부터 봅시다. 6축 각각의 관할 노드를 L3로 배치하는 건 트리 구조상 자연스럽습니다. skill_usage.json에 데이터만 추가하면 렌더링은 기존 로직이 처리합니다. 타입 안전성 유지.",
+            "stance": "approve"
+          },
+          {
+            "axis": "balthazar",
+            "text": "CEO가 MAGI 체계를 시각적으로 파악하려는 겁니다. CEO가 직접 쓰는 기능이냐? Yes. 비용? 0원. 시간? 30분 이내. 질문할 게 없습니다.",
+            "stance": "approve"
+          },
+          {
+            "axis": "casper",
+            "text": "데이터 추가만이라 유지보수 부담 증가 없습니다. JSON 노드 몇 개 추가하는 건 새벽 3시에도 고칠 수 있어요. 문서화만 해주면 찬성.",
+            "stance": "approve"
+          },
+          {
+            "axis": "urd",
+            "text": "이거 기록했습니까? 6축 관할 매핑이 시각화에 반영되면 다음 세션에서 누가 뭘 담당하는지 한눈에 파악됩니다. magi_personalities.md의 관할 정보와 일치하는지 크로스체크 필요합니다.",
+            "stance": "approve"
+          },
+          {
+            "axis": "verdandi",
+            "text": "노드 추가 후 3D 렌더링이 정상인지 확인해야 합니다. 노드 수 증가로 레이아웃 겹침이나 성능 저하 없는지. 스크린샷으로 검증 후 통과.",
+            "stance": "conditional"
+          },
+          {
+            "axis": "skuld",
+            "text": "영향 범위를 확인합니다. skill_usage.json에 노드 추가 → index.html의 렌더링 로직이 자동 처리 → 다른 파일 수정 불필요. council.html과 데이터 구조 공유 부분 있으면 확인 필요.",
+            "stance": "approve"
+          }
+        ],
+        "cross_debate": [
+          {
+            "from": "urd",
+            "to": "skuld",
+            "text": "skill_usage.json과 magi_personalities.md의 관할 매핑이 일치하는지 크로스체크해야 합니다. 불일치 발견 시 personalities.md를 기준(Single Source of Truth)으로 합시다."
+          },
+          {
+            "from": "skuld",
+            "to": "urd",
+            "text": "동의합니다. magi_personalities.md가 원본. 시각화는 그 데이터의 뷰일 뿐."
+          },
+          {
+            "from": "verdandi",
+            "to": "melchior",
+            "text": "노드 수가 112개에서 얼마나 늘어나죠? Three.js 성능에 영향은?"
+          },
+          {
+            "from": "melchior",
+            "to": "verdandi",
+            "text": "6축 x 평균 3~4개 관할 = 약 20개 추가. 총 130여 개. Three.js는 수천 개도 처리합니다. 성능 영향 무시 가능."
+          }
+        ],
+        "votes": [
+          {"axis": "melchior", "vote": "approve", "score": 5, "reason": "트리 구조 자연스러움. 기존 렌더링 로직 재사용. 타입 안전."},
+          {"axis": "balthazar", "vote": "approve", "score": 5, "reason": "CEO 직접 사용. 비용 0. 30분 이내 완료."},
+          {"axis": "casper", "vote": "approve", "score": 5, "reason": "JSON 데이터 추가만. 유지보수 부담 증가 없음."},
+          {"axis": "urd", "vote": "approve", "score": 5, "reason": "관할 매핑 시각화 = 조직 구조 문서화. 인수인계 효율 향상."},
+          {"axis": "verdandi", "vote": "conditional", "score": 4, "condition": "노드 추가 후 레이아웃 겹침/성능 스크린샷 검증 필요."},
+          {"axis": "skuld", "vote": "approve", "score": 5, "reason": "영향 범위 skill_usage.json만. 다른 파일 수정 불필요 확인."}
+        ]
+      },
+      "verdict": {
+        "result": "approved",
+        "magi_votes": "3/3 approve",
+        "norn_votes": "3/3 approve (VERDANDI conditional)",
+        "vetoes": [],
+        "summary": "만장일치 찬성. VERDANDI 조건: 렌더링 스크린샷 검증 후 완료 선언."
+      },
+      "status": "completed"
+    },
+    {
+      "id": "delib-003",
+      "timestamp": "2026-01-15T18:00:00+09:00",
+      "session_id": "SESSION #198",
+      "agenda": {
+        "title": "TP-Firewall 개발 계속 여부",
+        "description": "Swift NetworkExtension 기반 macOS 방화벽 앱 개발을 계속할 것인가. 1월 11~15일간 10개 세션, 30시간+ 투입 상태.",
+        "type": "nogo",
+        "risk": "high",
+        "project": "TP-Firewall",
+        "triggered_by": "auto"
+      },
+      "phases": {
+        "statements": [
+          {
+            "axis": "melchior",
+            "text": "기술적으로 구현 가능합니다. Swift NetworkExtension으로 패킷 레벨 제어, CoreData 통합, Extension UI까지 왔습니다. 만들 수 있습니다.",
+            "stance": "approve"
+          },
+          {
+            "axis": "balthazar",
+            "text": "Norton 360이 연 $49.99입니다. 우리가 30시간+ 투입했습니다. 시급으로 환산하면 이미 Norton 3년치를 넘었어요. IMSMS 매출 기여? 0. ROI = 마이너스 무한대. 이미 있는 솔루션을 왜 만듭니까? 즉시 폐기하십시오.",
+            "stance": "reject"
+          },
+          {
+            "axis": "casper",
+            "text": "1인 팀이 보안 소프트웨어를 유지보수한다고요? Apple이 NetworkExtension 정책 바꿀 때마다 대응해야 합니다. macOS 메이저 업데이트마다 호환성 테스트. 새벽 3시에 방화벽 버그 나면 혼자 고칠 수 있습니까? 이건 악몽입니다.",
+            "stance": "reject"
+          },
+          {
+            "axis": "urd",
+            "text": "10개 세션, 450줄 분량의 작업 기록은 보존합니다. 폐기하더라도 이 기록은 '왜 자체 개발을 하면 안 되는지'의 교훈 자료입니다. TP_history에 아카이브하고, 이걸로 헌장 제2조를 만듭시다.",
+            "stance": "conditional"
+          },
+          {
+            "axis": "verdandi",
+            "text": "Week 2 Day 3까지 왔는데 실제 패킷 차단 테스트 결과가 있습니까? Extension이 System Extension으로 로드되어 실행되는 증거는? '되는 것 같다'는 CEO한테 보고할 말이 아닙니다. 검증 없이 30시간 투입한 겁니다.",
+            "stance": "conditional"
+          },
+          {
+            "axis": "skuld",
+            "text": "이 프로젝트는 IMSMS, TP_MDM 등 핵심 프로젝트와 코드 공유 0, 의존성 0입니다. 폐기해도 다른 시스템에 영향 없습니다. 반대로 — 여기에 쏟는 30시간은 IMSMS API 불일치 26건이 방치되는 시간입니다.",
+            "stance": "reject"
+          }
+        ],
+        "cross_debate": [
+          {
+            "from": "balthazar",
+            "to": "melchior",
+            "text": "'만들 수 있다'가 '만들어야 한다'는 아닙니다. 기술적 흥미로 프로젝트를 승인하면 안 됩니다. Norton 360 연 $49.99면 끝나는 일입니다."
+          },
+          {
+            "from": "melchior",
+            "to": "balthazar",
+            "text": "... 반박이 어렵습니다. '만들 수 있다' 함정에 빠진 것 맞습니다. 기술적 판단과 사업적 판단은 분리해야 합니다."
+          },
+          {
+            "from": "casper",
+            "to": "melchior",
+            "text": "30시간이면 IMSMS Console FO 버그 8개를 다 잡았습니다. 우선순위가 틀어져 있었습니다."
+          },
+          {
+            "from": "skuld",
+            "to": "all",
+            "text": "이 프로젝트에 30시간 쓰는 동안 IMSMS API 불일치 26건은 방치되어 있었습니다. 연결을 봐야 합니다 — 여기에 쓰는 시간은 거기서 빠지는 시간입니다."
+          },
+          {
+            "from": "urd",
+            "to": "all",
+            "text": "폐기 결정이라도 10개 세션 기록은 보존해야 합니다. '자체 개발 vs 상용 솔루션' 판단 기준의 원점이 될 겁니다. 이걸로 헌장 제2조를 만듭시다."
+          },
+          {
+            "from": "verdandi",
+            "to": "melchior",
+            "text": "Week 2 Day 3까지 왔는데 실제 패킷 차단 동작 증거가 없습니다. Extension 로드 스크린샷도 없어요. 30시간 투입하고 검증 0입니다."
+          }
+        ],
+        "votes": [
+          {"axis": "melchior", "vote": "approve", "score": 3, "reason": "기술적으로 구현 가능. 하지만 '만들 수 있다' 함정 인정."},
+          {"axis": "balthazar", "vote": "reject", "score": 1, "reason": "Norton 360 연 $49.99. 30시간 투입 = 3년치 초과. IMSMS 기여 0. 즉시 폐기."},
+          {"axis": "casper", "vote": "reject", "score": 1, "reason": "1인 팀이 보안 SW 유지보수 불가능. Apple 정책 변경 대응 악몽."},
+          {"axis": "urd", "vote": "conditional", "score": 3, "condition": "폐기하되 10개 세션 기록 TP_history에 아카이브. 헌장 제2조 근거 자료로 보존."},
+          {"axis": "verdandi", "vote": "conditional", "score": 2, "condition": "실동작 증거 없이 30시간 투입. 검증 프로세스 부재가 근본 원인."},
+          {"axis": "skuld", "vote": "reject", "score": 1, "reason": "핵심 프로젝트(IMSMS) 시간 잠식. 코드 공유 0. 폐기 시 다른 시스템 영향 0."}
+        ]
+      },
+      "verdict": {
+        "result": "rejected",
+        "magi_votes": "1/3 approve (BALTHASAR, CASPER 반대)",
+        "norn_votes": "1/3 reject, 2/3 conditional",
+        "vetoes": [
+          {"axis": "balthazar", "type": "ROI<0.5 + 상용 대안 존재", "detail": "Norton 360 연 $49.99. ROI = -무한대. Go/No-Go Gate Q2 탈락."}
+        ],
+        "summary": "MELCHIOR만 찬성. BALTHASAR ROI 거부권 발동. CASPER 유지보수 불가 판정. 즉시 폐기 → archive. URD: 10개 세션 기록 보존 + 헌장 제2조 제정 근거. 이 사건이 Go/No-Go Gate의 원점."
+      },
+      "status": "completed"
+    }
+  ]
+}

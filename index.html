@@ -115,6 +115,7 @@ body.light .ol-sub .ol-item{color:rgba(0,40,30,0.3)}
   <button onclick="resetCam()">RESET</button>
   <button id="bTheme" onclick="toggleTheme()">DAY MODE</button>
   <button id="bOutline" onclick="toggleOutline()">OUTLINE</button>
+  <button onclick="window.location.href='council.html'">COUNCIL</button>
 </div>
 <div id="search-box">
   <div style="position:relative">
@@ -198,7 +199,8 @@ var COL={
   files:[120,200,180],
   norn:[180,120,255],tools_gov:[255,160,100],
   urd:[160,100,240],verdandi:[240,180,60],skuld:[100,220,240],
-  melchior:[255,60,60],balthazar:[255,180,40],casper:[0,200,255]
+  melchior:[255,60,60],balthazar:[255,180,40],casper:[0,200,255],
+  council:[255,200,100]
 };
 var COL_DAY={
   system:[0,130,90],magi:[200,20,20],team:[0,100,180],
@@ -211,7 +213,8 @@ var COL_DAY={
   files:[40,130,110],
   norn:[120,60,180],tools_gov:[190,100,50],
   urd:[100,50,170],verdandi:[180,120,10],skuld:[30,140,160],
-  melchior:[200,20,20],balthazar:[190,120,0],casper:[0,100,180]
+  melchior:[200,20,20],balthazar:[190,120,0],casper:[0,100,180],
+  council:[180,140,50]
 };
 function gc(n){var p=isDark?COL:COL_DAY;return p[n.pg]||p[n.gid]||(isDark?[0,255,200]:[0,130,90]);}
 
@@ -231,6 +234,7 @@ var L1=[
   {id:'charter',t:'WORKFLOW\nCHARTER (8)',d:'워크플로우 헌장 8개 조항\n세션/분석/보안/품질 규칙'},
   {id:'projects',t:'PROJECT MAP\n(9 PJ)',d:'IMSMS Core 6개 + 기타 6개\n프로젝트 현황 맵'},
   {id:'files',t:'FILE STRUCT',d:'TP_skills 파일 구조\nindex, projects, reference, templates'},
+  {id:'council',t:'MAGI COUNCIL',d:'6축 실시간 토론 시스템\n심의·투표·판정',gid:'council',pg:'council'},
 ];
 L1.forEach(function(n){n.layer=1;n.sz=1.4;n.gid=n.id;n.pg=n.id;ALL.push(n);EDGES.push({a:'system',b:n.id});});
 
@@ -379,6 +383,7 @@ var CROSS=[
   ['urd','ag_scribe','RECORD'],['urd','hook2','COMPACT'],
   ['skuld','wf4','CONTRACT'],['verdandi','wf7','FIX QA'],
   ['norn','magi','6-AXIS'],
+  ['council','magi','DELIBERATION'],['council','norn','ADVISORY'],
   // Personality jurisdiction cross-links
   ['mel_api','wf4','CONTRACT'],['mel_sec','ag_gate','SEC SYNC'],
   ['bal_gate','wf2','GO/NOGO'],['bal_roi','step5','REPORT'],
@@ -612,7 +617,7 @@ function toggleRot(){aRot=!aRot;document.getElementById('bRot').classList.toggle
 function resetCam(){camD=900;rX=-0.15;rY=0.3;pX=0;pY=0;aRot=true;document.getElementById('bRot').classList.add('on');}
 
 // Legend
-var legNames={magi:'MAGI',norn:'NORN',tools_gov:'TOOLS',dev_team:'DEV',qa_team:'QA',pm_team:'PM',process:'PROC',ceo_rules:'CEO',hooks:'HOOK',charter:'CHART',projects:'PJ',files:'FILE'};
+var legNames={magi:'MAGI',norn:'NORN',tools_gov:'TOOLS',dev_team:'DEV',qa_team:'QA',pm_team:'PM',process:'PROC',ceo_rules:'CEO',hooks:'HOOK',charter:'CHART',projects:'PJ',files:'FILE',council:'COUNCIL'};
 var leg=document.getElementById('leg');
 Object.keys(legNames).forEach(function(k){var c=COL[k]||[0,255,200];var d=document.createElement('div');d.className='li';d.innerHTML='<div class="ld" style="background:rgb('+c+');box-shadow:0 0 4px rgba('+c+',0.4)"></div>'+legNames[k];leg.appendChild(d);});
 
