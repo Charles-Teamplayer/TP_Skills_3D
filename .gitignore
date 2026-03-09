@@ -1,0 +1,5 @@
+# Original (unencrypted) source — NEVER push
+_src/
+
+# Build tool (contains encryption logic)
+build-secure.py
