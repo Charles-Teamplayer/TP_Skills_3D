@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAGI COUNCIL — 6-AXIS DELIBERATION</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;600;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --mel:#ff3c3c;--bal:#ffb428;--cas:#00c8ff;
+  --urd:#a064f0;--ver:#f0b43c;--skl:#64dcf0;
+  --bg:#020a08;--panel:#041210;--border:rgba(0,255,200,0.08);
+  --text:rgba(0,255,200,0.7);--dim:rgba(0,255,200,0.25);
+  --glow:rgba(0,255,200,0.15);
+}
+body{background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;overflow-x:hidden;min-height:100vh}
+/* Scanlines */
+body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:100;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px)}
+/* Vignette */
+body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:99;
+  background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,0.4) 100%)}
+
+/* Header */
+.header{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;border-bottom:1px solid var(--border)}
+.header h1{font-family:'Orbitron',monospace;font-size:13px;font-weight:700;letter-spacing:4px;color:rgba(0,255,200,0.6);text-shadow:0 0 20px var(--glow)}
+.header .sub{font-size:8px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+.header-right{display:flex;align-items:center;gap:12px}
+.session-info{font-size:8px;letter-spacing:1.5px;color:var(--dim);text-transform:uppercase;text-align:right}
+.session-id{color:rgba(0,255,200,0.5);font-size:9px}
+.status-dot{width:6px;height:6px;border-radius:50%;background:#0f8;box-shadow:0 0 8px rgba(0,255,128,0.6);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+
+/* Main layout */
+.main{display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:auto auto;gap:1px;padding:1px;background:var(--border)}
+.main>*{background:var(--panel)}
+
+/* Panel */
+.panel{position:relative;overflow:hidden}
+.panel-hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid var(--border)}
+.panel-name{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;letter-spacing:3px}
+.panel-role{font-size:7px;letter-spacing:2px;text-transform:uppercase;opacity:0.4}
+.panel-num{font-family:'Orbitron',monospace;font-size:9px;font-weight:900;opacity:0.2;position:absolute;top:6px;right:10px;font-size:28px}
+.panel-bar{height:3px;width:100%}
+
+/* Vote display */
+.vote-section{padding:8px 12px 6px}
+.vote-label{font-size:7px;letter-spacing:2px;text-transform:uppercase;opacity:0.3;margin-bottom:4px}
+.vote-status{font-family:'Orbitron',monospace;font-size:10px;font-weight:600;letter-spacing:2px;display:flex;align-items:center;gap:6px}
+.vote-icon{width:8px;height:8px;border-radius:1px}
+
+/* Stats */
+.stats{display:flex;gap:8px;padding:4px 12px 6px;flex-wrap:wrap}
+.stat{flex:1;min-width:60px}
+.stat-label{font-size:6px;letter-spacing:1.5px;text-transform:uppercase;opacity:0.25;margin-bottom:2px}
+.stat-val{font-family:'Orbitron',monospace;font-size:10px;font-weight:600}
+.stat-bar{height:2px;margin-top:2px;border-radius:0;overflow:hidden;background:rgba(255,255,255,0.03)}
+.stat-fill{height:100%;transition:width 1s ease}
+
+/* Chat / Opinion stream */
+.opinion-stream{padding:0 12px 8px;flex:1;overflow-y:auto;max-height:200px;min-height:120px}
+.opinion-stream::-webkit-scrollbar{width:2px}
+.opinion-stream::-webkit-scrollbar-thumb{background:rgba(0,255,200,0.08)}
+.opinion{padding:5px 0;border-bottom:1px solid rgba(0,255,200,0.03);animation:fadeIn 0.5s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.opinion-time{font-size:6px;opacity:0.2;letter-spacing:1px}
+.opinion-text{font-size:8px;line-height:1.6;margin-top:2px;opacity:0.6}
+.opinion-text.highlight{opacity:0.9}
+.opinion-target{font-size:7px;opacity:0.3;margin-top:1px}
+.opinion-target span{opacity:0.6}
+
+/* Veto indicator */
+.veto-zone{padding:4px 12px 6px;display:flex;align-items:center;gap:6px}
+.veto-label{font-size:7px;letter-spacing:2px;text-transform:uppercase;opacity:0.3}
+.veto-status{font-family:'Orbitron',monospace;font-size:8px;font-weight:600;letter-spacing:1px}
+.veto-active{color:#ff3c3c;text-shadow:0 0 8px rgba(255,60,60,0.4)}
+.veto-clear{color:rgba(0,255,200,0.3)}
+
+/* Center deliberation panel */
+.deliberation{grid-column:1/-1;border-top:1px solid var(--border);padding:12px 20px;display:flex;gap:20px;align-items:flex-start}
+.delib-left{flex:1}
+.delib-title{font-family:'Orbitron',monospace;font-size:9px;font-weight:600;letter-spacing:3px;color:rgba(0,255,200,0.4);margin-bottom:8px;text-transform:uppercase}
+.agenda-text{font-size:10px;line-height:1.8;color:rgba(0,255,200,0.7);margin-bottom:8px}
+.agenda-meta{font-size:7px;opacity:0.25;letter-spacing:1.5px;text-transform:uppercase}
+
+/* Vote tally */
+.delib-right{width:280px}
+.tally{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.tally-item{display:flex;align-items:center;gap:6px;padding:3px 6px;border:1px solid rgba(255,255,255,0.03);border-radius:1px;font-size:8px;letter-spacing:1px}
+.tally-dot{width:5px;height:5px;border-radius:1px;flex-shrink:0}
+.tally-name{flex:1;text-transform:uppercase;opacity:0.5}
+.tally-vote{font-family:'Orbitron',monospace;font-size:8px;font-weight:600}
+
+/* Verdict */
+.verdict{margin-top:8px;padding:6px 10px;border:1px solid;border-radius:1px;font-family:'Orbitron',monospace;font-size:10px;font-weight:700;letter-spacing:3px;text-align:center}
+.verdict.approved{border-color:rgba(0,255,128,0.3);color:#0f8;background:rgba(0,255,128,0.03);text-shadow:0 0 10px rgba(0,255,128,0.3)}
+.verdict.rejected{border-color:rgba(255,60,60,0.3);color:#f44;background:rgba(255,60,60,0.03)}
+.verdict.hold{border-color:rgba(255,180,40,0.3);color:#fb0;background:rgba(255,180,40,0.03)}
+.verdict.deliberating{border-color:rgba(0,255,200,0.15);color:rgba(0,255,200,0.4);background:rgba(0,255,200,0.02);animation:pulse 2s infinite}
+
+/* Corner marks */
+.corner-marks{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+.cm{position:absolute;width:8px;height:8px;opacity:0.15}
+.cm-tl{top:2px;left:2px;border-top:1px solid;border-left:1px solid}
+.cm-tr{top:2px;right:2px;border-top:1px solid;border-right:1px solid}
+.cm-bl{bottom:2px;left:2px;border-bottom:1px solid;border-left:1px solid}
+.cm-br{bottom:2px;right:2px;border-bottom:1px solid;border-right:1px solid}
+
+/* Bottom bar */
+.bottom-bar{display:flex;justify-content:space-between;align-items:center;padding:6px 20px;border-top:1px solid var(--border);font-size:7px;letter-spacing:1.5px;text-transform:uppercase;opacity:0.2}
+
+/* Cross-talk indicator */
+.cross-talk{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);z-index:50;
+  font-size:8px;letter-spacing:2px;text-transform:uppercase;opacity:0;
+  padding:4px 16px;border:1px solid rgba(0,255,200,0.1);background:rgba(0,12,10,0.9);
+  transition:opacity 0.3s;border-radius:1px}
+.cross-talk.show{opacity:1}
+
+/* Responsive */
+@media(max-width:900px){.main{grid-template-columns:1fr 1fr}.deliberation{grid-column:1/-1}}
+@media(max-width:600px){.main{grid-template-columns:1fr}.deliberation{flex-direction:column}.delib-right{width:100%}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>MAGI COUNCIL</h1>
+    <div class="sub">6-AXIS DELIBERATION SYSTEM &middot; TEAMPLAYER.INC</div>
+  </div>
+  <div class="header-right">
+    <div class="session-info">
+      <div class="session-id" id="sessionId">SESSION #---</div>
+      <div>ACTIVE DELIBERATION</div>
+    </div>
+    <div class="status-dot"></div>
+  </div>
+</div>
+
+<div class="main" id="panels"></div>
+
+<div class="deliberation" id="delib">
+  <div class="delib-left">
+    <div class="delib-title">CURRENT AGENDA</div>
+    <div class="agenda-text" id="agendaText">시스템 초기화 중...</div>
+    <div class="agenda-meta" id="agendaMeta"></div>
+  </div>
+  <div class="delib-right">
+    <div class="delib-title">VOTE TALLY</div>
+    <div class="tally" id="tally"></div>
+    <div class="verdict deliberating" id="verdict">DELIBERATING</div>
+  </div>
+</div>
+
+<div class="bottom-bar">
+  <span>MAGI + NORN 6-AXIS GOVERNANCE</span>
+  <span id="clock"></span>
+  <span>DRAG: ROTATE &middot; CLICK: DETAIL &middot; <a href="index.html" style="color:inherit;text-decoration:none;opacity:0.6">3D VIEW →</a></span>
+</div>
+
+<div class="cross-talk" id="crossTalk"></div>
+
+<script>
+// === MAGI 6-AXIS PERSONALITY ENGINE ===
+var AXES = [
+  {
+    id:'melchior', num:'01', name:'MELCHIOR', role:'TECHNICAL', color:'#ff3c3c',
+    rgb:'255,60,60', icon:'M1',
+    quotes:[
+      "그건 증상이고, 원인은 따로 있습니다",
+      "명세(Contract)부터 봅시다. 코드는 그 다음입니다",
+      "이거 기술 부채로 남깁니다. 3배로 돌아옵니다",
+      "타입이 any? 그건 코드가 아니라 기도입니다",
+      "3곳 다 확인했습니까? SecurityConfig, AuthFilter, ApiKeyFilter",
+      "아키텍처가 맞는지부터 확인합시다",
+      "근본 원인을 안 잡으면 3번 고칩니다",
+      "Contract-First. OpenAPI 스펙 먼저.",
+      "테스트가 근본 원인을 커버하는지 확인하세요"
+    ],
+    reactions:{
+      agree:["기술적으로 맞습니다","동의합니다. 아키텍처가 적절합니다","보안 관점에서도 문제없습니다"],
+      disagree:["기술 부채가 될 겁니다","타입 안전성이 보장되지 않습니다","증상만 때우는 접근입니다"],
+      to_bal:["비용으로만 판단하면 안 됩니다. 기술 부채는 이자가 붙습니다","ROI 계산에 유지보수 비용도 넣으셨습니까?"],
+      to_cas:["완벽하지 않아도 근본은 잡아야 합니다","1인 팀이라도 아키텍처는 타협할 수 없습니다"],
+      to_urd:["기술 결정 근거는 코드에 있습니다. 문서는 보조입니다","기록은 좋지만, 코드가 곧 문서입니다"],
+      to_ver:["테스트 커버리지부터 확인합시다","Playwright보다 단위 테스트가 먼저입니다"],
+      to_skl:["영향 범위는 저도 동의합니다. 전수조사 합시다","Contract-First로 가면 영향 범위 자체가 줄어듭니다"]
+    },
+    veto:'보안 취약점', stats:{arch:92,type:88,sec:95,debt:72}
+  },
+  {
+    id:'balthazar', num:'02', name:'BALTHASAR', role:'BUSINESS', color:'#ffb428',
+    rgb:'255,180,40', icon:'B2',
+    quotes:[
+      "그거 만드는 데 몇 시간? 사면 얼마?",
+      "IMSMS 매출에 기여합니까? Yes/No",
+      "연간으로 환산하면 얼마 절감입니까?",
+      "1일 PoC로 증명 안 되면 접으시죠",
+      "이미 Norton 360이 있는데 왜 만듭니까?",
+      "CEO가 직접 쓰는 겁니까, 아닌 겁니까?",
+      "ROI가 1 미만이면 No-Go입니다",
+      "그 시간에 매출을 올리는 게 낫습니다",
+      "상용 솔루션부터 확인했습니까?"
+    ],
+    reactions:{
+      agree:["비용 대비 효과가 좋습니다","CEO 사용 기능이니 우선순위 높습니다","ROI 충분합니다"],
+      disagree:["비용 대비 효과가 안 나옵니다","상용 솔루션이 이미 있습니다","IMSMS 매출 기여 0입니다"],
+      to_mel:["기술적 흥미와 사업 가치는 다릅니다","완벽한 아키텍처가 매출을 올려줍니까?"],
+      to_cas:["유지보수 비용도 연간으로 환산해 주세요","1인 팀 비용이 외주보다 싸긴 합니까?"],
+      to_urd:["기록하는 시간도 비용입니다. 자동화하세요","문서 작성 시간 vs 실제 개발 시간 비율은?"],
+      to_ver:["검증 비용도 계산에 넣으세요","Full QA가 매번 필요합니까? Quick이면 충분할 때도 있습니다"],
+      to_skl:["전수조사에 몇 시간 걸립니까? 핵심 3곳만 봅시다","분석 마비보다 빠른 실행이 ROI 높습니다"]
+    },
+    veto:'ROI < 0.5 + 상용 대안', stats:{roi:78,cost:85,revenue:65,efficiency:82}
+  },
+  {
+    id:'casper', num:'03', name:'CASPER', role:'REALITY', color:'#00c8ff',
+    rgb:'0,200,255', icon:'C3',
+    quotes:[
+      "새벽 3시에 장애 나면 혼자 고칠 수 있어요?",
+      "Docker는 오버헤드입니다. PM2면 충분합니다",
+      "이전에 되던 게 안 되면 CEO가 폭발합니다",
+      "완전 해결이 아니라, '이 범위에서 해결'입니다",
+      "'일단 돌아가게' 해놓고 로그 남기세요",
+      "그 22개 @Disabled 테스트, 시한폭탄입니다",
+      "문서 없으면 다음 세션의 내가 고생합니다",
+      "롤백 계획 있습니까?",
+      "1인 팀이 유지보수할 수 있는 수준입니까?"
+    ],
+    reactions:{
+      agree:["유지보수 부담이 적습니다. 좋습니다","롤백 계획이 있으니 안심입니다","1인 팀 기준 적절합니다"],
+      disagree:["유지보수 부담이 너무 큽니다","롤백 계획이 없습니다","1인 팀으로는 감당 불가입니다"],
+      to_mel:["기술적으로 맞아도 유지보수가 안 되면 소용없습니다","과잉 설계 아닙니까? 지금 필요한 만큼만 합시다"],
+      to_bal:["비용 절감도 좋지만, 운영 안정성이 먼저입니다","장애 복구 시간도 비용에 넣으셨습니까?"],
+      to_urd:["문서화 동의합니다. 다음 세션의 내가 이어받을 수 있어야 합니다","SESSION_HANDOFF.md 없이 세션 끝내면 안 됩니다"],
+      to_ver:["검증 좋지만 배포 지연도 문제입니다. Quick QA로 타협합시다","회귀 방지가 최우선입니다"],
+      to_skl:["영향 범위 확인 동의합니다. 하지만 핵심만 봅시다","전수조사는 시간이 너무 걸립니다"]
+    },
+    veto:'프로덕션 회귀 위험', stats:{maintain:90,stability:88,rollback:85,complexity:70}
+  },
+  {
+    id:'urd', num:'04', name:'URD', role:'MEMORY · 있었던 것', color:'#a064f0',
+    rgb:'160,100,240', icon:'U4',
+    quotes:[
+      "이거 기록했습니까? 안 했으면 처음부터 다시 합니다",
+      "SESSION_HANDOFF.md 없이 끝내면 미완료 세션 하나 더 늘어납니다",
+      "Compact 되기 전에 핵심 결정사항 먼저 저장하세요",
+      "3개월 전에 왜 이렇게 했는지 아무도 모릅니다",
+      "TP_history에 없으면 안 한 겁니다",
+      "다음 세션의 내가 이 코드를 보면 뭘 이해할 수 있습니까?",
+      "기록하지 않으면 존재하지 않았던 것입니다",
+      "의사결정 근거가 남아있습니까?",
+      "세션 완료율 17%... 83%가 미완료입니다"
+    ],
+    reactions:{
+      agree:["기록이 포함되어 있으니 좋습니다","다음 세션에서 이어받을 수 있습니다","히스토리에 남겨두겠습니다"],
+      disagree:["기록이 없습니다. 이대로는 안 됩니다","인수인계 자료가 빠져있습니다","의사결정 근거가 없습니다"],
+      to_mel:["기술 결정이라도 근거를 남겨야 합니다","코드가 문서라고요? 3개월 후에도요?"],
+      to_bal:["기록 비용은 자동화로 0에 수렴시킵니다","Hook으로 자동 기록하면 시간 안 듭니다"],
+      to_cas:["문서화와 같은 편입니다. 다음 세션의 우리를 위해","SESSION_HANDOFF.md, 같이 강제합시다"],
+      to_ver:["스크린샷이 곧 증거이자 기록입니다. 좋습니다","검증 결과도 기록으로 남겨야 의미 있습니다"],
+      to_skl:["변경 이력이 있으면 영향 범위 추적이 쉬워집니다","기록이 있으니까 전수조사가 가능한 겁니다"]
+    },
+    veto:'기록 없는 프로덕션 변경', stats:{records:82,handoff:45,compact:90,coverage:75}
+  },
+  {
+    id:'verdandi', num:'05', name:'VERDANDI', role:'VERIFY · 있는 것', color:'#f0b43c',
+    rgb:'240,180,60', icon:'V5',
+    quotes:[
+      "스크린샷 찍었습니까? 안 찍었으면 완료가 아닙니다",
+      "'되는 것 같다'는 CEO한테 보고할 말이 아닙니다",
+      "이전에 되던 기능 확인했습니까?",
+      "fix 커밋 40%가 뭘 의미하는지 알죠?",
+      "Playwright 스크린샷 없이 프론트엔드 완료? 웃기지 마세요",
+      "curl로 200 뜬다고 끝이 아닙니다",
+      "그 22개 @Disabled 테스트, 시한폭탄이라고 했죠?",
+      "증거 없는 완료는 완료가 아닙니다",
+      "회귀 하나면 CEO 폭발입니다"
+    ],
+    reactions:{
+      agree:["동작 증거가 확인되었습니다. 좋습니다","회귀 테스트 포함이니 안심입니다","QA 레벨 적절합니다"],
+      disagree:["증거가 없습니다. 완료로 인정 불가","회귀 테스트가 빠져있습니다","@Disabled 테스트가 또 늘었습니다"],
+      to_mel:["테스트 먼저, 리팩토링 나중입니다","보안 테스트도 자동화합시다"],
+      to_bal:["검증 안 하고 배포하면 hotfix 비용이 더 큽니다","Quick QA 10초면 됩니다. 비용 걱정 마세요"],
+      to_cas:["Quick QA로 타협합시다. 10초면 됩니다","회귀 방지에서는 같은 편입니다"],
+      to_urd:["스크린샷이 곧 증거 + 기록. 일석이조입니다","검증 로그도 TP_history에 남깁시다"],
+      to_skl:["영향 범위 확인이 끝나면 제가 검증합니다","범위 분석 결과를 테스트 케이스로 변환합시다"]
+    },
+    veto:'증거 없는 완료 선언', stats:{evidence:88,regression:82,coverage:72,fix_rate:75}
+  },
+  {
+    id:'skuld', num:'06', name:'SKULD', role:'CONNECT · 있어야 할 것', color:'#64dcf0',
+    rgb:'100,220,240', icon:'S6',
+    quotes:[
+      "이거 고치면 다른 데서 깨지는 거 없습니까?",
+      "Frontend 필드명 바꿨으면 Backend도 확인하세요. 26번 겪었습니다",
+      "SecurityConfig 고쳤으면 AuthFilter랑 ApiKeyFilter도요",
+      "서브모듈로 하자고요? 19번 커밋 낭비한 거 잊었습니까?",
+      "Mock 데이터 어디어디 흩어져 있는지 전수조사부터 합시다",
+      "배열인 줄 알았는데 객체였습니다. 타입 정의부터 맞춥시다",
+      "이 코드, 다른 프로젝트에도 있어요. 하나만 고치면 나머지가 틀어집니다",
+      "부분을 고치면 전체가 깨집니다",
+      "영향 범위부터 파악합시다"
+    ],
+    reactions:{
+      agree:["영향 범위 확인 완료. 안전합니다","다른 모듈에 영향 없습니다","API 계약 일치 확인했습니다"],
+      disagree:["영향 범위 미확인. 위험합니다","다른 모듈에 같은 코드가 있습니다","API 계약 불일치 발견"],
+      to_mel:["Contract-First 동의합니다. 영향 범위가 줄어듭니다","과잉 설계는 영향 범위를 넓힙니다"],
+      to_bal:["전수조사 비용? 안 하고 버그 터지면 10배입니다","핵심 3곳만 확인합시다. 타협하겠습니다"],
+      to_cas:["핵심 연결점만 봅시다. 전수조사까지는 안 합니다","영향 범위 확인이 곧 회귀 방지입니다"],
+      to_urd:["변경 이력이 있으면 영향 추적이 쉽습니다","기록 동의합니다. 어디가 연결되었는지 남겨야 합니다"],
+      to_ver:["영향 범위 확인 끝나면 바로 검증 넘기겠습니다","범위 분석 → 테스트 변환, 좋은 패턴입니다"]
+    },
+    veto:'영향 범위 미파악 변경', stats:{impact:85,contract:90,sync:78,integrity:88}
+  }
+];
+
+// === BUILD PANELS ===
+var panelsEl = document.getElementById('panels');
+AXES.forEach(function(ax){
+  var div = document.createElement('div');
+  div.className = 'panel';
+  div.id = 'p-'+ax.id;
+  div.innerHTML = '<div class="corner-marks" style="color:'+ax.color+'">'
+    +'<div class="cm cm-tl"></div><div class="cm cm-tr"></div><div class="cm cm-bl"></div><div class="cm cm-br"></div></div>'
+    +'<div class="panel-bar" style="background:linear-gradient(90deg,'+ax.color+' 0%,transparent 100%);opacity:0.6"></div>'
+    +'<div class="panel-hdr"><div><div class="panel-name" style="color:'+ax.color+'">'+ax.name+'</div>'
+    +'<div class="panel-role">'+ax.role+'</div></div>'
+    +'<div class="panel-num" style="color:'+ax.color+'">'+ax.num+'</div></div>'
+    +'<div class="vote-section"><div class="vote-label">CURRENT POSITION</div>'
+    +'<div class="vote-status" id="vote-'+ax.id+'"><div class="vote-icon" style="background:rgba('+ax.rgb+',0.3)"></div><span style="color:'+ax.color+';opacity:0.5">STANDBY</span></div></div>'
+    +'<div class="stats" id="stats-'+ax.id+'"></div>'
+    +'<div class="veto-zone"><div class="veto-label">VETO</div>'
+    +'<div class="veto-status veto-clear" id="veto-'+ax.id+'">CLEAR</div></div>'
+    +'<div class="opinion-stream" id="stream-'+ax.id+'"></div>';
+  panelsEl.appendChild(div);
+
+  // Build stats
+  var statsEl = document.getElementById('stats-'+ax.id);
+  var keys = Object.keys(ax.stats);
+  keys.forEach(function(k){
+    var v = ax.stats[k];
+    var sd = document.createElement('div'); sd.className='stat';
+    sd.innerHTML = '<div class="stat-label">'+k.toUpperCase()+'</div>'
+      +'<div class="stat-val" style="color:'+ax.color+'">'+v+'%</div>'
+      +'<div class="stat-bar"><div class="stat-fill" style="width:'+v+'%;background:'+ax.color+';opacity:0.4"></div></div>';
+    statsEl.appendChild(sd);
+  });
+});
+
+// Build tally
+var tallyEl = document.getElementById('tally');
+AXES.forEach(function(ax){
+  var d = document.createElement('div'); d.className='tally-item';
+  d.innerHTML='<div class="tally-dot" style="background:'+ax.color+'"></div>'
+    +'<span class="tally-name">'+ax.name+'</span>'
+    +'<span class="tally-vote" style="color:'+ax.color+'" id="tv-'+ax.id+'">—</span>';
+  tallyEl.appendChild(d);
+});
+
+// === DELIBERATION ENGINE ===
+var AGENDAS = [
+  {text:"신규 기능: 검색 + 아웃라인 패널 추가 — 3D 시각화에 Ctrl+F 검색과 우측 아웃라인 트리 추가", type:"feature", risk:"low"},
+  {text:"프로덕션 배포: IMSMS Console v2.8 — 사용자 관리 UI 변경사항 반영", type:"deploy", risk:"high"},
+  {text:"아키텍처 변경: 서브모듈 → 모노레포 전환 검토", type:"architecture", risk:"high"},
+  {text:"비용 검토: AWS CloudFront → GitHub Pages 전환 (연간 $60~180 절감)", type:"cost", risk:"low"},
+  {text:"기술 부채: 22개 @Disabled 테스트 복구 일정 수립", type:"debt", risk:"medium"},
+  {text:"신규 프로젝트: TP-Firewall 개발 계속 여부 (Norton 360 존재)", type:"nogo", risk:"low"},
+  {text:"보안: Spring Security 필터 체인 전수조사 3곳 체크리스트", type:"security", risk:"high"},
+  {text:"자동화: Ralph Loop 자율 실행 허용 범위 확대 (Safe Zone → 비프로덕션)", type:"automation", risk:"medium"},
+  {text:"리팩토링: API 불일치 26건 일괄 수정 — Contract-First 적용", type:"refactor", risk:"medium"},
+  {text:"QA 강화: fix 커밋 비율 25% → 20% 이하 달성 방안", type:"qa", risk:"low"},
+  {text:"인프라: RabbitMQ 브로커 Private VPC → Public IP 전환 (Agent 외부 접근)", type:"infra", risk:"high"},
+  {text:"문서화: SESSION_HANDOFF.md 강제화 — 세션 완료율 45% → 60% 목표", type:"docs", risk:"low"}
+];
+
+var currentAgenda = null;
+var deliberationPhase = 0; // 0=intro, 1=opinions, 2=cross, 3=vote
+var votes = {};
+var phaseTimer = 0;
+var sessionNum = Math.floor(Math.random()*900)+100;
+
+document.getElementById('sessionId').textContent = 'SESSION #'+sessionNum;
+
+function startAgenda(){
+  var idx = Math.floor(Math.random()*AGENDAS.length);
+  currentAgenda = AGENDAS[idx];
+  deliberationPhase = 0;
+  votes = {};
+  phaseTimer = 0;
+
+  document.getElementById('agendaText').textContent = currentAgenda.text;
+  document.getElementById('agendaMeta').textContent = 'TYPE: '+currentAgenda.type.toUpperCase()+' · RISK: '+currentAgenda.risk.toUpperCase()+' · PHASE: INITIALIZING';
+  document.getElementById('verdict').className = 'verdict deliberating';
+  document.getElementById('verdict').textContent = 'DELIBERATING';
+
+  AXES.forEach(function(ax){
+    document.getElementById('vote-'+ax.id).innerHTML = '<div class="vote-icon" style="background:rgba('+ax.rgb+',0.3)"></div><span style="color:'+ax.color+';opacity:0.5">ANALYZING...</span>';
+    document.getElementById('tv-'+ax.id).textContent = '—';
+    document.getElementById('tv-'+ax.id).style.color = ax.color;
+    document.getElementById('veto-'+ax.id).textContent = 'CLEAR';
+    document.getElementById('veto-'+ax.id).className = 'veto-status veto-clear';
+  });
+}
+
+function addOpinion(axIdx, text, targetName){
+  var ax = AXES[axIdx];
+  var stream = document.getElementById('stream-'+ax.id);
+  var div = document.createElement('div');
+  div.className = 'opinion';
+  var now = new Date();
+  var timeStr = String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0')+':'+String(now.getSeconds()).padStart(2,'0');
+  var html = '<div class="opinion-time">'+timeStr+'</div><div class="opinion-text'+(targetName?'':' highlight')+'">'+text+'</div>';
+  if(targetName) html += '<div class="opinion-target">→ <span>'+targetName+'</span></div>';
+  div.innerHTML = html;
+  stream.insertBefore(div, stream.firstChild);
+  // Keep max 8 opinions
+  while(stream.children.length > 8) stream.removeChild(stream.lastChild);
+}
+
+function showCrossTalk(from, to, text){
+  var ct = document.getElementById('crossTalk');
+  ct.innerHTML = '<span style="color:'+from.color+'">'+from.name+'</span> → <span style="color:'+to.color+'">'+to.name+'</span>: '+text;
+  ct.classList.add('show');
+  setTimeout(function(){ct.classList.remove('show');}, 3000);
+}
+
+function castVote(axIdx, vote){
+  var ax = AXES[axIdx];
+  votes[ax.id] = vote;
+  var voteEl = document.getElementById('vote-'+ax.id);
+  var tvEl = document.getElementById('tv-'+ax.id);
+
+  if(vote === 'approve'){
+    voteEl.innerHTML = '<div class="vote-icon" style="background:#0f8"></div><span style="color:#0f8">APPROVE</span>';
+    tvEl.textContent = 'APR'; tvEl.style.color = '#0f8';
+  } else if(vote === 'reject'){
+    voteEl.innerHTML = '<div class="vote-icon" style="background:#f44"></div><span style="color:#f44">REJECT</span>';
+    tvEl.textContent = 'REJ'; tvEl.style.color = '#f44';
+  } else if(vote === 'conditional'){
+    voteEl.innerHTML = '<div class="vote-icon" style="background:#fb0"></div><span style="color:#fb0">CONDITIONAL</span>';
+    tvEl.textContent = 'CND'; tvEl.style.color = '#fb0';
+  } else if(vote === 'hold'){
+    voteEl.innerHTML = '<div class="vote-icon" style="background:#f80"></div><span style="color:#f80">HOLD</span>';
+    tvEl.textContent = 'HLD'; tvEl.style.color = '#f80';
+  }
+}
+
+function activateVeto(axIdx){
+  var ax = AXES[axIdx];
+  var vetoEl = document.getElementById('veto-'+ax.id);
+  vetoEl.textContent = 'ACTIVE — '+ax.veto;
+  vetoEl.className = 'veto-status veto-active';
+}
+
+function getVoteForAgenda(axIdx, agenda){
+  var ax = AXES[axIdx];
+  var risk = agenda.risk;
+  var type = agenda.type;
+
+  // Personality-driven voting logic
+  if(ax.id === 'melchior'){
+    if(type==='nogo') return 'approve'; // Melchior likes building
+    if(type==='security' || type==='refactor') return 'approve';
+    if(type==='deploy' && risk==='high') return 'conditional';
+    if(risk==='low') return 'approve';
+    return Math.random()>0.3?'approve':'conditional';
+  }
+  if(ax.id === 'balthazar'){
+    if(type==='nogo') return 'reject'; // Norton exists
+    if(type==='cost') return 'approve';
+    if(type==='debt' || type==='refactor') return Math.random()>0.5?'conditional':'approve';
+    if(risk==='high') return 'conditional';
+    return Math.random()>0.2?'approve':'conditional';
+  }
+  if(ax.id === 'casper'){
+    if(type==='nogo') return 'reject'; // Maintenance nightmare
+    if(risk==='high') return 'conditional';
+    if(type==='deploy') return Math.random()>0.4?'conditional':'approve';
+    if(type==='architecture') return 'conditional';
+    return Math.random()>0.3?'approve':'conditional';
+  }
+  if(ax.id === 'urd'){
+    if(type==='docs') return 'approve';
+    if(type==='deploy' && risk==='high') return 'hold'; // Record first
+    return Math.random()>0.2?'approve':'conditional';
+  }
+  if(ax.id === 'verdandi'){
+    if(type==='deploy' && risk==='high') return 'conditional'; // Need evidence
+    if(type==='qa') return 'approve';
+    if(risk==='high') return 'conditional';
+    return Math.random()>0.3?'approve':'conditional';
+  }
+  if(ax.id === 'skuld'){
+    if(type==='architecture') return 'conditional'; // Impact analysis
+    if(type==='refactor') return 'approve'; // Contract-First
+    if(risk==='high') return 'hold';
+    return Math.random()>0.3?'approve':'conditional';
+  }
+  return 'approve';
+}
+
+function resolveVerdict(){
+  var approves=0, rejects=0, holds=0;
+  // Original 3-axis decide
+  ['melchior','balthazar','casper'].forEach(function(id){
+    var v = votes[id];
+    if(v==='approve'||v==='conditional') approves++;
+    if(v==='reject') rejects++;
+  });
+  // NORN veto check
+  var nornHold = false;
+  ['urd','verdandi','skuld'].forEach(function(id){
+    if(votes[id]==='hold'){nornHold=true;holds++;}
+  });
+
+  var verdictEl = document.getElementById('verdict');
+  if(nornHold){
+    verdictEl.className='verdict hold';
+    verdictEl.textContent='HOLD — NORN VETO';
+  } else if(rejects>=2){
+    verdictEl.className='verdict rejected';
+    verdictEl.textContent='REJECTED';
+  } else if(approves>=2){
+    verdictEl.className='verdict approved';
+    verdictEl.textContent='APPROVED';
+  } else {
+    verdictEl.className='verdict hold';
+    verdictEl.textContent='CEO ESCALATION';
+  }
+}
+
+// === SIMULATION LOOP ===
+var simStep = 0;
+function simTick(){
+  if(!currentAgenda){startAgenda();return;}
+
+  phaseTimer++;
+  var meta = document.getElementById('agendaMeta');
+
+  // Phase 0: Initial quotes (one per axis, staggered)
+  if(deliberationPhase === 0){
+    meta.textContent = 'TYPE: '+currentAgenda.type.toUpperCase()+' · RISK: '+currentAgenda.risk.toUpperCase()+' · PHASE: 1/3 — POSITION STATEMENTS';
+    if(phaseTimer <= 6){
+      var axIdx = phaseTimer - 1;
+      if(axIdx < AXES.length){
+        var q = AXES[axIdx].quotes[Math.floor(Math.random()*AXES[axIdx].quotes.length)];
+        addOpinion(axIdx, q);
+      }
+    }
+    if(phaseTimer >= 8){deliberationPhase=1;phaseTimer=0;}
+  }
+  // Phase 1: Cross-debate (reactions between axes)
+  else if(deliberationPhase === 1){
+    meta.textContent = 'TYPE: '+currentAgenda.type.toUpperCase()+' · RISK: '+currentAgenda.risk.toUpperCase()+' · PHASE: 2/3 — CROSS DEBATE';
+    if(phaseTimer % 2 === 0){
+      var fromIdx = Math.floor(Math.random()*AXES.length);
+      var toIdx;
+      do{toIdx = Math.floor(Math.random()*AXES.length);}while(toIdx===fromIdx);
+      var from = AXES[fromIdx], to = AXES[toIdx];
+      var key = 'to_'+to.id.substring(0,3);
+      var reactions = from.reactions[key];
+      if(reactions && reactions.length>0){
+        var text = reactions[Math.floor(Math.random()*reactions.length)];
+        addOpinion(fromIdx, text, to.name);
+        showCrossTalk(from, to, text.substring(0,50)+'...');
+      }
+    }
+    if(phaseTimer >= 14){deliberationPhase=2;phaseTimer=0;}
+  }
+  // Phase 2: Voting
+  else if(deliberationPhase === 2){
+    meta.textContent = 'TYPE: '+currentAgenda.type.toUpperCase()+' · RISK: '+currentAgenda.risk.toUpperCase()+' · PHASE: 3/3 — VOTING';
+    if(phaseTimer <= 6){
+      var axIdx = phaseTimer - 1;
+      if(axIdx < AXES.length){
+        var vote = getVoteForAgenda(axIdx, currentAgenda);
+        castVote(axIdx, vote);
+        var rx = AXES[axIdx].reactions;
+        if(vote==='approve'||vote==='conditional'){
+          var t = rx.agree[Math.floor(Math.random()*rx.agree.length)];
+          addOpinion(axIdx, t);
+        } else if(vote==='reject'){
+          var t = rx.disagree[Math.floor(Math.random()*rx.disagree.length)];
+          addOpinion(axIdx, t);
+        } else if(vote==='hold'){
+          activateVeto(axIdx);
+          addOpinion(axIdx, '거부권 발동: '+AXES[axIdx].veto);
+        }
+      }
+    }
+    if(phaseTimer === 8){resolveVerdict();}
+    if(phaseTimer >= 14){deliberationPhase=3;phaseTimer=0;}
+  }
+  // Phase 3: Pause, then new agenda
+  else if(deliberationPhase === 3){
+    meta.textContent = 'TYPE: '+currentAgenda.type.toUpperCase()+' · RISK: '+currentAgenda.risk.toUpperCase()+' · NEXT AGENDA IN '+(10-phaseTimer)+'s';
+    if(phaseTimer >= 10){
+      sessionNum++;
+      document.getElementById('sessionId').textContent = 'SESSION #'+sessionNum;
+      startAgenda();
+    }
+  }
+
+  // Fluctuate stats slightly
+  if(simStep % 5 === 0){
+    AXES.forEach(function(ax){
+      var keys = Object.keys(ax.stats);
+      var k = keys[Math.floor(Math.random()*keys.length)];
+      ax.stats[k] = Math.max(50, Math.min(99, ax.stats[k] + Math.floor(Math.random()*7)-3));
+      var statEls = document.getElementById('stats-'+ax.id).querySelectorAll('.stat');
+      var idx = keys.indexOf(k);
+      if(statEls[idx]){
+        statEls[idx].querySelector('.stat-val').textContent = ax.stats[k]+'%';
+        statEls[idx].querySelector('.stat-fill').style.width = ax.stats[k]+'%';
+      }
+    });
+  }
+
+  simStep++;
+}
+
+// Clock
+function updateClock(){
+  var now=new Date();
+  document.getElementById('clock').textContent=
+    now.getFullYear()+'.'+String(now.getMonth()+1).padStart(2,'0')+'.'+String(now.getDate()).padStart(2,'0')+' '
+    +String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0')+':'+String(now.getSeconds()).padStart(2,'0');
+}
+setInterval(updateClock,1000);updateClock();
+
+// Start simulation
+startAgenda();
+setInterval(simTick, 1500);
+</script>
+</body>
+</html>
