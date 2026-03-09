@@ -1,11 +1,11 @@
 # Session State (Auto-saved at compact)
-> Generated: 2026-03-08 12:52:18
+> Generated: 2026-03-09 19:51:32
 > Project: Claude-Code-System
 
 ## Note
 이 파일은 컨텍스트 압축 직전에 자동 생성되었습니다.
 Claude는 압축 후 이 파일을 읽어서 맥락을 복구하세요.
-압축 전 대화 원본: /Users/teample.casper/claude/TP_history/_global/compact_backups/Claude-Code-System_20260308_125218.jsonl
+압축 전 대화 원본: /Users/teample.casper/claude/TP_history/_global/compact_backups/Claude-Code-System_20260309_195132.jsonl
 
 ## Recovery
 압축 후 맥락이 부족하면:
