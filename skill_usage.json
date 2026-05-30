@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-05-28T22:39:46Z",
+  "lastUpdated": "2026-05-30T10:21:18Z",
   "skills": {
     "index": {
       "count": 5,
@@ -76,6 +76,10 @@
     "README": {
       "count": 2,
       "lastAccess": "2026-05-27T03:13:07Z"
+    },
+    "engine_router_advisor": {
+      "count": 1,
+      "lastAccess": "2026-05-30T10:21:18Z"
     }
   }
 }
