@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-06-10T16:50:48Z",
+  "lastUpdated": "2026-06-10T17:42:46Z",
   "skills": {
     "index": {
       "count": 8,
@@ -92,6 +92,10 @@
     "BALTHASAR": {
       "count": 1,
       "lastAccess": "2026-06-10T13:41:35Z"
+    },
+    "VERDANDI": {
+      "count": 1,
+      "lastAccess": "2026-06-10T17:42:46Z"
     }
   }
 }
