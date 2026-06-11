@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-06-10T17:42:46Z",
+  "lastUpdated": "2026-06-11T00:27:40Z",
   "skills": {
     "index": {
       "count": 8,
@@ -78,24 +78,36 @@
       "lastAccess": "2026-05-27T03:13:07Z"
     },
     "engine_router_advisor": {
-      "count": 3,
-      "lastAccess": "2026-06-10T13:11:48Z"
+      "count": 5,
+      "lastAccess": "2026-06-11T00:17:31Z"
     },
     "MELCHIOR": {
-      "count": 1,
-      "lastAccess": "2026-06-10T03:45:32Z"
+      "count": 2,
+      "lastAccess": "2026-06-11T00:11:33Z"
     },
     "SKULD": {
-      "count": 2,
-      "lastAccess": "2026-06-10T03:45:47Z"
+      "count": 3,
+      "lastAccess": "2026-06-11T00:13:38Z"
     },
     "BALTHASAR": {
-      "count": 1,
-      "lastAccess": "2026-06-10T13:41:35Z"
+      "count": 3,
+      "lastAccess": "2026-06-11T00:16:58Z"
     },
     "VERDANDI": {
+      "count": 2,
+      "lastAccess": "2026-06-11T00:13:33Z"
+    },
+    "CASPER": {
       "count": 1,
-      "lastAccess": "2026-06-10T17:42:46Z"
+      "lastAccess": "2026-06-11T00:11:45Z"
+    },
+    "URD": {
+      "count": 1,
+      "lastAccess": "2026-06-11T00:13:24Z"
+    },
+    "html_report_template": {
+      "count": 1,
+      "lastAccess": "2026-06-11T00:27:40Z"
     }
   }
 }
