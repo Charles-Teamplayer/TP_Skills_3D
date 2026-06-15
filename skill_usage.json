@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-06-15T13:10:23Z",
+  "lastUpdated": "2026-06-15T21:29:16Z",
   "skills": {
     "index": {
       "count": 10,
@@ -78,20 +78,20 @@
       "lastAccess": "2026-06-15T09:28:31Z"
     },
     "engine_router_advisor": {
-      "count": 5,
-      "lastAccess": "2026-06-11T00:17:31Z"
+      "count": 6,
+      "lastAccess": "2026-06-15T21:15:26Z"
     },
     "MELCHIOR": {
       "count": 6,
       "lastAccess": "2026-06-15T11:18:45Z"
     },
     "SKULD": {
-      "count": 5,
-      "lastAccess": "2026-06-15T13:10:23Z"
+      "count": 6,
+      "lastAccess": "2026-06-15T21:17:47Z"
     },
     "BALTHASAR": {
-      "count": 7,
-      "lastAccess": "2026-06-15T11:18:46Z"
+      "count": 9,
+      "lastAccess": "2026-06-15T21:28:56Z"
     },
     "VERDANDI": {
       "count": 3,
@@ -99,15 +99,15 @@
     },
     "CASPER": {
       "count": 3,
-      "lastAccess": "2026-06-15T11:18:46Z"
+      "lastAccess": "2026-06-15T21:29:16Z"
     },
     "URD": {
-      "count": 2,
-      "lastAccess": "2026-06-15T11:15:55Z"
+      "count": 3,
+      "lastAccess": "2026-06-15T21:17:29Z"
     },
     "html_report_template": {
-      "count": 2,
-      "lastAccess": "2026-06-15T07:03:00Z"
+      "count": 4,
+      "lastAccess": "2026-06-15T21:17:29Z"
     },
     "html_unify_mermaid_20260611_0930": {
       "count": 1,
@@ -116,6 +116,10 @@
     "overall_review_newfeatures_20260615_2010": {
       "count": 5,
       "lastAccess": "2026-06-15T11:16:05Z"
+    },
+    "CLAUDE": {
+      "count": 1,
+      "lastAccess": "2026-06-15T21:15:01Z"
     }
   }
 }
